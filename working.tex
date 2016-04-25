@@ -1,31 +1,46 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[11pt, twocolumn]{article}
+\documentclass{sig-alternate}
 
-\usepackage[a4paper,margin=25mm]{geometry}
-\usepackage{csquotes}
-\usepackage[sorting=none,backend=bibtex]{biblatex}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{cleveref}
+\usepackage[T1]{fontenc}
 
-\bibliography{lib}
+\usepackage[lighttt]{lmodern}
+
+\usepackage[british]{babel}%
+\usepackage{cleveref}%
+\usepackage{csquotes}%
+\usepackage[shortcuts]{extdash}%
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{subcaption}
+
+\lstset{language=python}
+\lstset{basicstyle=\tt\small}
+\lstset{keywordstyle=\ttfamily\bfseries}
+
+\newenvironment{FunctionList}{%
+\lstset{basicstyle=\ttfamily\bfseries\small}
+\begin{list}{}{\leftmargin=5pt}
+}{\end{list}\lstset{basicstyle=\ttfamily\small}}
+
 \newcommand{\picalc}{\(\pi\)-calculus }
-
-% \usepackage{verbments}   % For python code highlighting, as used in the dissertation.
-% For dissertation code samples, I used the block: 
-% \begin{pyglist}[language = python, encoding = utf8, caption = {Python function objects can be passed and run, like a function pointer}, listingname=\textbf{Code Sample}, numbers=left]
-
-% Code here!
-
-% \end{pyglist}
-% But I'm sure you have your own solution, just putting this here if you want something similar to the dissertation's highlighting.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title{Simulating Variance in Socio-Technical Workflows using Process Fuzzing}
 
-\author{Tom Wallis and Tim Storer}
+%\author{Tom Wallis \and Tim Storer}
+
+% \institute{Tom Wallis
+%   \at School of Computing Science, University of Glasgow, Glasgow \\
+%   \email{twallisgm@gmail.com}
+%   \and
+%   Tim Storer
+%   \at School of Computing Science, University of Glasgow, Glasgow \\
+%   \email{timothy.storer@glasgow.ac.uk}
+%   }  
+  
+% \date{Received: XXX / Accepted: XXX}
 
 % \date{}    Do we want a date on the paper? Don't know how these things are done. 
 
@@ -40,7 +55,43 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-%Variation on the abstract from the dissertation?
+  The engineering of large scale, complex software based socio-technical systems
+  is still very much a craft, dependent on methods based on trial, error and
+  subsequent revision.  A particular difficulty is the lack of modelling tools
+  that support the analysis of actor behaviours in and around socio-technical
+  systems.  Existing notations such as activity diagrams, business process
+  modelling languages or petri nets assume that behaviour can be described as
+  idealised work flows.  Unfortunately, the behaviour in a socio-technical
+  system is highly contingent and subject to considerable variability as actors
+  react to changing conditions and identify potential optimisations to their
+  practices.  As a consequence, existing techniques result in models that either
+  lack sufficient detail to capture the effect of subtle contingencies; are too
+  narrow to make useful assessments about the larger system; are unable to
+  capture evolution in behaviours; or are so complex that analysis and
+  interpretation becomes intractable.
+
+  This paper presents Fuzzi Moss, a novel method for simulating the effect of
+  contingent behaviour in socio-technical systems using software code fuzzing.
+  A socio-technical system is defined as an object-oriented domain model
+  compromising one or more classes.  Behaviours that operate on the system model
+  state are described separately as a set of idealised executable work flows.
+  These work flows are then annotated with code fuzzers, declarations of how the
+  work flow could be dynamically altered (removing steps, duplicating steps,
+  introducing new steps for example) when the work flow is executed.  A
+  simulation is then configured by executing the fuzzed work flow on an instance
+  of the domain model.  Results collected from the domain model state inform
+  predictions as to how an idealised work flow will perform in the presence of
+  contingent behaviour.
+ 
+  We have implemented a proof of concept tool to evaluate our method. Fuzzi Moss
+  is as a small Python library, comprising decorators for annotating workflows
+  with desired fuzzers, a mechanism for dynamically inspecting the structure of
+  a work flow and applying fuzzers during execution and a library of core
+  fuzzers.  We evaluate our approach to simulating socio-technical behaviours by
+  applying Fuzzi Moss to a socio-technical system case study.  The results of
+  the case study demonstrate the feasibility of the fuzzing method.  Finally, We
+  explore the wider applications of fuzzing in socio-technical systems modelling
+  and discuss the next steps for the research.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,7 +166,7 @@ As a result of i*'s better social modelling than KaOS, we get a slightly differe
 %Not really workflow-oriented, which is what we want, but actor orientation is interesting, because we're modelling the actions of people, rather than their goals. Therefore, this tells us something about the system we ultimately want to find/create.
 
 \subsubsection{YAWL} %TODO
-YAWL was particularly interesting because of its focus on workflow. YAWL, which stands for Yet Another Workflow Language\cite{TerHofstede2010}, is a workflow modelling platform with its own tools, which are sophisticated and multi-platform. The creators of YAWL also have interests in areas such as \picalc\cite{Aalst2004}, which makes YAWL interesting for the additional reason that it has some mathematical backing in its representation of workflows. With this said, the lead authors have also published work stating that workflows are much more than simple \picalc processes\cite{Aalst2004}. \par
+YAWL was particularly interesting because of its focus on workflow. YAWL, which stands for Yet Another Workflow Language\cite{hofstede2010yawl}, is a workflow modelling platform with its own tools, which are sophisticated and multi-platform. The creators of YAWL also have interests in areas such as \picalc\cite{Aalst2004}, which makes YAWL interesting for the additional reason that it has some mathematical backing in its representation of workflows. With this said, the lead authors have also published work stating that workflows are much more than simple \picalc processes\cite{Aalst2004}. \par
 
 While workflow is our main concern when searching for candidates to perform fuzzing on, YAWL is largely constructed with a graphical tool, making it difficult to find things to mutate. Ergo, YAWL would be inappropriate as a candidate for fuzzable systems. However, it does get us closer to the modelling system we require, and shows that there is some academic interest in workflow-oriented modelling systems. \par
 %Actually a workflow language!
@@ -135,7 +186,7 @@ Indeed, focusing away from the academic perspective, many modelling systems are 
 
 \subsection{Code Fuzzing for Sociotechnical Variance}
 Little academic research appears to have been done on programmatically inserting sociotechnical variance. A little work has been done into systems for \emph{Punctuated Socio-Technical Information System Change model}s\cite{Lyytinen2008}, but this appears to refer more to the way information systems alter over time and less to do with the study of uncertainty in information systems. \par
-Other research has been done into the management of organisational uncertainty\cite{Grote2004}\cite{Herrmann1999}, which appears to be ideal for the task at hand. Unfortunately, no sociotechnical simulations with uncertainty injected into the models created could be found. \par
+Other research has been done into the management of organisational uncertainty\cite{grote2004uncertainty}\cite{Herrmann1999}, which appears to be ideal for the task at hand. Unfortunately, no sociotechnical simulations with uncertainty injected into the models created could be found. \par
 Therefore, while sociotechnical modelling is now a well-established field with competing methodologies, and sociotechnical uncertainty has also been a research subject since as early as 1976\cite{Susman1976}, no programmatic sociotechnical modelling has been documented which models sociotechnical stress as a component of that model. Therefore, the hypothesis of the project is clear; that is, to construct such a system and attempt to verify that sociotechnical stress can be introduced to the system by means of code fuzzing. \par
 
 \subsubsection{Introducing Variance}
@@ -144,7 +195,7 @@ Currently, variance must be introduced to a programmatic model by hand. That is,
 
 \subsubsection{Graphical representations and UML}
 \label{pictorial}
-Pictorial representations of sociotechnical systems can be very human-readable, which makes them suitable candidates for creating a sociotechnical model. Modelling systems such as OBASHI\cite{ObashiMethodology} use graphical representations of sociotechnical systems to build models of business and IT processes, but build these models using dataflow. To contrast, a UML Use Case diagram\cite{Omg2010} models an actor within a larger system to visualise a sociotechnical system. Both models use graphical representations of the systems they model to make the complexity of the model easy for a human to parse, but these models can be difficult for a computer to parse. \par
+Pictorial representations of sociotechnical systems can be very human-readable, which makes them suitable candidates for creating a sociotechnical model. Modelling systems such as OBASHI\cite{ObashiMethodology} use graphical representations of sociotechnical systems to build models of business and IT processes, but build these models using dataflow. To contrast, a UML Use Case diagram\cite{omg2010omguml} models an actor within a larger system to visualise a sociotechnical system. Both models use graphical representations of the systems they model to make the complexity of the model easy for a human to parse, but these models can be difficult for a computer to parse. \par
 UML tries to overcome this by being equally readable by a computer: frameworks like the Eclipse Modelling Framework can generate Java code from a UML class diagram, for example\cite{EMFManual}. UML also succeeds in creating a standard for colloquial "flowcharts" by creating well-defined specifications such as the UML Activity Diagram. Therefore, using UML as a format for laying out a sociotechnical system that can be easily created and read by humans, but is also easily computer-parsable, seemed to be an appropriate way to create the programmatic models.
 
 \subsection{Fuzzing Library Requirements}\label{planning_fuzzing}
@@ -173,19 +224,19 @@ Therefore, we could not use Fusil as our fuzzing system of choice. \par
 
 \subsubsection{MutPy} 
 \label{fuzzing_mutpy}
-From the MutPy package page\cite{MutPy26:online}: 
+From the MutPy package page\cite{mutpy26}: 
 \begin{displayquote}
 MutPy is a mutation testing tool for Python 3.x source code. MutPy supports standard unittest module, generates YAML reports and has colorful output. It’s apply mutation on AST level. You could boost your mutation testing process with high order mutations (HOM) and code coverage analysis.
 \end{displayquote}\par
 
 It seemed that MutPy supplied \emph{everything} required. This would be beneficial, but unfortunately, MutPy had a relatively large and complex codebase\cite{khala8:online} that made it hard to modify for the specific requirements of the research. In addition, relying on a complex dependency that is designed for unit testing seemed to be a bad approach, as research interests might not align with MutPy's maintainers' in the future. As a result, it might have been necessary to fork their codebase at the time and maintain our own version for research purposes; this approach was not future-proof, and so an alternative approach was deemed necessary. \par
 
-Working in MutPy's favour, however, was that it was a \emph{code fuzzing} rather than protocol fuzzing library. Particularly, it fuzzed source code to a similar end as something like Java's PiTest\cite{PITMu92:online}. This was more in line with our goals, although MutPy still didn't deliver what was required from a code fuzzing library for this experiment. Therefore, it was decided to learn from MutPy's strong points and implement something similar, but from a fresh, maintainable codebase with interests more aligned with that of the research. This would also allow for potential improvements to be implemented in the future, which could not be determined before modelling began; as it happens, this decision turned out to pay off, as additional functionality was needed. \par
+Working in MutPy's favour, however, was that it was a \emph{code fuzzing} rather than protocol fuzzing library. Particularly, it fuzzed source code to a similar end as something like Java's PiTest\cite{coles14pitest}. This was more in line with our goals, although MutPy still didn't deliver what was required from a code fuzzing library for this experiment. Therefore, it was decided to learn from MutPy's strong points and implement something similar, but from a fresh, maintainable codebase with interests more aligned with that of the research. This would also allow for potential improvements to be implemented in the future, which could not be determined before modelling began; as it happens, this decision turned out to pay off, as additional functionality was needed. \par
 
 \subsubsection{PyMuTester}
 \label{fuzzing_pymutester}
-PyMuTester\cite{GitHu12:online} proved to be the closest to the library required, though it still fell short in some areas. Particularly, PyMuTester did not appear to have many types of mutation it could enact. \par
-PyMuTester did not have a large codebase\cite{GitHu12:online}, nor did it have very much functionality to offer, but it offered mutation via Abstract Syntax Tree editing. The decision was made to study the PyMuTester source as a template for a code fuzzing library of a new design. PyMuTester seemed to be much too immature as a library to base the whole project around, and was last updated in October 2014. However, it did show promise, and gave a basis around which writing a code mutation library could be built, while also taking cues from the more advanced source of MutPy\cite{khala8:online}.  \par%\cite{} PyMuTester source at https://github.com/miketeo/PyMuTester       \cite{} MutPy's source at https://bitbucket.org/khalas/mutpy/src
+PyMuTester\cite{PyMutTester} proved to be the closest to the library required, though it still fell short in some areas. Particularly, PyMuTester did not appear to have many types of mutation it could enact. \par
+PyMuTester did not have a large codebase\cite{PyMutTester}, nor did it have very much functionality to offer, but it offered mutation via Abstract Syntax Tree editing. The decision was made to study the PyMuTester source as a template for a code fuzzing library of a new design. PyMuTester seemed to be much too immature as a library to base the whole project around, and was last updated in October 2014. However, it did show promise, and gave a basis around which writing a code mutation library could be built, while also taking cues from the more advanced source of MutPy\cite{khala8:online}.  \par%\cite{} PyMuTester source at https://github.com/miketeo/PyMuTester       \cite{} MutPy's source at https://bitbucket.org/khalas/mutpy/src
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,7 +247,96 @@ PyMuTester did not have a large codebase\cite{GitHu12:online}, nor did it have v
 
 In this section we introduce our approach to modelling idealised workflows in
 socio-technical systems and then introducing variance in their execution through
-fuzzing.
+fuzzing.  Iimplementation details of the the proof of concept library, Fuzzi
+Moss, are also presented.  Source code for the Fuzzi Moss library is available
+from the project's GitHub repository \citep{storer2016fuzzi-moss-scm-repo}.  The
+method comprises: construction of an instrutmented object oriented model of the
+problem domain; construction of an idealised representations of socio-technical
+workflows that direct the specify the behaviours of actors in the problem
+domain; annotation of the work flows with fuzzers to introduce variance;
+execution of the workflows in scenarios; and measurement of outcomes in the
+scenarios through observation of the problem domain state.
+
+Each stage of the method is described in more detail below, using the task of
+developing software as an illustrative example (we will present the full case
+study in Section \ref{sec:evaluation}). Source code for this case study is also
+available from the GitHub repository for the study
+\citep{storer2016softdev-workflow-scm}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Problem Domain Modelling}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The initial step in the fuzzi moss method is to develop a model of the target
+socio-technical problem domain.  The model represents the invariant `physics' of
+the problem domain that cannot be altered because it represent hard constraints
+in the real world.  The model physics may represent constraints imposed by
+natural laws, such as the conservation of energy; deliberate technical system
+design, such as an access control client that limits access to a software system
+to those who know an appropriate username and password combination; or emergent
+phenomena, such as the tendency for the implementation of new features in a
+software system to introduce bugs.
+
+We have adopted an object-oriented approach to modelling the elements of the
+problem domain \citep{UMLtextbook}, so that domain artifacts are represented as
+instances of classes.  The state of a particular scenario in a problem domain is
+therefore represented by a collection of inter-related Python objects
+constructed from the classes specified in the domain model.  Figure
+\ref{fig:feature-class-diagram} shows part of a class diagram for the software
+development problem domain case study.  The diagram shows classes for system
+feature (representing user-facing specifications of the system's functionality;
+code chunks, representing the implementation details of the system and bugs
+introduced into chunks during the completion of features.  Figure
+\ref{fig:feature-instance-diagram} illustrates an example state for the same
+problem domain using an object diagram, showing a feature implemented with two
+chunks, one of which contains a bug.
+
+\begin{figure}
+  \centering
+
+  \begin{subfigure}{\linewidth}
+    
+    \caption{Class Diagram}
+  \end{subfigure}
+
+  \begin{subfigure}{\linewidth}
+    
+    \caption{Object diagram}
+  \end{subfigure}
+
+  
+  \caption{Object oriented models of a software development problem domain,
+    using the UML notation.}
+  \label{fig:feature-class-diagram}
+\end{figure}
+
+The state of the problem domain can only be altered through explicit actions on
+the domain (referred to as domain actions here), that are modelled as operations
+on the domain classes.  In the example given in Figure \ref{fig:class-diagram},
+the state of a feature can be altered by invoking the \lstinline!extend()!
+operation.  This adds a new chunk to the feature's implementation and also has
+two side effects. The addition of new chunks may introduce bugs into the newly
+created chunk, as well as create dependencies between the new chunk and other
+chunks already in the system as a whole.  Consequently, operations are also
+provided for refactoring (to reduce dependencies) and debugging (to remove bugs)
+the feature.
+
+Very few restrictions are placed on the design of the problem domain operations.
+Operations can accept a variety of arguments, modify the class state, invoke
+operations on other problem domain classes and return values as desired.
+However The operations on the problem domain should be modelled as atomic and
+independent, allowing them to be safely invoked in any combination.
+
+The object oriented problem domain model is implemented as a collection of
+Python classes.  Model state is represented by python instance attributes.
+Operations are implemented as Python methods in the appropriate classes.
+Problem domain classes can be extended with supplementary properties using the
+Python \lstinline!@property! decorator in order to improve readability as
+normal.  The state of the problem domain can therefore be accessed and read as
+desired for measuring behaviour in scenarios, or instrumented to record relevant
+events for later analysis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -204,26 +344,310 @@ fuzzing.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+The next stage of the method concerns the development of descriptions of
+socio-technical behaviours of actors in the problem domain, called workflows.
+These workflows orchestrate the sequence of actions by an actor on the artifacts
+in the problem domain.  Behaviours are modelled as \emph{idealised} work flows,
+i.e. the behaviour desired or expected of an actor in a socio-technical system
+without concern for contingencies.  Workflows are modelled as activity diagrams,
+which enables the construction of a hierarchy of workflow descriptions,
+supporting modularity and reuse.
+
+Two related work flows are illustrated in Figure \ref{fig:workflow-partial}.
+Figure \ref{fig:workflow-tdd} illustrates a Test Driven Development workflow, in
+which a software developer specifies an implementation, creates a test case,
+implements and debugs the feature and finally refactors the functional
+implementation.  Figure \ref{fig:workflow-refactoring} illustrates the more fine
+grained workflow for refactoring.  A developer, continues to refactor the
+feature until the measured coupling rate is less than a desired maximum.  Both
+workflows are executed by invoking operations on a \lstinline!Developer!
+instance.
+
+\begin{figure}
+  \centering
+
+  \begin{subfigure}{\linewidth}
+
+
+    \caption{Test driven development}
+  \end{subfigure}
+
+  \begin{subfigure}{\linewidth}
+    
+    \caption{Refactoring}
+  \end{subfigure}
+  
+  \caption{Partial socio-technical workflows for software development expressed
+    as UML activity diagrams.}
+
+  \label{fig:workflow-partial}
+\end{figure}
+
+
+The workflow models are implemented as collections of Python functions.  As for
+the domain actions, implementation of the workflow functions is
+flexible. Workflow functions can be parameterised as and may also return values
+as desired.  Workflow functions can be encapsulated into classes to support
+model maintenance, although this is not necessary for the method itself.  One
+restriction that is made is that workflow functions should not contain nested
+function definitions, as these may be inadvertently fuzzed by the Fuzzi Moss
+mechanism.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Types of Behaviour Fuzzing}
+\subsection{Specifying the Fuzzers for a Workflow}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Sequence Truncation
+The workflow functions implemented in Python are denoted as eligible for fuzzing
+by applying the \lstinline!@fuzz! decorator provided in the Fuzzi\_Moss
+package. The decorator's constructor accepts one argument, a pointer to a
+\emph{fuzzer} function, that will be used in the fuzzing mechanism described
+below.  Python's decorator mechanism intercepts invocations of the decorated
+function and allows these to be substituted with an alternative function to be
+invoked.  The Fuzzi\_Moss decorator exploits this mechanism by defining and
+returning a \lstinline!wrap()!  function that is able to dynamically fuzz the
+decorated function each time it is invoked.  The wrap function accepts the same
+set of arguments as the decorated function and should be expected to return the
+same values. The decorator's \lstinline!__call__()!  method, which intercepts
+the invocation of the decorated function, defines the wrap function as follows.
 
-Step re-ordering
+\begin{enumerate}
 
-Incorrect branch selection
+\item The abstract syntax tree (AST) for the decorated function is constructed,
+  using the Python \lstinline!inspect! package to recover the function's source
+  code and the \lstinline!ast!  package to build the AST from the source.  This
+  reference AST is then cached for future reference.
+
+\item A copy of the AST is made.  An AST visitor (called a transformer) is then
+  constructed and given the decorator's fuzzer attribute as an argument.  The
+  copied syntax tree is then passed to the visitor.
+
+\item The visitor identifies the function definition node in the AST and applies
+  the fuzzer to the function definition's body.  The body is represented as a
+  list of Python statements in the AST.  The function body is replaced by the
+  value returned by the fuzzer.
+
+\item Finally, the now fuzzed AST is compiled to Python byte code.  The byte
+  code of the fuzzed function is then substituted for the decorated function's
+  byte code and the function is invoked with its original parameters.  Control
+  is then passed back to the Python interpreter, allowing any returned values to
+  be passed back as normal.
+
+\end{enumerate}
+
+An example of the application of a fuzzer (identity) is shown in Figure
+\ref{fig:fuzz}.
+
+ \begin{figure}
+   \centering
+  \begin{lstlisting}
+@fuzz(identity)
+def _refactor_feature(developer, feature):
+    while len(feature.dependencies) > \
+        self.target_dependencies_per_feature:
+        developer.refactor(feature)
+  \end{lstlisting}
+  
+  \caption{Example fuzz decorator applied to a software development workflow.}
+  \label{fig:fuzz}
+\end{figure}
+
+The generic definition of the fuzzer function (accept and return a list of
+Python statement ASTs) allows a user to define a wide range of fuzzing
+mechanisms to suit their problem domain.  In addition, a suite of fuzzers is
+also provided with Fuzzi\_Moss that allow the modular construction of more
+complex fuzzer behaviours.  The behaviour of each of the fuzzers available in
+Fuzzi\_Moss are described in the following sub sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Illustrative Example - Software Development}
+\subsection{Simple Fuzzers}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\printbibliography
+A simple fuzzer accepts and returns a list of \lstinline!ast.Statement! objects
+and can be declared for use directly within a fuzz decorator.  The following
+simple fuzzers are defined in Fuzzi\_Moss.
+
+\begin{FunctionList}
+
+\item\lstinline!identity! returns the input list of statements.  The identity
+  fuzzer is used as a default for the fuzz decorator, but is also useful when
+  building composite fuzzers.
+
+\item\lstinline!replace_steps_with_passes! returns a list of \lstinline!pass!
+  statements of the same length as the input.  Replacing statements with pass is
+  safer than removing the statement, since a Python function must be defined
+  with at least one statement.
+
+\item\lstinline!duplicate_steps! returns a list containing the input sequence
+  repeated twice.
+
+\item\lstinline!shuffle_steps! returns a randomly shuffled list of the input.  A
+  Python Random object \lstinline!fuzzi_moss_random! is used as a random source.
+
+\item \lstinline!swap_if_blocks! switches the body and orelse blocks of all if
+  statements in the input.
+
+\end{FunctionList}
+
+We have already seen the application of simple fuzzers in Figure \ref{fig:fuzz}.
+Note that the fuzzer is supplied to the fuzz decorator as a function pointer,
+rather than as an evaluated function call.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Fuzzing Filters}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Sometimes it is desirable to restrict the application of simple fuzzers to
+particular portions of the body of a workflow function.  In this situation the
+\lstinline!filter_steps()! fuzzer can be used.  Filter steps takes two
+arguments: a filter function pointer and a fuzzer function pointer.  These are
+used to define a nested \lstinline!_filter_step! fuzzer that behaves like a
+fuzzer as described above.
+
+The filter fuzzer accepts a list of statements and returns a list of tuples.
+Each tuple defines gives the start and end index for a block in the input.  Each
+block is then fuzzed using the supplied fuzzer.  Blocks not specified by the
+filter are not affected by the fuzzer, such that the returned sequence of
+statements may contain a mix of fuzzed and un-fuzzed statements.
+
+The following filters are available for use in conjunction with a fuzzer.
+
+
+\begin{FunctionList}
+
+\item \lstinline!choose_last_step! returns the start and end index of the last
+  statement in the input, i.e. \lstinline!input[-2:-1]!
+
+\item \lstinline!choose_random_steps(n)!  returns $n$ length 1 sub-blocks
+  randomly selected from the input steps.
+
+\item \lstinline!exclude_control_structures(target)! permits the exclusion of
+  control structure statements by type as specified by the target input
+  argument. Supported structures are \lstinline!for!, \lstinline!while!,
+  \lstinline!if!, \lstinline!try!-\lstinline!except! and \lstinline!return!.
+
+\end{FunctionList}
+
+Several pre-defined filtering fuzzers are implemented in Fuzzi\_Moss combining
+some of the predefined filters and simple fuzzers.  These provide commonly
+required fuzzers, including removing or duplicating the last step or a random
+step. A \lstinline!choose_identity! filter is also included for completeness.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Composite Fuzzers}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+More complex fuzzers can be assembled using composite fuzzing functions that are
+implemented in a similar manner to filtering.  
+
+
+\begin{FunctionList}
+\item \lstinline!in_sequence(fuzzers)! applies each fuzzer found in the input
+  list of fuzzers in sequence to a function body.
+
+\item \lstinline!choose_from(distribution)! selects a fuzzer to apply at random
+  from the supplied probability distribution.  The distribution is defined as a
+  list of weight, fuzzer tuples.
+
+\item \lstinline!on_condition_that(condition, fuzzer)! %
+  applies the specified fuzzer if the specified condition holds.  The condition
+  may be a literal boolean value, a function pointer or a Python expression.
+  Lambda expressions are not supported.
+
+\item \lstinline!recurse_into_nested_steps(target_structures)! identifies
+  control structure statements and applies the supplied fuzzer to their body
+  blocks.  The recursion can be limited to particular control structures using
+  the option \lstinline!target_structures! argument.
+\end{FunctionList}
+
+An example of applying a composite fuzzer to a workflow is shown in Figure
+\ref{fig:composite}.  The figure shows a workflow for enhancing the quality of a
+software system.  A developer adds a test to a feature in order to detect the
+presence of bugs, or prevent the introduction of bugs during refactoring.  The
+developer then performs some debugging work, followed by some refactoring.  The
+fuzzer applied to the workflow is the \lstinline!choose_from!.  The supplied
+distribution will fuzz the workflow 5\% of the time on average, removing one
+step at random when it does so.  The figure therefore shows a convenient way of
+modelling the occasional random omission of steps in a workflow.
+
+\begin{figure}
+  \centering
+
+\begin{lstlisting}
+@fuzz(
+  choose_from([
+    (0.95, identity),
+    (0.05, remove_random_step)
+  ])
+)
+def _enhance_system_quality(
+    self, feature, developer):
+
+    developer.add_test(feature)
+    self._debug_feature(developer, feature)
+    self._refactor_feature(developer, feature) 
+\end{lstlisting}
+  
+  \caption{Application of a composite fuzzer to a workflow.}
+  \label{fig:composite}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Control Structure Fuzzers}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The final set of fuzzers provide for manipulation of control structure
+conditions and iterators.  
+
+\begin{FunctionList}
+
+\item \lstinline!replace_condtion_with(condition)! replaces conditions
+  discovered in control structure statements with the specified condition.  The
+  condition may be a literal boolean value, a function pointer or a Python
+  expression defined in a string.  Lambda expressions are not supported.
+
+\item \lstinline!replace_for_iterator_with(iterator)! replaces iterators
+  discovered in for loops with the specified iterator.  The replacement iterator
+  must be specified as a list containing numerical or string literal types only.
+
+\end{FunctionList}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Configuration Options}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Fuzzi\_Moss package exposes variables in the \verb!__init__.py! file.
+
+  This
+  object can be replaced in order to seed fuzzing for repeatable
+  experimentation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Evaluation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{plainnat}
+\bibliography{lib}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
