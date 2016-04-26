@@ -37,7 +37,7 @@ beginfig(1);
 
   item(iAssoc)("*")(obj.se = Bug.n);
 
-  link(association)(pathStepY(Chunk.n, Chunk.n+(50,0), 30));
+  link(association)(pathStepY(Chunk.n, Chunk.n+(50,0), 15));
   link(association)(pathStepX(Chunk.n+(50,0), Chunk.e, 00));
 
   item(iAssoc)("*")(obj.sw = Chunk.e);

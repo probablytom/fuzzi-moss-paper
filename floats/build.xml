@@ -1,325 +1,111 @@
-<?xml version="1.0" encoding="utf-8"?>
-<project basedir="." default="build" name="se-notes.figures">
+<project basedir="." default="build" name="storer15static.floats">
 
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
-	
-	<target name="clean">
+  <target
+      name="clean"
+      description="Remove all non-versioned files.">
 
-		<delete>
+    <delete>
 
-			<fileset dir=".">
-				<filename regex=".*\.[0-9]"/>
-			</fileset>
+      <fileset dir=".">
+	<filename regex=".*\.[0-9]"/>
+      </fileset>
 
-			<fileset dir="." includes="**/*.eps"/>
-			<fileset dir="." includes="**/*.log"/>
+      <fileset dir="."
+	       includes="**/*.*~"
+	       defaultexcludes="false"
+	       />
 
-			<fileset dir="." includes="**/*.mpx"/>
-			<fileset dir="." includes="**/mpxerr.tex"/>
-			<fileset dir="." includes="**/mptextmp.mp"/>
-			<fileset dir="." includes="**/*.mpo"/>
-			<fileset dir="." includes="**/*.mp.keep"/>
+      <fileset dir="." includes="**/cache.properties"/>
 
-		</delete>
+      <fileset dir="." includes="**/*.eps"/>
+      <fileset dir="." includes="**/*.log"/>
+      <fileset dir="." includes="**/*.mp.keep"/>
+      <fileset dir="." includes="**/*.mpo"/>
+      <fileset dir="." includes="**/*.mpx"/>
 
-		<delete file="evolution/resources.pdf"/>
-		<delete file="evolution/resources.tex"/>
-		<delete file="processes/causes.tex"/>
-		<delete file="processes/causes.pdf"/>
-		<delete file="processes/cancellations.pdf"/>
-		<delete file="processes/cancellations.tex"/>
-		<delete file="testing/mutation-efficiency.pdf"/>
-		<delete file="testing/mutation-efficiency.tex"/>
+      <fileset dir="." includes="**/mpxerr.tex"/>
+      <fileset dir="." includes="**/mptextmp.mp"/>
 
-	</target>
+      <fileset dir="." includes="**/*.mps"/>
+      <fileset dir="." includes="**/*.tex"/>
+      <fileset dir="." includes="**/*.pdf"/>
 
+    </delete>
 
-	<target name="cleanall" depends="clean">
+  </target>
 
-		<delete>
+  <target name="build.gnuplot">
 
-			<fileset
-				dir="."
-				includes="**/*.mps"
-			/>
-			
-			<fileset
-				dir="."
-				includes="**/*.pdf"
-				excludes=
-					"object-oriented/iteratorr.pdf,
-					processes/flash.pdf,
-					testing/jbehave-report.pdf,
-					swing/*.pdf
-					**/PitestExample.pdf,
-					delivery/jenkins/*.pdf,
-					processes/scrum/*.pdf"
-		/>
-
-		</delete>
-
-	</target>
-	
-	
-	<target
-		name="check.os"
-	>
-		
-		<condition property="is.windows">
-			<os family="windows" />
-		</condition>
-		
-		<condition property="is.linux">
-			<os family="unix" />
-		</condition>
-		
-	</target>
-
-	
-	<target
-		name="init.windows"
-		depends="check.os"
-		if="is.windows"
-	>
-		<echo>Working on Windows</echo>		
-		
-		<copy
-			file="metaumldefaults-windows.mp"
-			tofile="metaumldefaults.mp"
-		/>
-		
-	</target>
-	
-	
-	<target
-			name="init.linux"
-			depends="check.os"
-			if="is.linux"
-		>
-		
-		<echo>Working on Linux</echo>			
-		
-		<copy
-			file="metaumldefaults-linux.mp"
-			tofile="metaumldefaults.mp"
-		/>
-			
-	</target>
-		
-
-	<target
-		name="init"
-		depends="init.windows,init.linux"
+    <apply executable="gnuplot" dir="../">
+      <fileset file="${gnuplot.script}" />      
+      <globmapper 
+	  from="*.gp"
+	  to="${gpdir}/*.tex"
 	/>
-	
-	
-	<target name="build.gnuplot">
-		
-		<echo>Processing ${gnuplot.script}</echo> 
-		
-		<apply executable="gnuplot" dir="../">
-			
-			<fileset file="${gnuplot.script}" />			
-			
-			<globmapper 
-				from="*.gp"
-				to="${gpdir}/*.tex"
-			/>
-			
-		</apply>
+    </apply>
 
-		<pathconvert property="gnuplot.eps.out">
-		
-			<path path="${gnuplot.script}"/>
+    <pathconvert property="gnuplot.eps.out">
+      <path path="${gnuplot.script}"/>
+      <globmapper
+	  from="*.gp"
+	  to="*.eps" 
+	  />
+    </pathconvert>
+    
+    <apply executable="epstopdf">
+      <fileset file="${gnuplot.eps.out}"/>
+      <globmapper 
+	  from="*.eps"
+	  to="${gpdir}/*.pdf"
+	  />
+    </apply>
+    
+  </target>
 
-			<globmapper from="*.gp"	to="*.eps"/>
-		
-		</pathconvert>
-		
-		<echo>Converting ${gnuplot.eps.out}</echo>
-		
-		<apply executable="epstopdf">
-			
-			<fileset file="${gnuplot.eps.out}"/>
-			
-			<globmapper 
-				from="*.eps"
-				to="${gpdir}/*.pdf"
-			/>
-		
-		</apply>
-		
-	</target>
+  <target name="build.gnuplots.indir">
+    <foreach  target="build.gnuplot" param="gnuplot.script">
+      <fileset dir="${gpdir}" includes="*.gp"/>
+    </foreach>
+  </target>
+  
+  <target name="build.gnuplots">
+     <foreach target="build.gnuplots.indir" param="gpdir">
+       <path><dirset dir="../"/></path>
+    </foreach>
+  </target>
 
+  <!-- metapost targets -->
 
-	<target name="build.gnuplots.indir">
+  <target name="build.metapost.indir">
+    <apply executable="mpost" dir="${mpdir}" relative="true">
+      <arg value="-tex=latex"/>
+      <fileset file="${mpost.script}"/>
+	<globmapper
+	    from="*.mp" 
+	    to="${mpdir}/*-1.mps"/>
+    </apply>
+  </target>
 
-		<foreach 
-			target="build.gnuplot" 
-			param="gnuplot.script"
-		>
-		
-			<fileset dir="${gpdir}" includes="*.gp"/>
-		
-		</foreach>
+  <target name="build.metaposts.indir">
+    <foreach  target="build.metapost.indir" param="mpost.script">
+      <fileset 
+	  dir="${mpdir}"
+	  includes="*.mp"
+	  excludes="mptextmp.mp,metaumldefaults.mp,metaposttexdefaults.mp"
+	  />
+    </foreach>
+  </target>
+ 
+  <target name="build.metaposts">
 
-	</target>
+    <foreach target="build.metaposts.indir" param="mpdir">
+      <path><dirset dir="./"/></path>
+    </foreach>
+    
+  </target>
 
-	
-	<target
-		name="build.gnuplots"
-		depends="init"
-	>
-
-		<foreach
-			target="build.gnuplots.indir" param="gpdir">
-		
-			<path>
-				<dirset dir="../"/>
-			</path>
-		
-		</foreach>
-
-	</target>
-
-
-	<!-- metapost targets -->
-
-	<target name="build.metapost.indir">
-
-		<echo>${mpdir}</echo>
-
-		<apply executable="mpost" dir="${mpdir}" relative="true">
-
-			<arg value="-tex=latex"/>
-
-			<fileset 
-				dir="${mpdir}/" 
-				includes="*.mp" 
-				excludes=
-					"mptextmp.mp,
-					metaumldefaults.mp,
-					metaumldefaults-windows.mp,
-					metaumldefaults-linux.mp,
-					metaposttexdefaults.mp"
-			/>
-
-			<globmapper
-		from="*.mp" 
-		to="${mpdir}/*-1.mps"/>
-
-		</apply>
-
-	</target>
-
-
-	<target
-		name="build.metaposts"
-		depends="init"
-	>
-
-		<foreach
-			target="build.metapost.indir" 
-			param="mpdir">
-		
-			<path>
-				<dirset dir="./"/>
-			</path>
-		
-		</foreach>
-		
-	</target>
-
-
-	<target 
-		name="web.build"
-		description="Copies all image files to the same file name with an eps extension."
-		depends="build.metaposts,build.gnuplots"			
-	>
-
-		<copy todir=".">
-			
-			<fileset dir="."/>
-			
-			<globmapper from="*.mps" to="*.eps"/>
-		
-		</copy>
-
-		<apply 
-			executable="C:/cygwin/bin/convert" 
-			dest="." 
-			relative="true"
-			forwardslash="true"
-		>
-			<fileset dir="." includes="**/*.jpg"/>
-			
-			<globmapper	from="*.jpg" to="*.eps"/>
-			
-			<srcfile/>
-		
-			<targetfile />
-
-		</apply>
-
-		<apply 
-			executable="C:/cygwin/bin/convert" 
-			dest="." 
-			relative="true"
-			forwardslash="true"
-		>
-			
-			<fileset dir="." includes="**/*.JPG"/>
-			
-			<globmapper	from="*.JPG" to="*.eps"/>
-			
-			<srcfile/>
-			
-			<targetfile/>
-		
-		</apply>
-
-		<apply 
-			executable="C:/cygwin/bin/convert"
-			dest="."
-			relative="true"
-			forwardslash="true"
-		>
-			<fileset dir="." includes="**/*.png"/>
-		
-			<globmapper from="*.png" to="*.eps"/>
-			
-			<srcfile/>
-			
-			<targetfile/>
-		
-		</apply>
-
-		<apply
-			executable="C:/cygwin/bin/convert"
-			dest="."
-			relative="true"
-			forwardslash="true"
-		>
-			
-			<fileset dir="." includes="**/*.pdf"/>
-
-			<globmapper	from="*.pdf" to="*.eps"/>
-			
-			<srcfile/>
-			
-			<targetfile/>
-		
-		</apply>
-
-	</target>
-
-	
-	<!-- main target -->
-
-	<target
-			name="build"
-			description="Builds all metapost and gnuplot figures in this directory and all sub-directories." 
-			depends="build.gnuplots,build.metaposts"/>
+  <target name="build" depends="build.gnuplots,build.metaposts"/>
 
 </project>
