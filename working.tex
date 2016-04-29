@@ -10,7 +10,9 @@
 \usepackage{cleveref}%
 \usepackage{csquotes}%
 \usepackage[shortcuts]{extdash}%
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
+
+
 \usepackage{listings}
 \usepackage{subcaption}
 
@@ -25,9 +27,12 @@
 
 \newcommand{\picalc}{\(\pi\)-calculus }
 
+\hyphenation{poli-cies}
+%\hyphenation{tech-ni-cal}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Simulating Variance in Socio-Technical Workflows using Process Fuzzing}
+\title{Simulating Variance in Socio-Technical Behaviours using Workflow Fuzzing}
 
 %\author{Tom Wallis \and Tim Storer}
 
@@ -97,6 +102,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
+\label{sec:introduction}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -105,28 +111,30 @@ engineering projects is an on-going research challenge \citep{baxter08learning}.
 A socio-technical system is characterised by the interactions between a variety
 of actor types within the system's scope, including individual huamn operators,
 organisational units and technical artifacts
-\citep{elhassan07role,sommerville08socio}. These systems also incorporates a
-complex variety of structures and that direct or influence actor and system
-behaviour, including workflow descriptions, organisational hierarchies,
-regulatory or legal standards, organisational policies and culture, nterpersonal
-relationships and actor responsibilities
+\citep{Susman1976,elhassan07role,sommerville08socio}. These systems also
+incorporates a complex variety of structures and that direct or influence actor
+and system behaviour, including workflow descriptions, organisational
+hierarchies, regulatory or legal standards, organisational policies and culture,
+nterpersonal relationships and actor responsibilities
 \citep{bade07structures,pentland05organisational}. Examples of such systems with
 complex workflows involving multiple actors, include emergency vehicle dispatch
 \citep{robinson96limited}, electronic voting systems
 \citep{bryans04towards,lock07observations}, patient care in a neo-natal unit
 \citep{baxter07evaluating}; and electronic stock exchange infrastructures
-\citep{cftc-sec10findings}.  Systems of this form confound traditional approaches
-to modelling, simulating and predicting behaviour for several reasons.
+\citep{cftc-sec10findings}.  Systems of this form confound traditional
+approaches to modelling, simulating and predicting behaviour for several
+reasons.
 
 \begin{itemize}
 
 \item Socio-technical systems are typically very large, constituted of many
   hundred or thousands of autonomous actors and components, each with their own
-  behaviour that may be influenced by other actors in the system.  This
-  simultaneous intrinsic complexity makes refinement, reduction and abstraction,
-  the conventional tools of managing scale, difficult to apply, since individual
-  behaviours are difficult to classify and aggregate.  One study has advocated
-  the re-conception of systems engineering methods based on the analogy of city
+  behaviour that may be influenced by other actors in the system
+  \cite{crabtree00ethnomethodologically}.  This simultaneous intrinsic
+  complexity makes refinement, reduction and abstraction, the conventional tools
+  of managing scale, difficult to apply, since individual behaviours are
+  difficult to classify and aggregate.  One study has advocated the
+  re-conception of systems engineering methods based on the analogy of city
   maintenance, rather than system construction \citep{feiler06ultra}, although
   no methods are presented for making this transition.
 
@@ -146,11 +154,11 @@ to modelling, simulating and predicting behaviour for several reasons.
 \item Behaviour is continually evolving, as the autonomous actors in a system
   adapt to new circumstances, discover optimisations to their workflows, adapt
   the workflow to suit local organisational priorities or take shortcuts
-  \citep{bonen79evolutionary,anderson04heterogeneous}.  As a consequence, the
-  \emph{defacto} behaviour exhibited within a system may differ from that
-  envisaged by system architects in idealised workflows.  For example, a ward
-  manager in a hospital may delay releasing beds for re-allocation by wider
-  hospital management in the anticipation that these will be required by
+  \citep{bonen79evolutionary,Lyytinen2008,anderson04heterogeneous}.  As a
+  consequence, the \emph{defacto} behaviour exhibited within a system may differ
+  from that envisaged by system architects in idealised workflows.  For example,
+  a ward manager in a hospital may delay releasing beds for re-allocation by
+  wider hospital management in the anticipation that these will be required by
   incoming patients later in the day \citep{dewsbury07responsibility}.  This
   evolution may quickly invalidate expected models of behaviour.
 
@@ -173,10 +181,10 @@ descriptions, encoded as collections of Python functions.  Workflow variance is
 simulated by automatically and dynamically fuzzing the workflow descriptions
 using code fuzzing.
 
-A proof of concept fuzzing library, Fuzzi\_Moss is developed and presented.  To
+A proof of concept fuzzing library, Fuzzi Moss is developed and presented.  To
 evaluate the proposed approach an example case study, software development
-workflows was created using Fuzzi\_Moss.  The case study compares the
-performance of different software development processes (in terms of resources
+workflows was created using Fuzzi Moss.  The case study compares the
+performance of different software development processes (resources
 expended, features implemented and system quality) when following idealised
 workflows and when following workflows that have been subject to code fuzzing
 induced variance.
@@ -187,7 +195,7 @@ socio-technical workflows and other applications of code fuzzing in software
 engineering.  Section \ref{sec:fuzzi-moss} presents the method for constructing
 models of socio-technical systems, associated workflows and denoting desired
 fuzzings.  Where relevant, this section also discusses details of the
-implementation detalis for Fuzzi\_Moss.  Section \ref{sec:evaluation} presents
+implementation detalis for Fuzzi Moss.  Section \ref{sec:evaluation} presents
 the case study evaluation of the method and Section \ref{sec:conclusions}
 discusses future work and conclusions.
 
@@ -199,27 +207,18 @@ discusses future work and conclusions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section presents a literature review of the two bodies of related work for
-this research.  First, research that investigates the development of models and
-simulations of behaviours in socio-technical systems is discussed.  This section
-highlights the difficulties of developing modelling techniques that accommodate
-the inherent scale, complexity, contingency and dynamism of socio-technical
-systems.  Second, research on applications of software code fuzzing and mutation
-is reviewed.  This section also surveys available fuzzing mechanisms and
-illustrates the practical considerations of applying fuzzing to software code.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Modelling Socio-technical workflows}
-
-There are a variety of tools available for modelling and/or simulating
-socio-technical systems and the behaviours of the actors within them.  In
-particular, graphical notations have received considerable attention, perhaps
-due to their perceived efficacy in communicating requirements between users,
-customers and system architects.  These modelling languages include including
-UML activity diagrams \citep{omg2010omguml}, BPML \cite{White2004}, YAWL
-\citep{hofstede2010yawl}, KaOS \citep{Werneck2009}, i* \citep{Yu1995} and
-responsibility modelling \cite{sommerville09responsibility}.
+This section presents a literature review of the development of models and
+simulations of behaviours in socio-technical systems.  This section highlights
+the difficulties of developing modelling techniques that accommodate the
+inherent scale, complexity, contingency and dynamism of socio-technical systems.
+Graphical notations have received considerable attention, perhaps due to their
+perceived efficacy in communicating requirements between users, customers and
+system architects.  These modelling languages include include workflow based
+approaches including UML activity diagrams \citep{omg2010omguml}, BPML
+\citep{White2004}, YAWL \citep{hofstede2010yawl} and OBASHI
+\cite{obashimethodology}; and goal based approaches such as KaOS
+\citep{Werneck2009}, i* \citep{yu1995} and responsibility modelling
+\citep{sommerville09responsibility}.
 
 Activity diagrams are perhaps the most commonly known workflow language, due to
 incorporation in the UML standard \citep{omg2010omguml}.  The notation supports
@@ -234,122 +233,154 @@ advantage of this approach is that models can be used for negotiation between
 project stakeholders, whilst also being used for simulations to predict system
 behaviour.
 
+The Business Process Model and Notation (BPMN) is an alternative OMG standard
+for modelling workflows, with similar core notation and semantics for modelling
+workflows \citep{omg2011omgbpmn}.  Unlike activity diagrams, however, BPMN
+provides a richer notation for expressing more complex aspects of activities,
+such as differentiating between tasks, activities and transactions; triggering
+and orchestrating concurrent activiites using messages; the identification of
+information resources need to realise an activity; and the orchestration of
+activities across organisational boundaries \citep{White2004}.  The notation is
+intended to support the generation of executable business processes expressed as
+web services, however, it can also be employed in other workflow contexts.
+
 Yet another workflow language (YAWL) provides similar capabilities to activity
 diagrams for modelling workflows, as well as being supported by CASE tools for
-graphical modelling \cite{hofstede2010yawl}.  However, unlike activity diagrams,
-YAWL is based on the \picalc\cite{Aalst2004}.  The notation also provides for a
+graphical modelling \citep{hofstede2010yawl}.  However, unlike activity diagrams,
+YAWL is based on the \picalc\citep{Aalst2004}.  The notation also provides for a
 richer range of workflow requirements than activity diagrams, including
 sophisticated forking and merging rules, separation between workflow
 specfications and executions and resourcing and data requirements.
 
-BPML started off as distinct from UML, but efforts have been made to define concepts in the core UML notation \citep{White2004} and 
+The OBASHI (Ownership, Business, Application, System, Hardware, Infrastructure
+methodology and notation \citep{obashimethodology} is designed for modelling
+business processes across enterprise infrastructures.  The notation is intended
+for capturing the movement of data through a business process and revealing the
+associated dependencies on underlying infrastructure such as software systems,
+servers and network communications.  The language also provides a means for
+mapping these flows to higher level concerns, such as business rationale and
+ultimate organisational owner. In contrast to other workflow notations, flows
+are based on the movement of data rather than control.
 
-A very different approach to modelling socio-technical behaviours is adopted in
-goal oriented notations, such as
+%%%%
 
-KaOS is a goal-oriented modelling technique for socio-technical systems
-modelling\cite{Werneck2009}.  The actors are modelled as attempting to achieve
-or fulfil some goal,...
+Describing socio-technical behaviours using workflow notations can be difficult,
+because of the basic assumption that all contigencies in a workflow can be
+completely described at a given level of granularity, and that more complex
+details can be encapsulated within coarser grained activities with well defined
+interfaces.  However, as argued in Section \ref{sec:introduction},
+socio-technical behaviours are inherently complex, contingent and evolutionary,
+making such refinement based techniques difficult to apply.  As
+\citet{israilidis13ignorance} have argued, the unknowns in a socio-technical
+system may be far more significant than the knowns.Several authors have
+therefore discussed alternative techniques for modelling socio-technical systems
+with support for contingent behaviour
+\citep{yu1995,dardenne93goal,Herrmann1999,sommerville09deriving}.
 
-However, there are some issues with KaOS for the purposes of our models. For one, KaOS is useful if one must elicit software engineering requirements from a client, but in terms of modelling human actors, KaOS is less widely used. Requirements engineering techniques would be inappropriate for a model we intend to fuzz, even if a representation of the goals might also be fuzzable. \par 
+Both \citet{yu1995} and \citet{dardenne93goal} are goal oriented notations for
+modelling socio-technical systems \citep{Werneck2009}.  In contrast to workflows,
+goal oriented approaches primarily capture the intents of actors (what they are
+seeking to achieve).  Goals can be de-composed into a sub-goal hierarchy using
+logical operators to express the form of decomposition. Goals can also be
+annotated with strategies and/or resource requirements to support automated
+analysis.  \citeauthor{yu1995} argued that socio-technical systems should be
+viewed as collections of collaborating actors, each with their own (potentially
+conflicting) objectives.  Elciting and analysing the actors intents allows the
+inter-dependencies between actors and the overall behaviour of the system to be
+understood, without the need for explicit models of individual workflows. vents.
 
+Other authors have extended goal oriented approaches to provide greater
+flexibility.  \citet{sommerville09deriving} argued that stakeholders often
+struggle to express their behaviour within a socio-technical system in terms of
+goals.  Instead, \citet{sommerville09deriving} argued that the concept of
+\emph{responsibility}, the duties held by an actor in a system, are a more
+intuitive means of describing system behaviours that also capture a variety of
+contingent behaviours.  They provide a notation for expressing the relationships
+between responsibilities and resources in order to identify dependencies within
+a system.  Earlier work on responsibility modelling also provided mechanisms
+with annotating responsibilities with indicative workflows, expressing the means
+by which responsibilities \emph{could} be executed.
 
-i* is another technique that, while useful for gaining an insight into some sociotechnical system, is ill-suited to our needs as a result of its requirements engineering background\cite{Werneck2009}. In i*, actors rely on each other for goals and responsibilities to be fulfilled. i* therefore represents a better social model for a system than some of its competitors, and is widely cited and popular in the academic community, similar to KaOS. Both are used in situations as different as software engineering\cite{Almisned2010}, artificial intelligence\cite{VanDiggelen2010}, and even comes up in journals for infectious diseases\cite{Tutorial2007}. \par
+Despite providing for contingency, a limitation of the goal and responsibility
+approach is the need for complete model descriptions. \citet{Herrmann1999}
+introduced techniques for annotating goal oriented system models in the SeeMe
+notation with vagueness.  The notation enables a modeller to denote where
+vagueness may be present in a model due to abstraction (i.e. consistent
+vagueness) and due to ommission (inconsistent vagueness).  In addition,
+\citeauthor{Herrmann1999} provide notation for indicating that a model is
+thought to be complete, containing all pertinent details.  However, the
+annotations are not accompanied by a formal semantics, or other means of
+supporting automated analysis.
 
-As a result of i*'s better social modelling than KaOS, we get a slightly different look a sociotechnical modelling and requirements engineering. However, as widely cited and interesting as i* might be, it suffers the same fundamental flaws that KaOS does, the largest of which being its lack of workflow modelling. It is clear to see that interactions between people is an important component of any sociotechnical modelling platform, however. Indeed, literature suggests that any component of a sociotechnical system can greatly influence its operation\cite{crabtree00ethnomethodologically}. \par
+We are not aware of other applications of fuzzing techniques to modelling
+contingent behaviours in socio-technical systems.  However, software code
+fuzzing (or mutation) is employed in software quality assurance in order to
+automatically generate program variants.  Mutation operators may alter the value
+of literals, swap arithmetic or other operators, or change the ordering of
+arguments to a function call, for example.  Applying different combinations of
+mutation operators creates a population of mutants of the target program.  One
+application of this technique is mutation testing, in which the generation of
+program variants is used to simulate the introduction of defects and evaluate
+the effectiveness of an application's test suite in detecting regressions
+\citep{demillo78hints}.  A test is considered to have detected a mutant if the
+application of the test to the mutant fails.  A test suite that detects a higher
+proportion of mutants is considered to have good coverage of the target program.
 
-A particular limitation of all these techniques is their lack of support for
-explicit support for the inherent contingency of behaviours in socio-technical systems.
-\label{related_head}
-Herrmann \& Loser\cite{Herrmann1999} discuss sociotechnical modelling with inherent vagueness, and while this might be shown to be a useful construct, it doesn't address the problem that sociotechnical modelling with uncertainty of action is difficult to model. Instead, Herrmann \& Loser create sociotechnical models using pictorial representations -- but these may be difficult to fuzz programmatically. Therefore, a comparison of current methods for representing sociotechnical systems and introducing variance was necessary. \par
+The effectiveness of mutant generation is significantly influenced by choice of
+defect operators to apply, since the search space of potential mutants to be
+tested is very large and many mutants will reveal the same test suite
+deficiencies \citep{takanen08fuzzing}..  Generation of mutants based on an
+understanding of a system's specification allows defect generation to be focused
+on a system's intended behaviour.  It can therefore be expected that applying
+code fuzzing to simulating socio-technical behaviours requires an understanding
+of the likely variants to behaviour that may occur in a workflow in order to
+generate realistic simulations.
 
-OBASHI\cite{ObashiMethodology} is a modelling system that focuses on business processes instead of sociotechnical models. However, OBASHI's business process modelling techniques focus on dataflow. OBASHI also focuses on simplicity in its models, which it creates by saperating concerns using a layered modelling strategy. This simplified model with separated concerns was similar to what was needed, even if dataflow and workflow modelling are not fundamentally similar fields. \par 
-
-Few pieces of academic literature exist at all for OBASHI, despite its 15 year existence; yet it may be prudent to learn from insights into what works in the practically-minded setting of modelling in the private sector. \par
-
-\subsection{Code Fuzzing for Sociotechnical Variance}
-
-\subsection{Modelling System Requirements}\label{planning_modelling_requirements}
-
-The modelling system desired had some properties that could not be found in the available alternatives. For example, the models had to be procedural, but also easy to write and maintain. For reasons laid out in the library implementation section\cref{planning_fuzzing}, Python was the most suitable choice. \par
-
-However, the modelling system itself still needed to be designed. Particularly, the system needed to allow for large codebases, that were readable, and also to permit modularity and package systems that allowed different parts of the model to be seperated out for their own development. While Python provides support for these features, the modelling system itself needed to take these requirements into account.  \par
-
-Little academic research appears to have been done on programmatically inserting sociotechnical variance. A little work has been done into systems for \emph{Punctuated Socio-Technical Information System Change model}s\cite{Lyytinen2008}, but this appears to refer more to the way information systems alter over time and less to do with the study of uncertainty in information systems. \par
-
-
-Other research has been done into the management of organisational uncertainty\cite{grote2004uncertainty}\cite{Herrmann1999}, which appears to be ideal for the task at hand. Unfortunately, no sociotechnical simulations with uncertainty injected into the models created could be found. \par
-Therefore, while sociotechnical modelling is now a well-established field with competing methodologies, and sociotechnical uncertainty has also been a research subject since as early as 1976\cite{Susman1976}, no programmatic sociotechnical modelling has been documented which models sociotechnical stress as a component of that model. Therefore, the hypothesis of the project is clear; that is, to construct such a system and attempt to verify that sociotechnical stress can be introduced to the system by means of code fuzzing. \par
-
-
-\subsubsection{Graphical representations and UML}
-\label{pictorial}
-Pictorial representations of sociotechnical systems can be very human-readable, which makes them suitable candidates for creating a sociotechnical model. Modelling systems such as OBASHI\cite{ObashiMethodology} use graphical representations of sociotechnical systems to build models of business and IT processes, but build these models using dataflow. To contrast, a UML Use Case diagram\cite{omg2010omguml} models an actor within a larger system to visualise a sociotechnical system. Both models use graphical representations of the systems they model to make the complexity of the model easy for a human to parse, but these models can be difficult for a computer to parse. \par
-
-
-
-Although sociotechnical uncertainty has been studied since as early as 1976\cite{Susman1976}, no programmatic sociotechnical modelling has been documented which models sociotechnical stress as a component of that model. Therefore, the hypothesis of the project is clear; that is, to construct such a system and attempt to verify that sociotechnical stress can be introduced to the system by means of code fuzzing. \par
-
-
-\subsection{Fuzzing Library Requirements}\label{planning_fuzzing}
-%%%%%%%%%%%%%%%Okay to leave this blank?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%The fuzzing library desired also had unique properties that made it difficult to find an equivalent for in a commercial or academic setting. \par
-
-%The fuzzing library was of particular importance because the main study of the project was on variance in sociotechnical systems. Therefore, the fuzzing library had a particularly strict set of requirements. The fuzzing library needed to have fairly precise control over the activity of the mutations, because the mutations it introduced needed to be representative of sociotechnical stress. In addition, these mutations had to change every time a part of the system operated, so that activity in a system was analogous to repeating an action: an actor may make different mistakes in different iterations of a workflow. \par
-
-\subsubsection{Existing Fuzzing Platforms}
-\label{research_fuzzing}
-Because the systems we were interested in creating were to be self-documenting, we chose Python as a language to write our models in. Python's clarity combined with the ease of quickly writing working Python code meant that self-documenting models could be feasibly made. In addition, Python supplied language features such as decorators and a built in Abstract Syntax Tree library that made it an ideal candidate. \par
-We therefore set about finding appropriate fuzzing libraries in Python:
-
-\subsubsection{MutPy} 
-\label{fuzzing_mutpy}
-From the MutPy package page\cite{mutpy26}: 
-\begin{displayquote}
-MutPy is a mutation testing tool for Python 3.x source code. MutPy supports the standard Python unittest module, generates YAML reports and has colorful output. It’s apply mutation on AST level. You could boost your mutation testing process with high order mutations (HOM) and code coverage analysis.
-\end{displayquote}\par
-
-Unfortunately, MutPy had a relatively large and complex codebase\cite{mutpy26} that made it hard to modify for the specific requirements of the research. In addition, relying on a complex dependency that is designed for unit testing seemed to be a bad approach, as research interests might not align with MutPy's maintainers' in the future. As a result, it might have been necessary to fork their codebase at the time and maintain our own version for research purposes; this approach was not future-proof, and so an alternative approach was deemed necessary. \par
-
-Working in MutPy's favour, however, was that it was a \emph{code fuzzing} rather than protocol fuzzing library. Particularly, it fuzzed source code to a similar end as something like Java's PiTest\cite{coles14pitest}. This was more in line with our goals, although MutPy still didn't deliver what was required from a code fuzzing library for this experiment. Therefore, it was decided to learn from MutPy's strong points and implement something similar, but from a fresh, maintainable codebase with interests more aligned with that of the research. This would also allow for potential improvements to be implemented in the future, which could not be determined before modelling began; as it happens, this decision turned out to pay off, as additional functionality was needed. \par
-
-\subsubsection{PyMuTester}
-\label{fuzzing_pymutester}
-PyMuTester\cite{PyMutTester} proved to be the closest to the library required, though it still fell short in some areas. Particularly, PyMuTester did not appear to have many types of mutation it could enact. \par
-PyMuTester did not have a large codebase\cite{PyMutTester}, nor did it have very much functionality to offer, but it offered mutation via Abstract Syntax Tree editing. The decision was made to study the PyMuTester source as a template for a code fuzzing library of a new design. PyMuTester seemed to be much too immature as a library to base the whole project around, and was last updated in October 2014. However, it did show promise, and gave a basis around which writing a code mutation library could be built, while also taking cues from the more advanced source of MutPy\cite{mutpy26}.  \par%\cite{} PyMuTester source at https://github.com/miketeo/PyMuTester       \cite{} MutPy's source at https://bitbucket.org/khablas/mutpy/src
-=======
-In line with our goals was that MutPy supplied a code fuzzing system, although MutPy still didn't deliver what was required for this experiment. Therefore, it was decided to learn from MutPy's strong points and implement something similar, but from a fresh, maintainable codebase with interests even more aligned with that of the research. \par
-
-\subsubsection{PyMuTester}
-\label{fuzzing_pymutester}
-PyMuTester\cite{PyMutTester} proved to be the closest to the library required, though it still fell short in some areas. Particularly, PyMuTester did not appear to have many types of mutation it could enact. \par
-
-PyMuTester did not have a large codebase\cite{PyMutTester}, nor did it have very much functionality to offer, but it offered mutation via Abstract Syntax Tree editing. The decision was made to study the PyMuTester source as a template for a code fuzzing library of a new design. PyMuTester seemed to be much too immature as a library to base the whole project around, and was last updated in October 2014. However, it did show promise, and gave a basis around which writing a code mutation library could be built, while also taking cues from the more advanced source of MutPy\cite{mutpy26}. \par
+There are a variety of existing tools that incorporate fuzzing functionality,
+including PiTest \citep{coles14pitest} for Java and MutPy \citep{mutpy26} and
+PyMuTester \citep{pymuttester} for Python.  \citet{storer15ringneck-repos} has
+also developed a tool for mutation testing component assembly
+specifications. All these tools work by constructing and then manipulating
+abstract syntax trees of target programs.  The result is a suite of statically
+generated mutant programs that can be evaluated using the target program's own
+test suite.  A disadvantage of this mechanism (for the purposes of modelling
+socio-technical systems) is that the mutants are generated statically, prior to
+program execution.  Our own implementation of code fuzzing is motivated by the
+desire to simulate dynamic contingent behaviour, that can vary from the
+idealised model each time a fuzzed step in a workflow is executed.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Socio-Technical Workflow Fuzzing}
+\section{Method and Implementation}
+\label{sec:fuzzi-moss}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section we introduce our approach to modelling idealised workflows in
 socio-technical systems and then introducing variance in their execution through
-fuzzing.  Iimplementation details of the the proof of concept library, Fuzzi
-Moss, are also presented.  Source code for the Fuzzi Moss library is available
-from the project's GitHub repository \citep{wallis2016fuzzi-moss-scm}.  The
-method comprises: construction of an object oriented model of the problem
-domain; construction of an idealised representations of socio-technical
-workflows that direct the specify the behaviours of actors in the problem
-domain; annotation of the work flows with fuzzers to introduce variance;
-execution of the workflows in scenarios; and measurement of outcomes in the
-scenarios through observation of the problem domain state.
+dynamic fuzzing. The method comprises: construction of an object oriented model
+of the problem domain; construction of an idealised representations of
+socio-technical workflows that direct the specify the behaviours of actors in
+the problem domain; annotation of the work flows with fuzzers to introduce
+variance; execution of the workflows in scenarios; and measurement of outcomes
+in the scenarios through observation of the problem domain state. Each stage of
+the method is described in more detail below, using the task of developing
+software as an illustrative example (we will present the full case study in
+Section \ref{sec:evaluation}).
 
-Each stage of the method is described in more detail below, using the task of
-developing software as an illustrative example (we will present the full case
-study in Section \ref{sec:evaluation}). Source code for this case study is also
-available from the GitHub repository for the study
-\citep{storer2016softdev-workflow-scm}.
+Implementation details of the the proof of concept library, Fuzzi Moss, are
+also presented.  Source code for the Fuzzi Moss library is available from the
+project's GitHub repository \citep{wallis2016fuzzi-moss-scm}.  The library was
+implemented in the Python programming language.  The Python syntax is designed
+to be readable, meaning that domain models and workflows could be expressed in
+structured natural language.  Further, Python is an interpreted object-oriented
+language, that treats function definitions as first class constructs.  This made
+the development of a proof of concept fuzzing library straight forward.  The
+core implementation is less than 100 lines of program code, including blank
+lines and comments, whilst the library of utility fuzzers is implemented in less
+than 300 lines. Source code for the case study is also available in a separate
+GitHub repository \citep{storer2016softdev-workflow-scm}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -434,7 +465,6 @@ events for later analysis.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Workflow Modelling}
-\label{sec:fuzzi-moss}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -445,7 +475,7 @@ in the problem domain.  Behaviours are modelled as \emph{idealised} work flows,
 i.e. the behaviour desired or expected of an actor in a socio-technical system
 without concern for contingencies.  Workflows are modelled as activity diagrams,
 which enables the construction of a hierarchy of workflow descriptions,
-supporting modularity and reuse.
+supporting modularity and reuse.  
 
 Two related work flows are illustrated in Figure \ref{fig:workflow-partial}.
 Figure \ref{fig:workflow-tdd} illustrates a Test Driven Development workflow, in
@@ -457,18 +487,17 @@ feature until the measured coupling rate is less than a desired maximum.  Both
 workflows are executed by invoking operations on a \lstinline!Developer!
 instance.
 
-\begin{figure}
+\begin{figure*}
   \centering
 
-  \begin{subfigure}{\linewidth}
+  \begin{subfigure}[b]{.45\linewidth}
     \centering
     \includegraphics{floats/tdd-workflow-1}
 
     \caption{Test driven development}
     \label{fig:workflow-tdd}
   \end{subfigure}
-
-  \begin{subfigure}{\linewidth}
+  \begin{subfigure}[b]{.45\linewidth}
     \centering
     \includegraphics{floats/refactoring-workflow-1}
     
@@ -476,11 +505,19 @@ instance.
     \label{fig:workflow-refactoring}
   \end{subfigure}
   
+\
+
   \caption{Partial socio-technical workflows for software development expressed
     as UML activity diagrams.}
 
   \label{fig:workflow-partial}
-\end{figure}
+\end{figure*}
+
+We currently limit the use of activity diagram notation to begin, end, activity
+and conditional branches, with transitions indicating the flow of control
+between steps.  Fuzzi Moss does not currently support concurrent behaviours that
+would be represented by fork and join nodes, although this feature is discussed
+in Section \ref{sec:future-work}.
 
 
 The workflow models are implemented as collections of Python functions.  As for
@@ -499,12 +536,12 @@ mechanism.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The workflow functions implemented in Python are denoted as eligible for fuzzing
-by applying the \lstinline!@fuzz! decorator provided in the Fuzzi\_Moss
+by applying the \lstinline!@fuzz! decorator provided in the Fuzzi Moss
 package. The decorator's constructor accepts one argument, a pointer to a
 \emph{fuzzer} function, that will be used in the fuzzing mechanism described
 below.  Python's decorator mechanism intercepts invocations of the decorated
 function and allows these to be substituted with an alternative function to be
-invoked.  The Fuzzi\_Moss decorator exploits this mechanism by defining and
+invoked.  The Fuzzi Moss decorator exploits this mechanism by defining and
 returning a \lstinline!wrap()!  function that is able to dynamically fuzz the
 decorated function each time it is invoked.  The wrap function accepts the same
 set of arguments as the decorated function and should be expected to return the
@@ -555,9 +592,9 @@ def _refactor_feature(developer, feature):
 The generic definition of the fuzzer function (accept and return a list of
 Python statement ASTs) allows a user to define a wide range of fuzzing
 mechanisms to suit their problem domain.  In addition, a suite of fuzzers is
-also provided with Fuzzi\_Moss that allow the modular construction of more
+also provided with Fuzzi Moss that allow the modular construction of more
 complex fuzzer behaviours.  The behaviour of each of the fuzzers available in
-Fuzzi\_Moss are described in the following sub sections.
+Fuzzi Moss are described in the following sub sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -567,7 +604,7 @@ Fuzzi\_Moss are described in the following sub sections.
 
 A simple fuzzer accepts and returns a list of \lstinline!ast.Statement! objects
 and can be declared for use directly within a fuzz decorator.  The following
-simple fuzzers are defined in Fuzzi\_Moss.
+simple fuzzers are defined in Fuzzi Moss.
 
 \begin{FunctionList}
 
@@ -631,7 +668,7 @@ The following filters are available for use in conjunction with a fuzzer.
 
 \end{FunctionList}
 
-Several pre-defined filtering fuzzers are implemented in Fuzzi\_Moss combining
+Several pre-defined filtering fuzzers are implemented in Fuzzi Moss combining
 some of the predefined filters and simple fuzzers.  These provide commonly
 required fuzzers, including removing or duplicating the last step or a random
 step. A \lstinline!choose_identity! filter is also included for completeness.
@@ -723,17 +760,18 @@ one found.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Configuration Options}
+\subsection{Defining Experiments}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Fuzzi\_Moss package exposes variables in the \verb!__init__.py! file that
-can be used to configure the global behaviour of the fuzz decorator,
-specifically:
+Experiments in Fuzzi Moss are created by defining initial scenarios for 
+
+The Fuzzi Moss package exposes variables in that can be used to configure the
+global behaviour of the fuzz decorator, specifically:
 
 \begin{itemize}
 \item A Python random object, \lstinline!fuzzi_moss_random! is exposed.  This
-  object is used as a source of randomness where required by the Fuzzi\_Moss
+  object is used as a source of randomness where required by the Fuzzi Moss
   fuzzers.  The object can be seeded or even completely replaced as desired by
   the modeller.
 
@@ -745,21 +783,11 @@ specifically:
 \end{itemize}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Defining Experiments}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Evaluation}
 \label{sec:evaluation}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -772,14 +800,15 @@ Future work ideas from Tom's dissertation.
 
 Also, what about an aspect oriented approach.
 
-
+\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\bibliographystyle{plainnat}
+\bibliographystyle{abbrvnat}
 \bibliography{lib}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \end{document}
