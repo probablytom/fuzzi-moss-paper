@@ -12,13 +12,13 @@
 \usepackage[shortcuts]{extdash}%
 \usepackage[numbers]{natbib}
 
-
 \usepackage{listings}
 \usepackage{subcaption}
 
 \lstset{language=python}
-\lstset{basicstyle=\tt\small}
+\lstset{basicstyle=\ttfamily\small}
 \lstset{keywordstyle=\ttfamily\bfseries}
+\lstset{frame=single}
 
 \newenvironment{FunctionList}{%
 \lstset{basicstyle=\ttfamily\bfseries\small}
@@ -63,17 +63,17 @@
   The engineering of large scale, complex software based socio-technical systems
   is still very much a craft, dependent on methods based on trial, error and
   subsequent revision.  A particular difficulty is the lack of modelling tools
-  that support the analysis of actor behaviours in and around socio-technical
-  systems.  Existing notations such as activity diagrams, business process
-  modelling languages or petri nets assume that behaviour can be described as
-  idealised work flows.  Unfortunately, the behaviour in a socio-technical
-  system is highly contingent and subject to considerable variability as actors
-  react to changing conditions and identify potential optimisations to their
-  practices.  As a consequence, existing techniques result in models that either
-  lack sufficient detail to capture the effect of subtle contingencies; are too
-  narrow to make useful assessments about the larger system; are unable to
-  capture evolution in behaviours; or are so complex that analysis and
-  interpretation becomes intractable.
+  that support the analysis and prediction of actor behaviours in and around
+  socio-technical systems.  Existing notations such as activity diagrams,
+  business process modelling languages or petri nets assume that behaviour can
+  be described as idealised work flows.  Unfortunately, the behaviour in a
+  socio-technical system is highly contingent and subject to considerable
+  variability as actors react to changing conditions and identify potential
+  optimisations to their practices.  As a consequence, existing techniques
+  result in models that either lack sufficient detail to capture the effect of
+  subtle contingencies; are too narrow to make useful assessments about the
+  larger system; are unable to capture evolution in behaviours; or are so
+  complex that analysis and interpretation becomes intractable.
 
   This paper presents Fuzzi Moss, a novel method for simulating the effect of
   contingent behaviour in socio-technical systems using software code fuzzing.
@@ -164,12 +164,15 @@ reasons.
 
 \end{itemize}
 
-As a consequence, modelling socio-technical system behaviours using conventional
-techniques will typically either result in a model that is tractable, but lacks
-the necessary detail of the underlying system to provide informative results; so
-narrow in scope as to be uninformative about the behaviour of the wider system
-of interest; or so large and complex as to be intractable for analysis, whether
-manual or automated.
+Due to these challenges, modelling socio-technical system behaviours using
+conventional techniques will typically either result in a model that is
+tractable, but lacks the necessary detail of the underlying system to provide
+informative results; so narrow in scope as to be uninformative about the
+behaviour of the wider system of interest; or so large and complex as to be
+intractable for analysis, whether manual or automated.  The design and
+construction of systems at this scale is still very much a craft, lacking the
+methods and tools to support modelling and predictive simulation available in
+other engineering disciplines.
 
 The contribution of this paper is to present and evaluate a novel approach to
 simulating variance in socio-technical behaviours on overall system performance,
@@ -405,8 +408,8 @@ is therefore represented by a collection of inter-related Python objects
 constructed from the classes specified in the domain model.  Figure
 \ref{fig:feature-class-diagram} shows part of a class diagram for the software
 development problem domain case study.  The diagram shows classes for system
-feature (representing user-facing specifications of the system's functionality;
-code chunks, representing the implementation details of the system and bugs
+Features, representing user-facing specifications of the system's functionality;
+code Chunks, representing the implementation details of the system and Bugs
 introduced into chunks during the completion of features.  Figure
 \ref{fig:feature-instance-diagram} illustrates an example state for the same
 problem domain using an object diagram, showing a feature implemented with two
@@ -422,6 +425,8 @@ chunks, one of which contains a bug.
     \label{fig:feature-class-diagram}
   \end{subfigure}
 
+  \vspace{10pt}
+
   \begin{subfigure}{\linewidth}
     \centering 
     \includegraphics{floats/object-diagram-1}
@@ -429,6 +434,8 @@ chunks, one of which contains a bug.
     \label{fig:feature-instance-diagram}
   
   \end{subfigure}
+
+  \vspace{10pt}
 
   
   \caption{Object oriented models of a software development problem domain,
@@ -517,7 +524,7 @@ We currently limit the use of activity diagram notation to begin, end, activity
 and conditional branches, with transitions indicating the flow of control
 between steps.  Fuzzi Moss does not currently support concurrent behaviours that
 would be represented by fork and join nodes, although this feature is discussed
-in Section \ref{sec:future-work}.
+in Section \ref{sec:conclusions}.
 
 
 The workflow models are implemented as collections of Python functions.  As for
@@ -668,10 +675,38 @@ The following filters are available for use in conjunction with a fuzzer.
 
 \end{FunctionList}
 
-Several pre-defined filtering fuzzers are implemented in Fuzzi Moss combining
-some of the predefined filters and simple fuzzers.  These provide commonly
-required fuzzers, including removing or duplicating the last step or a random
-step. A \lstinline!choose_identity! filter is also included for completeness.
+An invert filter is also provided which inverts the selection provided by its
+argument. Several pre-defined filtering fuzzers are implemented in Fuzzi Moss
+combining some of the predefined filters and simple fuzzers.  These provide
+commonly required fuzzers, including removing or duplicating the last step or a
+random step. A \lstinline!choose_identity! filter is also included for
+completeness.  Figure \ref{fig:filter} illustrates the application of a filter
+steps fuzzer that randomly shuffles all but the last step.
+
+\begin{figure}
+  \centering
+
+\begin{lstlisting}
+@fuzz(
+  filter_steps(
+    invert(choose_last_step),
+    shuffle_steps
+  )
+)
+def work(self, system, developer, schedule):
+
+  self.complete_specification(schedule, system)
+  self.implement_features(developer, system)
+  self.implement_test_suite(developer, system)
+  self.debug_system(developer, system)
+  self.refactor_system(developer, system)
+
+\end{lstlisting}
+
+\caption{Using filters to control the application of step replacement to all but
+  the last step in a Waterfall software development workflow.}
+  \label{fig:filter}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -725,9 +760,9 @@ modelling the occasional random omission of steps in a workflow.
 def _enhance_system_quality(
     self, feature, developer):
 
-    developer.add_test(feature)
-    self._debug_feature(developer, feature)
-    self._refactor_feature(developer, feature) 
+  developer.add_test(feature)
+  self._debug_feature(developer, feature)
+  self._refactor_feature(developer, feature) 
 \end{lstlisting}
   
   \caption{Application of a composite fuzzer to a workflow.}
@@ -758,22 +793,43 @@ one found.
 
 \end{FunctionList}
 
+Control structure fuzzers are useful for introducing variability in decision
+making into a workflow.  A developer may decide to stop working on refactoring a
+feature before the number of dependencies on other parts of a system are reduced
+below the specified level, even if this is required by the idealised workflow.
+Similarly, a developer may skip the application of a task to a feature through
+an error of omission.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Defining Experiments}
+\subsection{Defining and Evaluating Scenarios}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Experiments in Fuzzi Moss are created by defining initial scenarios for 
+Experiments in Fuzzi Moss are created by defining scenarios with initial
+conditions (available resources, participants and so on), as well as a schedule
+of work items.  The schedule of work items is specified as part of the problem
+domain, so may be altered during the execution of a workflow, or as a result of
+external events during a simulation.  For example, the specified set of features
+for a software system may be altered as development proceeds and requirements
+become better understood.
 
-The Fuzzi Moss package exposes variables in that can be used to configure the
-global behaviour of the fuzz decorator, specifically:
+By convention, workflows are organised as Python classes, and contain a
+top-level \lstinline!work()! method to initiate activity.  Invoking this method
+causes the simulation to be executed.  Additional behaviour may also be
+simulated in order to evaluate the behaviour of the workflow.  For example, a
+software system may be operated within a simulation after a development workflow
+has been executed in order to estimate quality assurance characteristics such as
+meantime to failure.
+
+The Fuzzi Moss package exposes variables that can be used to configure the
+global behaviour of the fuzz decorator and support the management of
+experiments. Specifically:
 
 \begin{itemize}
-\item A Python random object, \lstinline!fuzzi_moss_random! is exposed.  This
-  object is used as a source of randomness where required by the Fuzzi Moss
-  fuzzers.  The object can be seeded or even completely replaced as desired by
-  the modeller.
+\item A Python random object, \lstinline!fuzzi_moss_random!.  This object is
+  used as a source of randomness where required by the Fuzzi Moss fuzzers.  The
+  object can be seeded or even completely replaced as desired by the modeller.
 
 \item A boolean variable, \lstinline!enable\_fuzzings! is provided, which can be
   used to control whether fuzzings are applied.  This feature is useful for
@@ -782,7 +838,12 @@ global behaviour of the fuzz decorator, specifically:
 
 \end{itemize}
 
-
+The dynamic application of fuzzings to socio-technical behaviours in Fuzzi Moss,
+mean that different sets of fuzzings may be applied to different runs of the
+same scenario.  Many problem domains will also incorporate some form of
+probablistic functionality in order to represent stochastic elements of a
+problem domain.  Therefore, it is anticipated that the characteristics of a
+workflow should be measured across multiple runs of the same scenario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -791,21 +852,297 @@ global behaviour of the fuzz decorator, specifically:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+This section describes the results of a case study that was undertaken to
+evaluate the efficacy of workflow fuzzing for modelling and simulating
+behaviours in software systems.  Software development was the problem domain
+chosen for the case study, because the familiarity of the authors with the
+domain and associated workflows mitigated the risk of infidelity in the domain
+model.  This allowed the evaluation to focus on the efficacy of the fuzzing
+method, rather than the validity of the case study model. The problem domain
+model is illustrated in Figure \ref{fig:full-class-diagram}.  The relationships
+between features, chunks and bugs have already been described in Section
+\ref{sec:fuzzi-moss}.  Aspects of the model that have not yet been described are
+given below.
+
+\begin{figure*}
+  \centering
+  \includegraphics{floats/full-class-diagram-1}
+  \caption{Full class diagram of the software development problem domain.}
+  \label{fig:full-class-diagram}
+\end{figure*}
+
+
+The Test class represents unit tests that are developed against system
+specifications detailed by the Feature class.  The detection of bugs in a
+feature by tests is set probabilistically, but is deterministic (once set, a
+test will either always or never reveal a bug when exercised).  By contrast the
+introduction of bugs into chunks by modification; the relationship between bugs
+and chunk operation; and the introduction of dependencies between chunks are
+stochastic and modelled by probablistic functions.
+
+Software systems encapsulate are characterised by a collection of features and
+associated tests.  Software systems also record logs of traces of feature
+operations and other characteristics implemented as Python properties, including
+mean time to failure of historic trace runs.  Developers perform the work on a
+software system in terms of development, debugging and refactoring features.
+All of these tasks consume available person time, measured in person time units
+(ptu), which is tracked as a Developer attribute.  Developers are associated
+with software systems by the SoftwareProject class, which encapsulates a
+particiular run of a software development workflow.  Finally, software projects
+for the same scenario are grouped together in order to obtain averaged metrics
+across multiple runs of the same simulation.
+
+Two software development workflows were selected for evaluation in the case
+study: waterfall \citep{benington83production} and test driven development
+\citep{beck02test}.  Again, these workflows were selected due to their
+familiarity to the authors.  To gain additional assurance, unit tests were
+developed for each of the problem domain and workflow classes to document the
+expected behaviour of each class independently (using mocks to replace
+dependencies) and to gain assurance that the exhibited behaviour without fuzzing
+was that intended by the authors.
+
+The implementation of the two workflows, decorated with fuzzers is illustrated
+in Figure \ref{fig:workflow-impl}.  Although the two workflows describe
+different behaviours, the implementation has been chosen to enable comparison
+between the workflow structures and fuzzers chosen.
+
+\begin{figure*}
+  \centering
+  
+  \begin{subfigure}[b]{.45\linewidth}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+@fuzz(choose_from(
+ [(0.95, identity), (0.05, remove_random_step)]
+ )
+)
+def work(system, developer, schedule):
+ _complete_specification(schedule, system)
+ _implement_features(developer, system)
+ _implement_test_suite(developer, system)
+ _debug_system(developer, system)
+ _refactor_system(developer, system)
+
+@fuzz(choose_from(
+ [(0.95, identity),
+  (0.05, remove_random_step)]
+ )
+)
+def _complete_specification(
+  schedule, system):
+  for feature_size in schedule:
+    system.add_feature(feature_size)
+
+@fuzz(choose_from(
+ [(0.99, identity),
+  (0.01, replace_condition_with(False))]
+ )
+)
+def _implement_features(
+ developer, system):
+  for feature in system.features:
+    while not feature.is_implemented:
+      developer.extend_feature(feature)
+
+@fuzz(choose_from(
+ [(0.95, identity),
+  (0.05, replace_condition_with(False))]
+ )
+)
+def _implement_test_suite(
+  developer, system):
+  for feature in system.features:
+    while feature.test_coverage < \
+      target_test_coverage_per_feature:
+      developer.add_test(feature)
+
+@fuzz(
+ choose_from(
+ [(0.99, identity), 
+  (0.01, replace_condition_with(False))]
+ )
+)
+def _debug_system(developer, system):
+  for test in system.tests:
+    while True:
+      try:
+        test.exercise()
+        break
+      except BugEncounteredException as e:
+        developer.debug(test.feature, e.bug)
+
+@fuzz(
+  choose_from(
+  [(0.99, identity), 
+   (0.01, replace_condition_with(False))]
+ )
+)
+def _refactor_system(developer, system):
+  for feature in system.features:
+    while len(feature.dependencies) > \
+      target_dependencies_per_feature:
+      developer.refactor(feature)
+
+
+
+
+
+
+
+''''''
+\end{lstlisting}
+    \caption{Waterfall}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{.45\linewidth}
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
+@fuzz(
+  recurse_into_nested_steps(
+    target_structures={ast.For, ast.TryExcept},
+    fuzzer=filter_steps(
+      exclude_control_structures(),
+      fuzzer=choose_from(
+      [(0.95, identity), 
+       (0.05, remove_random_step)])
+    )
+  )
+)
+def work(system, developer, schedule):
+
+  for feature_size in schedule:
+    try:
+      feature = \
+        system.add_feature(feature_size)
+      _ensure_sufficient_tests(developer, feature)
+      _complete_feature(developer, feature)
+      _refactor_feature(developer, feature)
+    except DeveloperExhaustedException:
+      system.features.remove(feature)
+
+  while True:
+    try:
+      feature = choice(system.features)
+      _enhance_system_quality(feature, developer)
+    except DeveloperExhaustedException:
+      break
+
+@fuzz(choose_from(
+  [(0.95, identity), 
+   (0.05, replace_condition_with(False))]))
+def _ensure_sufficient_tests(developer, feature):
+  while feature.test_coverage <\
+    target_test_coverage_per_feature:
+    developer.add_test(feature)
+
+@fuzz(choose_from(
+  [(0.99, identity), 
+   (0.01, replace_condition_with(False))]))
+def _complete_feature(developer, feature):
+  while not feature.is_implemented:
+    developer.extend_feature(feature)
+    _debug_feature(developer, feature)
+
+@fuzz(choose_from(
+  [(0.95, identity), 
+   (0.05, remove_random_step)]))
+def _enhance_system_quality(feature, developer):
+  developer.add_test(feature)
+  _debug_feature(developer, feature)
+  _refactor_feature(developer, feature)
+
+@staticmethod
+@fuzz(choose_from(
+ [(0.99, identity), 
+  (0.01, replace_condition_with(False))]
+))
+def _debug_feature(developer, feature):
+  while True:
+    try:
+      feature.exercise_tests()
+      break
+    except BugEncounteredException as e:
+      developer.debug(feature, e.bug)
+
+@fuzz(
+ choose_from(
+  [(0.99, identity), 
+   (0.01, replace_condition_with(False))]
+))
+def _refactor_feature(developer, feature):
+  while len(feature.dependencies) >\
+   target_dependencies_per_feature:
+    developer.refactor(feature)
+
+''''''
+\end{lstlisting}
+
+    \caption{Test Driven Development}
+  \end{subfigure}
+
+  \caption{Workflow implementations in Python with fuzzers for Waterfall and Test Driven software development.}
+  \label{fig:workflow-impl}
+\end{figure*}
+
+A default scenario was configured in which a single developer was tasked with
+building a software system with a schedule comprising three features, of 3, 5,
+and 7 chunks in order of priority.  Both workflows aimed to achieve a target
+test coverage of 100\% of code chunks and a inter-feature dependency rate of 0.
+Dependencies between chunks within features were unregulated.  Each system was
+constructed following the specified workflow behaviour, applying any specified
+fuzzings.  Then, each resulting system was operated 50 times, allowing for a
+maximum trace of 750 features per operation. Each overall build-operate sequence
+was executed 10 times, resulting in 500 system operation traces per
+configuration.
+
+The workflows scenarios were evaluated in twelve configurations, parameterised
+by workflow type, resource availability and the presence of fuzzing.  Initially,
+the experiment was calibrated to deterimine an adequate resourcing level for the
+waterfall methodology to complete, by executing the waterfall workflow and
+determining an average resource consumption.  This was found to be 250ptu.
+Then, two further resource parameters were specified: inadequate resources
+(50ptu) and excess resources (500ptu).  Each of these three resource
+configurations were run with workflow fuzzing disabled and enabled.  Average
+mean times to failure (feature operation trace length), remaining person time
+resources, completed features and simulation run time were recorded and
+tabulated as shown in Table \ref{tab:results}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{lrlrrrl}
+    Work flow & Resources & Fuzzed  & MTF & Remaining PTU & Features & Run time (ms)\\
+
+  \end{tabular}
+  \caption{Results for twelve simulation runs of Fuzzi Moss on the software development problem domain.}
+  \label{tab:results}
+\end{table}
+
+The results 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Conclusions}
 \label{sec:conclusions}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+In order to evalutae
+
 Future work ideas from Tom's dissertation.
 
-Also, what about an aspect oriented approach.
+Also what about an aspect oriented approach.
 
-\clearpage
+Concurrency
+
+Other case studies.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \bibliographystyle{abbrvnat}
 \bibliography{lib}
+
+\balancecolumns
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

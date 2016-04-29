@@ -13,7 +13,7 @@ beginfig(1);
 
   Begin.b;
   
-  Activity.RefactorFeature("reduce","dependencies");
+  Activity.RefactorFeature("developer","refactor");
 
   Branch.WorkCompleted;
 
