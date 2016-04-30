@@ -77,7 +77,7 @@
 
   This paper presents Fuzzi Moss, a novel method for simulating the effect of
   contingent behaviour in socio-technical systems using software code fuzzing.
-  A socio-technical system is defined as an object-oriented domain model
+  A socio-technical system is represented as an object-oriented domain model
   compromising one or more classes.  Behaviours that operate on the system model
   state are described separately as a set of idealised executable workflows.
   These workflows are then annotated with code fuzzers, declarations of how the
@@ -86,13 +86,13 @@
   simulation is then configured by executing the fuzzed workflow on an instance
   of the domain model.  Results collected from the domain model state inform
   predictions as to how an idealised workflow will perform in the presence of
-  contingent behaviour.
+  contingent behaviour in the real world.
  
   We have implemented a proof of concept tool to evaluate our method. Fuzzi Moss
-  is as a small Python library, comprising decorators for annotating executable
+  is as a small Python library, comprising a decorator for annotating executable
   workflows with desired fuzzers, a mechanism for dynamically inspecting the
-  structure of a workflow and applying fuzzers during execution and a library
-  of core fuzzers.  We evaluate our approach to simulating socio-technical
+  structure of a workflow and applying fuzzers during execution and a library of
+  core fuzzers.  We evaluate our approach to simulating socio-technical
   behaviours by applying Fuzzi Moss to a socio-technical system case study.  The
   results of the case study demonstrate the feasibility of the fuzzing method.
   Finally, We explore the wider applications of fuzzing in socio-technical
@@ -140,17 +140,17 @@ reasons.
   this transition.
 
 \item The behaviour is contingent on unpredictable circumstances, including both
-  factors in the environment; and concerning the system actors.  For example,
-  the time and manner in which a task, such as developing a new feature for a
+  factors in the environment and concerning the system actors.  For example, the
+  time and manner in which a task, such as developing a new feature for a
   software system, is completed may vary considerably between actors with
   different training and experiences.  Similarly, the decision to work on a task
   at all may depend on unpredictable and uncontrollable external circumstances
-  (such as a power outage).  In these circumstances, actors may take it upon
-  themselves to complete tasks outwith expected workflows in order to discharge
-  their responsibilities, by working from a nearby office, or cafe, even if this
-  violates organisational security policies.  As \citet{besnard03human} note,
-  such adaptations often make the human actors the dependable parts of
-  a socio-technical system.
+  (such as a power outage).  In these circumstances, actors may also take it
+  upon themselves to complete tasks outwith expected workflows in order to
+  discharge their responsibilities, by working from a nearby cafe for example,
+  even if this violates organisational security policies.  As
+  \citet{besnard03human} note, such adaptations often make the human actors the
+  dependable parts of a socio-technical system.
 
 \item Behaviour is continually evolving, as the autonomous actors in a system
   adapt to new circumstances, discover optimisations to their workflows, adapt
