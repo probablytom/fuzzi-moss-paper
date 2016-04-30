@@ -350,8 +350,8 @@ There are a variety of existing tools that incorporate fuzzing functionality for
 mutation testing, including PiTest \citep{coles14pitest} for Java and MutPy
 \citep{mutpy26} and PyMuTester \citep{pymuttester} for Python.
 \citet{storer15ringneck-repos} has also developed a tool for mutation testing
-component assembly specifications. All these tools work by constructing and then
-manipulating abstract syntax trees of target programs.  The result is a
+Maven component assembly specifications. All these tools work by constructing
+and then manipulating abstract syntax trees of target programs.  The result is a
 population of statically generated mutant programs that can be evaluated using
 the target program's own test suite.  A disadvantage of this mechanism (for the
 purposes of modelling socio-technical systems) is that the mutants are generated
@@ -376,7 +376,7 @@ domain; annotation of the workflows with fuzzers to introduce variance;
 execution of the workflows in scenarios; and measurement of outcomes in the
 scenarios through observation of the problem domain state. Each stage of the
 method is described in more detail below, using the task of developing software
-as an illustrative example (we will present the full case study in Section
+as an illustrative example the full case study is presented in Section
 \ref{sec:evaluation}).
 
 Implementation details of the the proof of concept library, Fuzzi Moss, are also
@@ -402,7 +402,7 @@ approximately 1000 lines of program code.
 The initial step in the Fuzzi Moss method is to develop a model of the target
 socio-technical problem domain.  The model represents the invariant `physics' of
 the problem domain that cannot be altered because it represent hard constraints
-in the real world.  The model may portray represent constraints imposed by
+in the real world.  The model may represent constraints imposed by
 natural laws, such as the conservation of energy; deliberate technical system
 design, such as an access control client that limits access to a software system
 to those who know an appropriate username and password combination; or emergent
@@ -416,8 +416,8 @@ is therefore represented by a collection of inter-related Python objects
 constructed from the classes specified in the domain model.  Figure
 \ref{fig:feature-class-diagram} shows part of a class diagram for the software
 development problem domain case study.  The diagram shows classes for system
-Features, representing user-facing specifications of the system's functionality;
-code Chunks, representing the implementation details of the system; and Bugs
+features, representing user-facing specifications of the system's functionality;
+code chunks, representing the implementation details of the system; and bugs
 introduced into chunks during the completion of features.  Figure
 \ref{fig:feature-instance-diagram} illustrates an example state for the same
 problem domain using an object diagram, showing a feature implemented with two
@@ -660,7 +660,7 @@ arguments: a filter function pointer and a fuzzer function pointer.  These are
 used to define a nested \lstinline!_filter_step! fuzzer that behaves like a
 simple fuzzer as described above.
 
-The filter fuzzer accepts a list of statements and returns a list of tuples.
+A filter function accepts a list of statements and returns a list of tuples.
 Each tuple denotes the start and end index for a block of statements in the
 input.  Each block is then fuzzed using the supplied fuzzer.  Blocks not
 specified by the filter are not affected by the fuzzer, such that the returned
