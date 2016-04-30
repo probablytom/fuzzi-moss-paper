@@ -109,8 +109,8 @@
 Modelling and simulating in large scale, complex socio-technical systems
 development projects is an on-going research challenge \citep{baxter08learning}.
 Socio-technical systems are characterised by the interactions between a variety
-of actor types within a system's scope, including individual huamn operators,
-organisational units and technical artifacts
+of actor types within a system's scope, including individual human operators,
+organisational units and technical artefacts
 \citep{Susman1976,elhassan07role,sommerville08socio}. These systems also
 incorporates a complex variety of structures that direct or influence actor
 and system behaviour, including workflow descriptions, organisational
@@ -147,7 +147,7 @@ reasons.
   at all may depend on unpredictable and uncontrollable external circumstances
   (such as a power outage).  In these circumstances, actors may take it upon
   themselves to complete tasks outwith expected workflows in order to discharge
-  their responsiblities, by working from a nearby office, or cafe, even if this
+  their responsibilities, by working from a nearby office, or cafe, even if this
   violates organisational security policies.  As \citet{besnard03human} note,
   such adaptations often make the human actors the dependable parts of
   a socio-technical system.
@@ -156,7 +156,7 @@ reasons.
   adapt to new circumstances, discover optimisations to their workflows, adapt
   the workflow to suit local organisational priorities or take shortcuts
   \citep{bonen79evolutionary,Lyytinen2008,anderson04heterogeneous}.  As a
-  consequence, the \emph{defacto} behaviour exhibited within a system may differ
+  consequence, the \emph{de facto} behaviour exhibited within a system may differ
   from that envisaged by system architects in idealised workflows.  For example,
   a ward manager in a hospital may delay releasing beds for re-allocation by
   wider hospital management in the anticipation that these will be required by
@@ -199,7 +199,7 @@ socio-technical workflows and other applications of code fuzzing in software
 engineering.  Section \ref{sec:fuzzi-moss} presents the method for constructing
 models of socio-technical systems, associated workflows and denoting desired
 fuzzings.  Where relevant, this section also discusses details of the
-implementation detalis for Fuzzi Moss.  Section \ref{sec:evaluation} presents
+implementation details for Fuzzi Moss.  Section \ref{sec:evaluation} presents
 the case study evaluation of the method and Section \ref{sec:conclusions}
 discusses conclusions and future work, as well as noting the potential for
 applying fuzzing to other forms of socio-technical models.
@@ -222,9 +222,9 @@ their relevance to the present work.
 Graphical notations have received considerable attention, perhaps due to their
 perceived efficacy in communicating requirements between users, customers and
 system architects.  These modelling languages include workflow based approaches
-such as UML activity diagrams \citep{omg2010omguml}, BPML \citep{White2004},
+such as UML activity diagrams \citep{omg2010omguml}, BPMN \citep{omg2011omgbpmn},
 YAWL \citep{hofstede2010yawl} and OBASHI \cite{obashimethodology}; and goal
-based approaches such as KaOS \citep{Werneck2009}, i* \citep{yu1995} and
+based approaches such as KaOS \citep{Werneck2009}, \emph{i*} \citep{yu1995} and
 responsibility modelling \citep{sommerville09responsibility}.
 
 Activity diagrams are perhaps the most commonly known workflow language, due to
@@ -245,7 +245,7 @@ for modelling workflows, with similar core notation and semantics for modelling
 workflows \citep{omg2011omgbpmn}.  Unlike activity diagrams, however, BPMN
 provides a richer notation for expressing more complex aspects of activities,
 such as differentiating between tasks, activities and transactions; triggering
-and orchestrating concurrent activiites using messages; the identification of
+and orchestrating concurrent activities using messages; the identification of
 information resources need to realise an activity; and the orchestration of
 activities across organisational boundaries \citep{White2004}.  The notation is
 intended to support the generation of executable business processes expressed as
@@ -257,7 +257,7 @@ graphical modelling \citep{hofstede2010yawl}.  However, unlike activity diagrams
 YAWL is based on the \picalc\citep{Aalst2004}.  The notation also provides for a
 richer range of workflow requirements than activity diagrams, including
 sophisticated forking and merging rules, separation between workflow
-specfications and executions and resourcing and data requirements.
+specifications and executions and resourcing and data requirements.
 
 The OBASHI (Ownership, Business, Application, System, Hardware, Infrastructure
 methodology and notation \citep{obashimethodology} is designed for modelling
@@ -272,7 +272,7 @@ are based on the movement of data rather than control.
 %%%%
 
 Describing socio-technical behaviours using workflow notations can be difficult,
-because of the basic assumption that all contigencies in a workflow can be
+because of the basic assumption that all contingencies in a workflow can be
 completely described at a given level of granularity, and that more complex
 details can be encapsulated within coarser grained activities with well defined
 interfaces.  As argued in Section \ref{sec:introduction}, socio-technical
@@ -315,7 +315,7 @@ approaches is the need for complete model descriptions. \citet{Herrmann1999}
 introduced techniques for annotating goal oriented system models in the SeeMe
 notation with vagueness.  The notation enables a modeller to denote where
 vagueness may be present in a model due to abstraction (i.e. consistent
-vagueness) and due to ommission (inconsistent vagueness).  In addition,
+vagueness) and due to omission (inconsistent vagueness).  In addition,
 \citeauthor{Herrmann1999} provide notation for indicating that a model is
 thought to be complete, containing all pertinent details.  However, the
 annotations are not accompanied by a formal semantics, or other means of
@@ -410,7 +410,7 @@ phenomena that can be modelled stochastically, such as the tendency for the
 implementation of new features in a software system to introduce bugs.
 
 We have adopted an object-oriented approach to modelling the elements of the
-problem domain \citep{bennett06object}, so that domain artifacts are represented
+problem domain \citep{bennett06object}, so that domain artefacts are represented
 as instances of classes.  The state of a particular scenario in a problem domain
 is therefore represented by a collection of inter-related Python objects
 constructed from the classes specified in the domain model.  Figure
@@ -488,7 +488,7 @@ events for later analysis.
 
 The next stage of the method concerns the development of descriptions of
 socio-technical behaviours of actors in the problem domain, using workflows.
-Workflows direct the sequence of actions by an actor on the artifacts in the
+Workflows direct the sequence of actions by an actor on the artefacts in the
 problem domain.  Behaviours are modelled as \emph{idealised} workflows,
 i.e. the behaviour desired or expected of an actor in a socio-technical system
 without concern for contingencies.  Workflows are modelled as activity diagrams,
@@ -537,7 +537,7 @@ between steps.  Fuzzi Moss does not currently support concurrent behaviours that
 would be represented by fork and join nodes, although this feature is discussed
 in Section \ref{sec:conclusions}.  The workflow models are implemented as
 collections of Python functions.  As for the domain actions, implementation of
-the workflow functions is flexible. Workflow functions can be parameterised as
+the workflow functions is flexible. Workflow functions can be parameterised
 and may also return values as desired.  Workflow functions can be encapsulated
 into classes to support model maintenance, although this is not necessary for
 the method itself.  One restriction that is made is that workflow functions
@@ -736,7 +736,7 @@ implemented in a similar manner to filtering.
 
 \item \lstinline!on_condition_that(condition, fuzzer)! %
   applies the specified fuzzer if the specified condition holds.  The condition
-  may be a literal boolean value, a function pointer or a Python expression.
+  may be a literal Boolean value, a function pointer or a Python expression.
   Lambda expressions are not supported.
 
 \item \lstinline!recurse_into_nested_steps(target_structures)! identifies
@@ -790,9 +790,9 @@ one found.
 
 \begin{FunctionList}
 
-\item \lstinline!replace_condtion_with(condition)! replaces conditions
+\item \lstinline!replace_condition_with(condition)! replaces conditions
   discovered in control structure statements with the specified condition.  The
-  condition may be a literal boolean value, a function pointer or a Python
+  condition may be a literal Boolean value, a function pointer or a Python
   expression defined in a string.  Lambda expressions are not supported.
 
 \item \lstinline!replace_for_iterator_with(iterator)! replaces iterators
@@ -839,7 +839,7 @@ experiments. Specifically:
   used as a source of randomness where required by the Fuzzi Moss fuzzers.  The
   object can be seeded or even completely replaced as desired by the modeller.
 
-\item A boolean variable, \lstinline!enable\_fuzzings! is provided, which can be
+\item A Boolean variable, \lstinline!enable\_fuzzings! is provided, which can be
   used to control whether fuzzings are applied.  This feature is useful for
   executing the fuzzed workflows in their idealised state, since this provides
   for comparison with fuzzed workflows.
@@ -849,7 +849,7 @@ experiments. Specifically:
 The dynamic application of fuzzings to socio-technical behaviours in Fuzzi Moss,
 mean that different sets of fuzzings may be applied to different runs of the
 same scenario.  Many problem domains will also incorporate some form of
-probablistic functionality in order to represent stochastic elements of a
+probabilistic functionality in order to represent stochastic elements of a
 problem domain.  Therefore, it is anticipated that the characteristics of a
 workflow should be measured across multiple runs of the same scenario.
 
@@ -890,7 +890,7 @@ feature by tests is set probabilistically, but is deterministic (once set, a
 test will either always or never reveal a bug when exercised).  By contrast the
 introduction of bugs into chunks by modification; the relationship between bugs
 and chunk operation; and the introduction of dependencies between chunks are
-stochastic and modelled by probablistic functions.
+stochastic and modelled by probabilistic functions.
 
 Software systems are characterised by a collection of features and associated
 tests.  Like features, software systems can be operated.  When this happens,
@@ -904,7 +904,7 @@ software system in terms of development, debugging and refactoring features.
 All of these tasks consume available person time, measured in person time units
 (ptu), which is tracked as a Developer attribute.  Developers are associated
 with software systems by the SoftwareProject class, which encapsulates a
-particiular run of a software development workflow and subsequent operation.
+particular run of a software development workflow and subsequent operation.
 Finally, software projects for the same scenario are grouped together in the
 SoftwareProjectGroup class in order to obtain averaged metrics across multiple
 runs of the same simulation.
@@ -937,7 +937,7 @@ it was hypothesised that:
   due to the termination of the workflow as soon as planned quality objectives
   are met.
 
-\item The behaviour of TDD would be less susceptable to socio-technical variance
+\item The behaviour of TDD would be less susceptible to socio-technical variance
   due to the application of workflow fuzzing, due to it's iterative nature.
 
 \end{itemize}
@@ -1132,7 +1132,7 @@ configuration.
 
 The workflows scenarios were evaluated in twelve configurations, parameterised
 by workflow type, resource availability and the presence of fuzzing.  Initially,
-the experiment was calibrated to deterimine an adequate resourcing level for the
+the experiment was calibrated to determine an adequate resourcing level for the
 Waterfall methodology to complete, by executing the Waterfall workflow and
 determining an average resource consumption.  This was found to be approximately
 250ptu.  Then, two further resource parameters were specified: inadequate
@@ -1190,7 +1190,7 @@ system.  TDD achieves a mean operation to failure that is higher than Waterfall
 even when comparing execution of constrained TDD resources with unconstrained
 Waterfall (259 vs 114).  This difference is explained by the far greater
 presence of bugs and greater complexity of systems built following the Waterfall
-driven approach, as well as the presence of incompleted features in the systems
+driven approach, as well as the presence of incomplete features in the systems
 built following the Waterfall workflow.  This distinction is particularly marked
 in the context of constrained resources, in which test driven development
 achieves a far higher mean operations to failure (259 vs 14), but fewer features
@@ -1274,7 +1274,7 @@ modelling formalisms, besides activity diagrams.  For example, fuzzing goal
 oriented models such as i* could be used to simulate the shifting goals of
 actors over time as priorities and focus varies.  Similarly, fuzzing enterprise
 modelling techniques such as OBASHI could provide means of assessing the
-resillience of critical infrastructures when subject to unexpected behaviours,
+resilience of critical infrastructures when subject to unexpected behaviours,
 similar to HAZOPS like techniques that have been applied manually to
 responsibility models \cite{lock09modelling}. The proof of concept in this
 research demonstrates the potential for the development of realistic simulations
