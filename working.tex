@@ -391,7 +391,9 @@ implementation is less than 100 lines of program code, including blank lines and
 source code documentation, whilst the library of utility fuzzers is implemented
 in less than 300 lines. Source code for the case study is also available in a
 separate GitHub repository \citep{storer2016softdev-workflow-scm} and comprises
-approximately 1000 lines of program code.
+approximately 1000 lines of program code.  Some of the example code fragments
+shown below have been modified to ease explanation (removing self arguments from
+function definitions, for example).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -884,13 +886,13 @@ described are given below.
 \end{figure*}
 
 
-The Test class represents unit tests that are developed against system
-specifications detailed by the Feature class.  The detection of bugs in a
-feature by tests is set probabilistically, but is deterministic (once set, a
-test will either always or never reveal a bug when exercised).  By contrast the
-introduction of bugs into chunks by modification; the relationship between bugs
-and chunk operation; and the introduction of dependencies between chunks are
-stochastic and modelled by probabilistic functions.
+The \lstinline!Test! class represents unit tests that are developed against
+system specifications detailed by the \lstinline!Feature! class.  The detection
+of bugs in a feature by tests is set probabilistically, but is deterministic
+(once set, a test will either always or never reveal a bug when exercised).  By
+contrast the introduction of bugs into chunks by modification; the relationship
+between bugs and chunk operation; and the introduction of dependencies between
+chunks are stochastic and modelled by probabilistic functions.
 
 Software systems are characterised by a collection of features and associated
 tests.  Like features, software systems can be operated.  When this happens,
@@ -902,12 +904,12 @@ and other characteristics implemented as Python properties, including mean
 operations to failure of historic trace runs.  Developers perform the work on a
 software system in terms of development, debugging and refactoring features.
 All of these tasks consume available person time, measured in person time units
-(ptu), which is tracked as a Developer attribute.  Developers are associated
-with software systems by the SoftwareProject class, which encapsulates a
-particular run of a software development workflow and subsequent operation.
-Finally, software projects for the same scenario are grouped together in the
-SoftwareProjectGroup class in order to obtain averaged metrics across multiple
-runs of the same simulation.
+(ptu), which is tracked as a \lstinline!Developer! class attribute.  Developers
+are associated with software systems by the \lstinline!SoftwareProject! class,
+which encapsulates a particular run of a software development workflow and
+subsequent operation.  Finally, software projects for the same scenario are
+grouped together in the \lstinline!SoftwareProjectGroup! class in order to
+obtain averaged metrics across multiple runs of the same simulation.
 
 Two software development workflows were selected for evaluation in the case
 study: Waterfall \citep{benington83production} and Test Driven Development (TDD)
@@ -1024,7 +1026,6 @@ def _refactor_system(developer, system):
 
 
 
-
 ''''''
 \end{lstlisting}
     \caption{Waterfall}
@@ -1086,7 +1087,6 @@ def _enhance_system_quality(feature, developer):
   _debug_feature(developer, feature)
   _refactor_feature(developer, feature)
 
-@staticmethod
 @fuzz(choose_from(
  [(0.99, identity), 
   (0.01, replace_condition_with(False))]
