@@ -212,12 +212,12 @@ applying fuzzing to other forms of socio-technical models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section presents a literature review of the development of models and
-simulations of behaviours in socio-technical systems.  The difficulties of
-developing modelling techniques that accommodate the inherent scale, complexity,
-contingency and dynamism of socio-technical systems are highlighted.  In
-addition, existing applications of software fuzzing are reviewed with respect to
-their relevance to the present work.
+This section presents a literature review of the development of models and of
+behaviours in socio-technical systems.  The difficulties of developing modelling
+techniques that accommodate the inherent scale, complexity, contingency and
+dynamism of socio-technical systems are highlighted.  In addition, existing
+applications of software fuzzing are reviewed with respect to their relevance to
+the present work.
 
 Graphical notations have received considerable attention, perhaps due to their
 perceived efficacy in communicating requirements between users, customers and
@@ -271,7 +271,7 @@ are based on the movement of data rather than control.
 
 %%%%
 
-Describing socio-technical behaviours using workflow notations can be difficult,
+Describing socio-technical behaviour using workflow notations can be difficult,
 because of the basic assumption that all contingencies in a workflow can be
 completely described at a given level of granularity, and that more complex
 details can be encapsulated within coarser grained activities with well defined
@@ -284,7 +284,7 @@ therefore discussed alternative techniques for modelling socio-technical systems
 with support for contingent behaviour
 \citep{yu1995,dardenne93goal,Herrmann1999,sommerville09deriving}.
 
-Both i*\citet{yu1995} and KaOS \citet{dardenne93goal} are goal oriented
+Both \emph{i*}\citet{yu1995} and KaOS \citet{dardenne93goal} are goal oriented
 notations for modelling socio-technical systems \citep{Werneck2009}.  In
 contrast to workflows, goal oriented approaches primarily capture the intents of
 actors (what they are seeking to achieve).  Goals can be de-composed into a
@@ -741,10 +741,10 @@ implemented in a similar manner to filtering.
   may be a literal Boolean value, a function pointer or a Python expression.
   Lambda expressions are not supported.
 
-\item \lstinline!recurse_into_nested_steps(target_structures)! identifies
+\item \lstinline!recurse_into_nested_steps(target)! identifies
   control structure statements and applies the supplied fuzzer to their body
   blocks.  The recursion can be limited to particular control structures using
-  the option \lstinline!target_structures! argument.
+  the option \lstinline!target! argument.
 \end{FunctionList}
 
 An example of applying a composite fuzzer to a workflow is shown in Figure
@@ -841,7 +841,7 @@ experiments. Specifically:
   used as a source of randomness where required by the Fuzzi Moss fuzzers.  The
   object can be seeded or even completely replaced as desired by the modeller.
 
-\item A Boolean variable, \lstinline!enable\_fuzzings! is provided, which can be
+\item A Boolean variable, \lstinline!enable_fuzzings! is provided, which can be
   used to control whether fuzzings are applied.  This feature is useful for
   executing the fuzzed workflows in their idealised state, since this provides
   for comparison with fuzzed workflows.
@@ -923,8 +923,10 @@ was that intended by the authors.
 The implementation of the two workflows, decorated with fuzzers is illustrated
 in Figure \ref{fig:workflow-impl}.  Although the two workflows describe
 different behaviours, the implementation has been chosen to enable comparison
-between the workflow structures and fuzzers chosen.  Following implementation,
-it was hypothesised that:
+between the workflow structures and fuzzers chosen.  Fuzzers were applied based
+on the judgement of the authors regarding the typical variance that occurs in
+software development activities, in terms of omitted or re-ordered steps.
+Following implementation, it was hypothesised that:
 
 \begin{itemize}
 
@@ -1183,18 +1185,18 @@ adequate and excess resource requirements for Waterfall is likely explained by
 the workflow terminating once the minimum resources required (250) are consumed,
 regardless of the excess availability.
 
-The results also confirm the hypotheses that without fuzzing, the simulated test
-driven development workflow achieves higher software quality than the simulated
-Waterfall workflow, at the cost of a reduction of features incorporated in the
-system.  TDD achieves a mean operation to failure that is higher than Waterfall
-even when comparing execution of constrained TDD resources with unconstrained
-Waterfall (259 vs 114).  This difference is explained by the far greater
-presence of bugs and greater complexity of systems built following the Waterfall
-driven approach, as well as the presence of incomplete features in the systems
-built following the Waterfall workflow.  This distinction is particularly marked
-in the context of constrained resources, in which test driven development
-achieves a far higher mean operations to failure (259 vs 14), but fewer features
-are delivered (1.5 vs 3.0).
+The results also confirm the hypotheses that without fuzzing, the simulated TDD
+workflow achieves higher software quality than the simulated Waterfall workflow,
+at the cost of a reduction of features incorporated in the system.  TDD achieves
+a mean operation to failure that is higher than Waterfall even when comparing
+execution of constrained TDD resources with unconstrained Waterfall (259 vs
+114).  This difference is explained by the far greater presence of bugs and
+greater complexity of systems built following the Waterfall driven approach, as
+well as the presence of incomplete features in the systems built following the
+Waterfall workflow.  This distinction is particularly marked in the context of
+constrained resources, in which test driven development achieves a far higher
+mean operations to failure (259 vs 14), but fewer features are delivered (1.5 vs
+3.0).
 
 The result of applying fuzzing to the workflows reveals both expected and
 unexpected behaviours.  On the one hand, the results support the hypothesis that
@@ -1241,8 +1243,10 @@ the scope of the Fuzzi Moss project, several immediate next steps are proposed:
 
 \begin{itemize}
 
-\item We plan to evaluate Fuzzi Moss in more detailed case studies, such as the
-  e-counting system described in detail by \citet{lock07observations}.  A more
+\item Evaluate Fuzzi Moss further by extending the current case study to
+  incorporate more complex aspects of software development (such as change
+  management). Other case studies such as the e-counting system described in
+  detail by \citet{lock07observations} will also be investigated.  A more
   complex case study will allow the identification of required new fuzzers, as
   well as areas in which the methodology can be optimised.
 
@@ -1255,9 +1259,9 @@ the scope of the Fuzzi Moss project, several immediate next steps are proposed:
 \item Experimentation with the Fuzzi Moss API (aspects) and extension of fuzz
   operator capability.  In some respects, the current specifications of fuzzers
   using function decorators is unsatisfactory, since it prevents flexible
-  experimentation with different fuzzer combinations.  An aspect-oriented style
-  approach \citep{filman01aspect}, with problem domain models oblivious to the
-  application of fuzzers may be more appropriate for this purpose.
+  experimentation with different fuzzer configurations.  An aspect-oriented
+  style approach \citep{filman01aspect}, with problem domain models oblivious to
+  the application of fuzzers may be more appropriate for this purpose.
 
 \item The development of more rigorous methods for identifying and validating
   suitable fuzzers for application to workflows.  One possibility is the
@@ -1269,18 +1273,17 @@ the scope of the Fuzzi Moss project, several immediate next steps are proposed:
 
 \end{itemize}
 
-More widely, fuzzing techniques may be applicable to other socio-technical
-modelling formalisms, besides activity diagrams.  For example, fuzzing goal
-oriented models such as i* could be used to simulate the shifting goals of
-actors over time as priorities and focus varies.  Similarly, fuzzing enterprise
-modelling techniques such as OBASHI could provide means of assessing the
-resilience of critical infrastructures when subject to unexpected behaviours,
-similar to HAZOPS like techniques that have been applied manually to
-responsibility models \cite{lock09modelling}. The proof of concept in this
-research demonstrates the potential for the development of realistic simulations
-of socio-technical systems with predictive power.  The availability of such
-tools would do much to progress the current craft of large scale systems
-engineering.
+More widely, fuzzing techniques may be applicable for other socio-technical
+modelling formalisms.  For example, fuzzing goal oriented models such as
+\emph{i*} could be used to simulate the shifting goals of actors over time as
+priorities and focus varies.  Similarly, fuzzing enterprise modelling techniques
+such as OBASHI could provide means of assessing the resilience of critical
+infrastructures when subject to unexpected behaviours, similar to HAZOPS like
+techniques that have been applied manually to responsibility models
+\cite{lock09modelling}. The proof of concept in this research demonstrates the
+potential for the development of realistic simulations of socio-technical
+systems with predictive power.  The availability of such tools would do much to
+progress the current craft of large scale systems engineering.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
