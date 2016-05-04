@@ -5,7 +5,7 @@ iActivity.iStack.iPict.iFont.name := "t1-zi4r-7";
 
 iGuard.iFont.name := "t1-zi4r-7";
 
-filenametemplate "%j-%c.eps";
+filenametemplate "%j-%c.mps";
 
 prologues:= 3;
 
