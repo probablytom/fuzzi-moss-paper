@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="build" name="wallis2016simulating-socio-technical-variance-using-executable-workflow-fuzzing">
+  
+  <target name="clean">
+    <ant dir="floats" target="clean"/>
+    
+    <delete>      
+      <fileset dir="." includes="**/*.*~" defaultexcludes="false"/>
+
+      <fileset dir="." includes="**/cache.properties"/>
+      <fileset dir="." includes="*.aux,*.bbl,*.blg,*.dvi,*.idx,*.lof,*.log,*.ckeys,*.maf,*.mtc*,*.nav,*.out,*.ps,*.snm,*.toc,*.vrb,*.svn"/>  
+
+    </delete>
+   
+    <delete dir="working-entries"/>
+    <delete dir="final-entries"/>
+    <delete dir="slides-entries"/>
+   
+  </target>
+
+  
+  <target name="cleanall" depends="clean">
+    
+    <delete >
+      <fileset dir="." includes="*.pdf"/>
+    </delete>
+
+  </target>
+
+  
+  <target name="build.diagrams">
+    <ant dir="floats" target="build"/>
+  </target>
+
+  
+  <target name="build-file" depends="build.diagrams">
+		
+    <exec executable="pdflatex" dir=".">
+      <arg value="${file.name}" />
+    </exec>
+    
+    <exec executable="bibtex" dir=".">
+      <arg value="${file.name}" />
+    </exec>
+    
+    <exec executable="pdflatex" dir=".">
+      <arg value="${file.name}" />
+    </exec>
+
+    <exec executable="pdflatex" dir=".">
+      <arg value="${file.name}" />
+    </exec>
+    
+    <copy 
+	file="${file.name}.pdf"
+	tofile="${ant.project.name}-${file.name}.pdf"
+	/>
+    
+  </target>
+  
+  <target name="working">
+    <antcall target="build-file">
+      <param name="file.name" value="working"/>
+    </antcall>
+  </target>
+
+  <target name="build" depends="working"/>  
+
+</project>
