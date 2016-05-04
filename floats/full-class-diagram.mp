@@ -1,6 +1,6 @@
 input metauml;
 
-filenametemplate "%j-%c.eps";
+filenametemplate "%j-%c.mps";
 
 prologues:= 3;
 
