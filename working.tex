@@ -60,43 +60,31 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-  The engineering of large scale, complex software based socio-technical systems
-  is still very much a craft, dependent on methods based on trial, error and
-  subsequent revision.  A particular difficulty is the lack of modelling tools
-  that support the analysis and prediction of actor behaviours in and around
-  socio-technical systems.  Existing notations such as activity diagrams,
-  business process modelling languages or Petri Nets assume that behaviour can
-  be described as idealised workflows.  Unfortunately, the behaviour in a
-  socio-technical system is highly contingent and subject to considerable
-  variability as actors react to changing conditions and identify potential
-  optimisations to their practices.  As a consequence, existing techniques
-  result in models that either lack sufficient detail to capture the effect of
-  subtle contingencies; are too narrow to make useful assessments about the
-  larger system; are unable to capture evolution in behaviours; or are so
-  complex that analysis and interpretation becomes intractable.
+  The engineering of large scale, complex software based socio-technical systems is still very much a craft, dependent
+  on methods based on trial, error and subsequent revision.  A particular difficulty is the lack of modelling tools that
+  support the analysis and prediction of actor behaviours in and around socio-technical systems.  Existing notations
+  such as activity diagrams, business process modelling languages or Petri Nets assume that behaviour can be described
+  as idealised workflows.  Unfortunately, the behaviour in a socio-technical system is highly contingent and subject to
+  considerable variability as actors react to changing conditions and identify potential optimisations to their
+  practices.  As a consequence, existing techniques result in models that either lack sufficient detail to capture the
+  effect of subtle contingencies; are too narrow to make useful assessments about the larger system; are unable to
+  capture evolution in behaviours; or are so complex that analysis and interpretation becomes intractable.
 
-  This paper presents Fuzzi Moss, a novel method for simulating the effect of
-  contingent behaviour in socio-technical systems using software code fuzzing.
-  A socio-technical system is represented as an object-oriented domain model
-  compromising one or more classes.  Behaviours that operate on the system model
-  state are described separately as a set of idealised executable workflows.
-  These workflows are then annotated with code fuzzers, declarations of how the
-  workflow could be dynamically altered (removing steps, duplicating steps,
-  introducing new steps for example) when the workflow is executed.  A
-  simulation is then configured by executing the fuzzed workflow on an instance
-  of the domain model.  Results collected from the domain model state inform
-  predictions as to how an idealised workflow will perform in the presence of
-  contingent behaviour in the real world.
+  This paper presents Fuzzi Moss, a novel method for simulating the effect of contingent behaviour in socio-technical
+  systems using software code fuzzing.  A socio-technical system is represented as an object-oriented domain model
+  compromising one or more classes.  Behaviours that operate on the system model state are described separately as a set
+  of idealised executable workflows.  These workflows are then annotated with code fuzzers, declarations of how the
+  workflow could be dynamically altered (removing steps, duplicating steps, introducing new steps for example) when the
+  workflow is executed.  A simulation is then configured by executing the fuzzed workflow on an instance of the domain
+  model.  Results collected from the domain model state inform predictions as to how an idealised workflow will perform
+  in the presence of contingent behaviour in the real world.
  
-  We have implemented a proof of concept tool to evaluate our method. Fuzzi Moss
-  is as a small Python library, comprising a decorator for annotating executable
-  workflows with desired fuzzers, a mechanism for dynamically inspecting the
-  structure of a workflow and applying fuzzers during execution and a library of
-  core fuzzers.  We evaluate our approach to simulating socio-technical
-  behaviours by applying Fuzzi Moss to a socio-technical system case study.  The
-  results of the case study demonstrate the feasibility of the fuzzing method.
-  Finally, We explore the wider applications of fuzzing in socio-technical
-  systems modelling and discuss the next steps for the research.
+  We have implemented a proof of concept tool to evaluate our method. Fuzzi Moss is as a small Python library,
+  comprising a decorator for annotating executable workflows with desired fuzzers, a mechanism for dynamically
+  inspecting the structure of a workflow and applying fuzzers during execution and a library of core fuzzers.  We
+  evaluate our approach to simulating socio-technical behaviours by applying Fuzzi Moss to a socio-technical system case
+  study.  The results of the case study demonstrate the feasibility of the fuzzing method.  Finally, We explore the
+  wider applications of fuzzing in socio-technical systems modelling and discuss the next steps for the research.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,105 +94,75 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Modelling and simulating in large scale, complex socio-technical systems
-development projects is an on-going research challenge \citep{baxter08learning}.
-Socio-technical systems are characterised by the interactions between a variety
-of actor types within a system's scope, including individual human operators,
-organisational units and technical artifacts
-\citep{Susman1976,elhassan07role,sommerville08socio}. For the purposes of this
-research, sociotechnical systems are defined to be systems where the inner workings 
-are combinations of human and computational/technological activities. These systems 
-also incorporate a complex variety of structures that direct or influence actor
-and system behaviour, including workflow descriptions, organisational
-hierarchies, regulatory or legal standards, organisational policies and culture,
-interpersonal relationships and actor responsibilities
-\citep{bade07structures,pentland05organisational}. Examples of such systems with
-complex workflows involving multiple actors include emergency vehicle dispatch
-\citep{robinson96limited}, electronic voting systems
-\citep{bryans04towards,lock07observations}, patient care in a neo-natal unit
-\citep{baxter07evaluating} and electronic stock exchange infrastructures
-\citep{cftc-sec10findings}.  Systems of this form confound traditional
-approaches to modelling, simulating and predicting behaviour for several
-reasons.
+Modelling and simulating in large scale, complex socio-technical systems development projects is an on-going research
+challenge \citep{baxter08learning}.  Socio-technical systems are characterised by the interactions between a variety of
+actor types within a system's scope, including individual human operators, organisational units and technical artifacts
+\citep{Susman1976,elhassan07role,sommerville08socio}. For the purposes of this research, sociotechnical systems are
+defined to be systems where the inner workings are combinations of human and computational/technological
+activities. These systems also incorporate a complex variety of structures that direct or influence actor and system
+behaviour, including workflow descriptions, organisational hierarchies, regulatory or legal standards, organisational
+policies and culture, interpersonal relationships and actor responsibilities
+\citep{bade07structures,pentland05organisational}. Examples of such systems with complex workflows involving multiple
+actors include emergency vehicle dispatch \citep{robinson96limited}, electronic voting systems
+\citep{bryans04towards,lock07observations}, patient care in a neo-natal unit \citep{baxter07evaluating} and electronic
+stock exchange infrastructures \citep{cftc-sec10findings}.  Systems of this form confound traditional approaches to
+modelling, simulating and predicting behaviour for several reasons.
 
 \begin{itemize}
 
-\item Socio-technical systems are typically very large, constituted of
-  autonomous actors and components, each with their own behaviour that may be
-  influenced by other actors in the system
-  \cite{crabtree00ethnomethodologically}.  This intrinsic scale and complexity
-  makes refinement, reduction and abstraction, the conventional tools of the
-  systems engineer, difficult to apply, since individual behaviours are
-  difficult to classify and aggregate.  One study has advocated the development
-  of systems engineering methods based on the metaphor of city maintenance,
-  rather than individual building construction \citep{feiler06ultra} to meet
-  this system-of-systems challenge, although no methods are presented for making
-  this transition.
+\item Socio-technical systems are typically very large, constituted of autonomous actors and components, each with their
+  own behaviour that may be influenced by other actors in the system \cite{crabtree00ethnomethodologically}.  This
+  intrinsic scale and complexity makes refinement, reduction and abstraction, the conventional tools of the systems
+  engineer, difficult to apply, since individual behaviours are difficult to classify and aggregate.  One study has
+  advocated the development of systems engineering methods based on the metaphor of city maintenance, rather than
+  individual building construction \citep{feiler06ultra} to meet this system-of-systems challenge, although no methods
+  are presented for making this transition.
 
-\item The behaviour is contingent on unpredictable circumstances, including both
-  factors in the environment and concerning the system actors.  For example, the
-  time and manner in which a task, such as developing a new feature for a
-  software system, is completed may vary considerably between actors with
-  different training and experiences.  Similarly, the decision to work on a task
-  at all may depend on unpredictable and uncontrollable external circumstances
-  (such as a power outage).  In these circumstances, actors may also take it
-  upon themselves to complete tasks outwith expected workflows in order to
-  discharge their responsibilities, by working from a nearby cafe for example,
-  even if this violates organisational security policies.  As
-  \citet{besnard03human} note, such adaptations often make the human actors the
-  dependable parts of a socio-technical system.
+\item The behaviour is contingent on unpredictable circumstances, including both factors in the environment and
+  concerning the system actors.  For example, the time and manner in which a task, such as developing a new feature for
+  a software system, is completed may vary considerably between actors with different training and experiences.
+  Similarly, the decision to work on a task at all may depend on unpredictable and uncontrollable external circumstances
+  (such as a power outage).  In these circumstances, actors may also take it upon themselves to complete tasks outwith
+  expected workflows in order to discharge their responsibilities, by working from a nearby cafe for example, even if
+  this violates organisational security policies.  As \citet{besnard03human} note, such adaptations often make the human
+  actors the dependable parts of a socio-technical system.
 
-\item Behaviour is continually evolving, as the autonomous actors in a system
-  adapt to new circumstances, discover optimisations to their workflows, adapt
-  the workflow to suit local organisational priorities or take shortcuts
-  \citep{bonen79evolutionary,Lyytinen2008,anderson04heterogeneous}.  As a
-  consequence, the \emph{de facto} behaviour exhibited within a system may differ
-  from that envisaged by system architects in idealised workflows.  For example,
-  a ward manager in a hospital may delay releasing beds for re-allocation by
-  wider hospital management in the anticipation that these will be required by
-  incoming patients later in the day \citep{dewsbury07responsibility}.  This
-  evolution of practice may quickly invalidate expected models of behaviour.
+\item Behaviour is continually evolving, as the autonomous actors in a system adapt to new circumstances, discover
+  optimisations to their workflows, adapt the workflow to suit local organisational priorities or take shortcuts
+  \citep{bonen79evolutionary,Lyytinen2008,anderson04heterogeneous}.  As a consequence, the \emph{de facto} behaviour
+  exhibited within a system may differ from that envisaged by system architects in idealised workflows.  For example, a
+  ward manager in a hospital may delay releasing beds for re-allocation by wider hospital management in the anticipation
+  that these will be required by incoming patients later in the day \citep{dewsbury07responsibility}.  This evolution of
+  practice may quickly invalidate expected models of behaviour.
 
 \end{itemize}
 
-Due to these challenges, modelling socio-technical system behaviours using
-conventional techniques will typically either result in a model that is
-tractable, but lacks the necessary detail of the underlying system to provide
-informative results; so narrow in scope as to be uninformative about the
-behaviour of the wider system of interest; or so large and complex as to be
-intractable for analysis, whether manual or automated.  The design and
-construction of systems at this scale is still very much a craft, lacking the
-methods and tools to support modelling and predictive simulation available in
-other engineering disciplines.
+Due to these challenges, modelling socio-technical system behaviours using conventional techniques will typically either
+result in a model that is tractable, but lacks the necessary detail of the underlying system to provide informative
+results; so narrow in scope as to be uninformative about the behaviour of the wider system of interest; or so large and
+complex as to be intractable for analysis, whether manual or automated.  The design and construction of systems at this
+scale is still very much a craft, lacking the methods and tools to support modelling and predictive simulation available
+in other engineering disciplines.
 
-The contribution of this paper is to present and evaluate a novel approach to
-simulating variance in socio-technical behaviours on overall system performance,
-based on the automated \emph{fuzzing} of executable workflow descriptions.  The
-paper presents a method for describing socio-technical systems as
-object-oriented domain models, implemented in the Python programming language.
-These models are manipulated by system actors, who are directed by idealised
-workflow descriptions, encoded as collections of Python functions.  Workflow
-variance is simulated by automatically and dynamically fuzzing the workflow
-descriptions using code fuzzing.
+The contribution of this paper is to present and evaluate a novel approach to simulating variance in socio-technical
+behaviours on overall system performance, based on the automated \emph{fuzzing} of executable workflow descriptions.
+The paper presents a method for describing socio-technical systems as object-oriented domain models, implemented in the
+Python programming language.  These models are manipulated by system actors, who are directed by idealised workflow
+descriptions, encoded as collections of Python functions.  Workflow variance is simulated by automatically and
+dynamically fuzzing the workflow descriptions using code fuzzing.
 
-A proof of concept fuzzing library, Fuzzi Moss is developed and presented.  To
-evaluate the proposed approach an example case study, software development
-workflows was created using Fuzzi Moss.  The case study compares the
-performance of different software development processes (resources
-expended, features implemented and system quality) when following idealised
-workflows and when following workflows that have been subject to code fuzzing
-induced variance.
+A proof of concept fuzzing library, Fuzzi Moss is developed and presented.  To evaluate the proposed approach an example
+case study, software development workflows was created using Fuzzi Moss.  The case study compares the performance of
+different software development processes (resources expended, features implemented and system quality) when following
+idealised workflows and when following workflows that have been subject to code fuzzing induced variance.
 
-The rest of this paper is structured as follows.  Section \ref{sec:related}
-discusses related work, covering existing techniques for modelling
-socio-technical workflows and other applications of code fuzzing in software
-engineering.  Section \ref{sec:fuzzi-moss} presents the method for constructing
-models of socio-technical systems, associated workflows and denoting desired
-fuzzings.  Where relevant, this section also discusses details of the
-implementation details for Fuzzi Moss.  Section \ref{sec:evaluation} presents
-the case study evaluation of the method and Section \ref{sec:conclusions}
-discusses conclusions and future work, as well as noting the potential for
-applying fuzzing to other forms of socio-technical models.
+The rest of this paper is structured as follows.  Section \ref{sec:related} discusses related work, covering existing
+techniques for modelling socio-technical workflows and other applications of code fuzzing in software engineering.
+Section \ref{sec:fuzzi-moss} presents the method for constructing models of socio-technical systems, associated
+workflows and denoting desired fuzzings.  Where relevant, this section also discusses details of the implementation
+details for Fuzzi Moss.  Section \ref{sec:evaluation} presents the case study evaluation of the method and Section
+\ref{sec:conclusions} discusses conclusions and future work, as well as noting the potential for applying fuzzing to
+other forms of socio-technical models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -214,152 +172,111 @@ applying fuzzing to other forms of socio-technical models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section presents a literature review of the development of models and of
-behaviours in socio-technical systems.  The difficulties of developing modelling
-techniques that accommodate the inherent scale, complexity, contingency and
-dynamism of socio-technical systems are highlighted.  In addition, existing
-applications of software fuzzing are reviewed with respect to their relevance to
-the present work.
+This section presents a literature review of the development of models and of behaviours in socio-technical systems.
+The difficulties of developing modelling techniques that accommodate the inherent scale, complexity, contingency and
+dynamism of socio-technical systems are highlighted.  In addition, existing applications of software fuzzing are
+reviewed with respect to their relevance to the present work.
 
-Graphical notations have received considerable attention, perhaps due to their
-perceived efficacy in communicating requirements between users, customers and
-system architects.  These modelling languages include workflow based approaches
-such as UML activity diagrams \citep{omg2010omguml}, BPMN \citep{omg2011omgbpmn},
-YAWL \citep{hofstede2010yawl} and OBASHI \cite{obashimethodology}; and goal
-based approaches such as KaOS \citep{Werneck2009}, \emph{i*} \citep{yu1995} and
-responsibility modelling \citep{sommerville09responsibility}.
+Graphical notations have received considerable attention, perhaps due to their perceived efficacy in communicating
+requirements between users, customers and system architects.  These modelling languages include workflow based
+approaches such as UML activity diagrams \citep{omg2010omguml}, BPMN \citep{omg2011omgbpmn}, YAWL
+\citep{hofstede2010yawl} and OBASHI \cite{obashimethodology}; and goal based approaches such as KaOS
+\citep{Werneck2009}, \emph{i*} \citep{yu1995} and responsibility modelling \citep{sommerville09responsibility}.
 
-Activity diagrams are perhaps the most commonly known workflow language, due to
-incorporation in the UML standard \citep{omg2010omguml}.  The notation supports
-the modelling of the flow of control across a directed graph of activities, with
-arcs representing transitions in control.  Additional nodes are provided for
-denoting entry and exit points, as well as decision branches.  The notation is
-based on the Petri Net formalism and includes support for concurrent flows
-through the chart, as well as workflow forking and merging. The semi-formal
-nature of the UML standard enable the automatic parsing of graphical models,
-using CASE tools such as the Eclipse Modelling Framework \citep{EMFManual}.  An
-advantage of this approach is that models can be used for negotiation between
-project stakeholders, whilst also being used for simulations to predict system
-behaviour.
+Activity diagrams are perhaps the most commonly known workflow language, due to incorporation in the UML standard
+\citep{omg2010omguml}.  The notation supports the modelling of the flow of control across a directed graph of
+activities, with arcs representing transitions in control.  Additional nodes are provided for denoting entry and exit
+points, as well as decision branches.  The notation is based on the Petri Net formalism and includes support for
+concurrent flows through the chart, as well as workflow forking and merging. The semi-formal nature of the UML standard
+enable the automatic parsing of graphical models, using CASE tools such as the Eclipse Modelling Framework
+\citep{EMFManual}.  An advantage of this approach is that models can be used for negotiation between project
+stakeholders, whilst also being used for simulations to predict system behaviour.
 
-The Business Process Model and Notation (BPMN) is an alternative OMG standard
-for modelling workflows, with similar core notation and semantics for modelling
-workflows \citep{omg2011omgbpmn}.  Unlike activity diagrams, however, BPMN
-provides a richer notation for expressing more complex aspects of activities,
-such as differentiating between tasks, activities and transactions; triggering
-and orchestrating concurrent activities using messages; the identification of
-information resources need to realise an activity; and the orchestration of
-activities across organisational boundaries \citep{White2004}.  The notation is
-intended to support the generation of executable business processes expressed as
-web services, however, it can also be employed in other workflow contexts.
+The Business Process Model and Notation (BPMN) is an alternative OMG standard for modelling workflows, with similar core
+notation and semantics for modelling workflows \citep{omg2011omgbpmn}.  Unlike activity diagrams, however, BPMN provides
+a richer notation for expressing more complex aspects of activities, such as differentiating between tasks, activities
+and transactions; triggering and orchestrating concurrent activities using messages; the identification of information
+resources need to realise an activity; and the orchestration of activities across organisational boundaries
+\citep{White2004}.  The notation is intended to support the generation of executable business processes expressed as web
+services, however, it can also be employed in other workflow contexts.
 
-Yet Another Workflow Language (YAWL) provides similar capabilities to activity
-diagrams for modelling workflows, as well as being supported by CASE tools for
-graphical modelling \citep{hofstede2010yawl}.  However, unlike activity diagrams,
-YAWL is based on the \picalc\citep{Aalst2004}.  The notation also provides for a
-richer range of workflow requirements than activity diagrams, including
-sophisticated forking and merging rules, separation between workflow
-specifications and executions and resourcing and data requirements.
+Yet Another Workflow Language (YAWL) provides similar capabilities to activity diagrams for modelling workflows, as well
+as being supported by CASE tools for graphical modelling \citep{hofstede2010yawl}.  However, unlike activity diagrams,
+YAWL is based on the \picalc\citep{Aalst2004}.  The notation also provides for a richer range of workflow requirements
+than activity diagrams, including sophisticated forking and merging rules, separation between workflow specifications
+and executions and resourcing and data requirements.
 
-The OBASHI (Ownership, Business, Application, System, Hardware, Infrastructure)
-methodology and notation \citep{obashimethodology} is designed for modelling
-business processes across enterprise infrastructures.  The notation is intended
-for capturing the movement of data through a business process and revealing the
-associated dependencies on underlying infrastructure such as software systems,
-servers and network communications.  The language also provides a means for
-mapping these flows to higher level concerns, such as business rationale and
-ultimate organisational owner. In contrast to other workflow notations, flows
-are based on the movement of data rather than control.
+The OBASHI (Ownership, Business, Application, System, Hardware, Infrastructure) methodology and notation
+\citep{obashimethodology} is designed for modelling business processes across enterprise infrastructures.  The notation
+is intended for capturing the movement of data through a business process and revealing the associated dependencies on
+underlying infrastructure such as software systems, servers and network communications.  The language also provides a
+means for mapping these flows to higher level concerns, such as business rationale and ultimate organisational owner. In
+contrast to other workflow notations, flows are based on the movement of data rather than control.
 
 %%%%
 
-Describing socio-technical behaviour using workflow notations can be difficult,
-because of the basic assumption that all contingencies in a workflow can be
-completely described at a given level of granularity, and that more complex
-details can be encapsulated within coarser grained activities with well defined
-interfaces.  As argued in Section \ref{sec:introduction}, socio-technical
-behaviours are inherently complex, contingent and evolutionary, making such
-refinement based techniques difficult to apply.  As
-\citet{israilidis13ignorance} have argued, the unknowns in a socio-technical
-system may be far more significant than the knowns. Several authors have
-therefore discussed alternative techniques for modelling socio-technical systems
-with support for contingent behaviour
+Describing socio-technical behaviour using workflow notations can be difficult, because of the basic assumption that all
+contingencies in a workflow can be completely described at a given level of granularity, and that more complex details
+can be encapsulated within coarser grained activities with well defined interfaces.  As argued in Section
+\ref{sec:introduction}, socio-technical behaviours are inherently complex, contingent and evolutionary, making such
+refinement based techniques difficult to apply.  As \citet{israilidis13ignorance} have argued, the unknowns in a
+socio-technical system may be far more significant than the knowns. Several authors have therefore discussed alternative
+techniques for modelling socio-technical systems with support for contingent behaviour
 \citep{yu1995,dardenne93goal,Herrmann1999,sommerville09deriving}.
 
-Both \emph{i*}\citet{yu1995} and KaOS \citet{dardenne93goal} are goal oriented
-notations for modelling socio-technical systems \citep{Werneck2009}.  In
-contrast to workflows, goal oriented approaches primarily capture the intents of
-actors (what they are seeking to achieve).  Goals can be de-composed into a
-sub-goal hierarchy using logical operators to express the form of
-decomposition. Goals can also be annotated with strategies and/or resource
-requirements to support automated analysis.  \citeauthor{yu1995} argued that
-socio-technical systems should be viewed as collections of collaborating actors,
-each with their own (potentially conflicting) objectives.  Eliciting and
-analysing the actors intents allows the inter-dependencies between actors and
-the overall behaviour of the system to be understood, without the need for
-explicit models of individual workflows.
+Both \emph{i*}\citet{yu1995} and KaOS \citet{dardenne93goal} are goal oriented notations for modelling socio-technical
+systems \citep{Werneck2009}.  In contrast to workflows, goal oriented approaches primarily capture the intents of actors
+(what they are seeking to achieve).  Goals can be de-composed into a sub-goal hierarchy using logical operators to
+express the form of decomposition. Goals can also be annotated with strategies and/or resource requirements to support
+automated analysis.  \citeauthor{yu1995} argued that socio-technical systems should be viewed as collections of
+collaborating actors, each with their own (potentially conflicting) objectives.  Eliciting and analysing the actors
+intents allows the inter-dependencies between actors and the overall behaviour of the system to be understood, without
+the need for explicit models of individual workflows.
 
-Other authors have extended goal oriented approaches to provide greater
-flexibility.  \citet{sommerville09deriving} argued that stakeholders often
-struggle to express their behaviour within a socio-technical system in terms of
-goals.  Instead, \citeauthor{sommerville09deriving} argue that the concept of
-\emph{responsibilities}, the duties held by an actor in a system, are a more
-intuitive means of describing system behaviours that also capture a variety of
-contingent behaviours.  A notation for expressing the relationships between
-responsibilities and resources in order to identify dependencies within a system
-is provided.  Earlier work on responsibility modelling also provided mechanisms
-with annotating responsibilities with indicative workflows, expressing the means
-by which responsibilities \emph{could} be executed
-\citep{dewsbury07responsibility}.
+Other authors have extended goal oriented approaches to provide greater flexibility.  \citet{sommerville09deriving}
+argued that stakeholders often struggle to express their behaviour within a socio-technical system in terms of goals.
+Instead, \citeauthor{sommerville09deriving} argue that the concept of \emph{responsibilities}, the duties held by an
+actor in a system, are a more intuitive means of describing system behaviours that also capture a variety of contingent
+behaviours.  A notation for expressing the relationships between responsibilities and resources in order to identify
+dependencies within a system is provided.  Earlier work on responsibility modelling also provided mechanisms with
+annotating responsibilities with indicative workflows, expressing the means by which responsibilities \emph{could} be
+executed \citep{dewsbury07responsibility}.
 
-Despite providing for contingency, a limitation of the goal and responsibility
-approaches is the need for complete model descriptions. \citet{Herrmann1999}
-introduced techniques for annotating goal oriented system models in the SeeMe
-notation with vagueness.  The notation enables a modeller to denote where
-vagueness may be present in a model due to abstraction (i.e. consistent
-vagueness) and due to omission (inconsistent vagueness).  In addition,
-\citeauthor{Herrmann1999} provide notation for indicating that a model is
-thought to be complete, containing all pertinent details.  However, the
-annotations are not accompanied by a formal semantics, or other means of
-supporting automated analysis.
+Despite providing for contingency, a limitation of the goal and responsibility approaches is the need for complete model
+descriptions. \citet{Herrmann1999} introduced techniques for annotating goal oriented system models in the SeeMe
+notation with vagueness.  The notation enables a modeller to denote where vagueness may be present in a model due to
+abstraction (i.e. consistent vagueness) and due to omission (inconsistent vagueness).  In addition,
+\citeauthor{Herrmann1999} provide notation for indicating that a model is thought to be complete, containing all
+pertinent details.  However, the annotations are not accompanied by a formal semantics, or other means of supporting
+automated analysis.
 
-We are not aware of other applications of fuzzing techniques to modelling
-contingent behaviours in socio-technical systems.  However, software code
-fuzzing (or mutation) is employed in software quality assurance in order to
-automatically generate program variants.  \emph{Mutation operators} in such
-applications may alter the value of literals, swap arithmetic or other
-operators, or change the ordering of arguments to a function call, for example.
-Applying different combinations of mutation operators creates a population of
-mutants of the target program.  One application of this technique is mutation
-testing, in which the generation of program variants is used to simulate the
-introduction of defects and evaluate the effectiveness of an application's test
-suite in detecting regressions \citep{demillo78hints}.  A test is considered to
-have detected a mutant if the application of the test to the mutant fails.  A
-test suite that detects a higher proportion of mutants is considered to have
-good coverage of the target program.
+We are not aware of other applications of fuzzing techniques to modelling contingent behaviours in socio-technical
+systems.  However, software code fuzzing (or mutation) is employed in software quality assurance in order to
+automatically generate program variants.  \emph{Mutation operators} in such applications may alter the value of
+literals, swap arithmetic or other operators, or change the ordering of arguments to a function call, for example.
+Applying different combinations of mutation operators creates a population of mutants of the target program.  One
+application of this technique is mutation testing, in which the generation of program variants is used to simulate the
+introduction of defects and evaluate the effectiveness of an application's test suite in detecting regressions
+\citep{demillo78hints}.  A test is considered to have detected a mutant if the application of the test to the mutant
+fails.  A test suite that detects a higher proportion of mutants is considered to have good coverage of the target
+program.
 
-The effectiveness of mutant generation is significantly influenced by choice of
-mutant operators to apply, since the search space of potential mutants to be
-tested is very large and many mutants will reveal the same test suite
-deficiencies \citep{takanen08fuzzing}.  Generation of mutants based on an
-understanding of a system's specification allows mutant generation to be focused
-on a system's intended behaviour.  It can therefore be expected that applying
-code fuzzing to simulating socio-technical behaviours requires an understanding
-of the likely variants to behaviour that may occur in a workflow in order to
-generate realistic simulations.
+The effectiveness of mutant generation is significantly influenced by choice of mutant operators to apply, since the
+search space of potential mutants to be tested is very large and many mutants will reveal the same test suite
+deficiencies \citep{takanen08fuzzing}.  Generation of mutants based on an understanding of a system's specification
+allows mutant generation to be focused on a system's intended behaviour.  It can therefore be expected that applying
+code fuzzing to simulating socio-technical behaviours requires an understanding of the likely variants to behaviour that
+may occur in a workflow in order to generate realistic simulations.
 
-There are a variety of existing tools that incorporate fuzzing functionality for
-mutation testing, including PiTest \citep{coles14pitest} for Java and MutPy
-\citep{mutpy26} and PyMuTester \citep{pymuttester} for Python.
-\citet{storer15ringneck-repos} has also developed a tool for mutation testing
-Maven component assembly specifications. All these tools work by constructing
-and then manipulating abstract syntax trees of target programs.  The result is a
-population of statically generated mutant programs that can be evaluated using
-the target program's own test suite.  A disadvantage of this mechanism (for the
-purposes of modelling socio-technical systems) is that the mutants are generated
-statically, prior to program execution.  Our own implementation of code fuzzing
-is motivated by the desire to simulate dynamic contingent behaviour, that can
-vary from the idealised model each time a fuzzed step in a workflow is executed.
+There are a variety of existing tools that incorporate fuzzing functionality for mutation testing, including PiTest
+\citep{coles14pitest} for Java and MutPy \citep{mutpy26} and PyMuTester \citep{pymuttester} for Python.
+\citet{storer15ringneck-repos} has also developed a tool for mutation testing Maven component assembly
+specifications. All these tools work by constructing and then manipulating abstract syntax trees of target programs.
+The result is a population of statically generated mutant programs that can be evaluated using the target program's own
+test suite.  A disadvantage of this mechanism (for the purposes of modelling socio-technical systems) is that the
+mutants are generated statically, prior to program execution.  Our own implementation of code fuzzing is motivated by
+the desire to simulate dynamic contingent behaviour, that can vary from the idealised model each time a fuzzed step in a
+workflow is executed.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -369,33 +286,25 @@ vary from the idealised model each time a fuzzed step in a workflow is executed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we introduce our approach to modelling idealised workflows in
-socio-technical systems and introducing variance in their execution through
-dynamic fuzzing. The method comprises: construction of an object oriented model
-of the problem domain; construction of an idealised representation of
-socio-technical workflows that specify the behaviours of actors in the problem
-domain; annotation of the workflows with fuzzers to introduce variance;
-execution of the workflows in scenarios; and measurement of outcomes in the
-scenarios through observation of the problem domain state. Each stage of the
-method is described in more detail below, using the task of developing software
-as an illustrative example the full case study is presented in Section
-\ref{sec:evaluation}).
+In this section we introduce our approach to modelling idealised workflows in socio-technical systems and introducing
+variance in their execution through dynamic fuzzing. The method comprises: construction of an object oriented model of
+the problem domain; construction of an idealised representation of socio-technical workflows that specify the behaviours
+of actors in the problem domain; annotation of the workflows with fuzzers to introduce variance; execution of the
+workflows in scenarios; and measurement of outcomes in the scenarios through observation of the problem domain
+state. Each stage of the method is described in more detail below, using the task of developing software as an
+illustrative example the full case study is presented in Section \ref{sec:evaluation}).
 
-Implementation details of the the proof of concept library, Fuzzi Moss, are also
-presented.  Source code for the Fuzzi Moss library is available from the
-project's GitHub repository \citep{wallis2016fuzzi-moss-scm}.  The library was
-implemented in the Python programming language.  The Python syntax is designed
-to be readable, meaning that domain models and workflows could be expressed in
-structured natural language.  Further, Python is an interpreted object-oriented
-language, that treats function definitions as first class constructs.  This made
-the development of a proof of concept fuzzing library convenient.  The core
-implementation is less than 100 lines of program code, including blank lines and
-source code documentation, whilst the library of utility fuzzers is implemented
-in less than 300 lines. Source code for the case study is also available in a
-separate GitHub repository \citep{storer2016softdev-workflow-scm} and comprises
-approximately 1000 lines of program code.  Some of the example code fragments
-shown below have been modified to ease explanation (removing self arguments from
-function definitions, for example).
+Implementation details of the the proof of concept library, Fuzzi Moss, are also presented.  Source code for the Fuzzi
+Moss library is available from the project's GitHub repository \citep{wallis2016fuzzi-moss-scm}.  The library was
+implemented in the Python programming language.  The Python syntax is designed to be readable, meaning that domain
+models and workflows could be expressed in structured natural language.  Further, Python is an interpreted
+object-oriented language, that treats function definitions as first class constructs.  This made the development of a
+proof of concept fuzzing library convenient.  The core implementation is less than 100 lines of program code, including
+blank lines and source code documentation, whilst the library of utility fuzzers is implemented in less than 300
+lines. Source code for the case study is also available in a separate GitHub repository
+\citep{storer2016softdev-workflow-scm} and comprises approximately 1000 lines of program code.  Some of the example code
+fragments shown below have been modified to ease explanation (removing self arguments from function definitions, for
+example).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -403,29 +312,22 @@ function definitions, for example).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The initial step in the Fuzzi Moss method is to develop a model of the target
-socio-technical problem domain.  The model represents the invariant `physics' of
-the problem domain that cannot be altered because it represent hard constraints
-in the real world.  The model may represent constraints imposed by
-natural laws, such as the conservation of energy; deliberate technical system
-design, such as an access control client that limits access to a software system
-to those who know an appropriate username and password combination; or emergent
-phenomena that can be modelled stochastically, such as the tendency for the
-implementation of new features in a software system to introduce bugs.
+The initial step in the Fuzzi Moss method is to develop a model of the target socio-technical problem domain.  The model
+represents the invariant `physics' of the problem domain that cannot be altered because it represent hard constraints in
+the real world.  The model may represent constraints imposed by natural laws, such as the conservation of energy;
+deliberate technical system design, such as an access control client that limits access to a software system to those
+who know an appropriate username and password combination; or emergent phenomena that can be modelled stochastically,
+such as the tendency for the implementation of new features in a software system to introduce bugs.
 
-We have adopted an object-oriented approach to modelling the elements of the
-problem domain \citep{bennett06object}, so that domain artefacts are represented
-as instances of classes.  The state of a particular scenario in a problem domain
-is therefore represented by a collection of inter-related Python objects
-constructed from the classes specified in the domain model.  Figure
-\ref{fig:feature-class-diagram} shows part of a class diagram for the software
-development problem domain case study.  The diagram shows classes for system
-features, representing user-facing specifications of the system's functionality;
-code chunks, representing the implementation details of the system; and bugs
-introduced into chunks during the completion of features.  Figure
-\ref{fig:feature-instance-diagram} illustrates an example state for the same
-problem domain using an object diagram, showing a feature implemented with two
-chunks, one of which contains a bug.
+We have adopted an object-oriented approach to modelling the elements of the problem domain \citep{bennett06object}, so
+that domain artefacts are represented as instances of classes.  The state of a particular scenario in a problem domain
+is therefore represented by a collection of inter-related Python objects constructed from the classes specified in the
+domain model.  Figure \ref{fig:feature-class-diagram} shows part of a class diagram for the software development problem
+domain case study.  The diagram shows classes for system features, representing user-facing specifications of the
+system's functionality; code chunks, representing the implementation details of the system; and bugs introduced into
+chunks during the completion of features.  Figure \ref{fig:feature-instance-diagram} illustrates an example state for
+the same problem domain using an object diagram, showing a feature implemented with two chunks, one of which contains a
+bug.
 
 \begin{figure}
   \centering
@@ -440,7 +342,7 @@ chunks, one of which contains a bug.
   \vspace{10pt}
 
   \begin{subfigure}{\linewidth}
-    \centering 
+    \centering
     \includegraphics{floats/object-diagram-1}
     \caption{Object diagram}
     \label{fig:feature-instance-diagram}
@@ -450,39 +352,30 @@ chunks, one of which contains a bug.
   \vspace{10pt}
 
   
-  \caption{Object oriented models of a software development problem domain,
-    using the UML notation.}
+  \caption{Object oriented models of a software development problem domain, using the UML notation.}
 
 \end{figure}
 
-The state of the problem domain can only be altered through explicit actions on
-the domain (referred to as domain actions here), that are modelled as operations
-on the domain classes.  In the example given in Figure
-\ref{fig:feature-class-diagram}, the state of a feature can be altered by
-invoking the \lstinline!extend()!  operation.  This adds a new chunk to the
-feature's implementation and also has two side effects. The addition of new
-chunks may introduce bugs into the newly created chunk, as well as create
-dependencies between the new chunk and other chunks already in the system as a
-whole.  Consequently, operations are also provided for refactoring to reduce
-dependencies between chunks, and debugging, to remove bugs from the feature.
-System features can be operated, in turn causing a random sequence of feature
-chunks to be operated.  When this happens, there is the potential for the system
-to fail, due to the manifestation of a bug in a chunk.
+The state of the problem domain can only be altered through explicit actions on the domain (referred to as domain
+actions here), that are modelled as operations on the domain classes.  In the example given in Figure
+\ref{fig:feature-class-diagram}, the state of a feature can be altered by invoking the \lstinline!extend()!  operation.
+This adds a new chunk to the feature's implementation and also has two side effects. The addition of new chunks may
+introduce bugs into the newly created chunk, as well as create dependencies between the new chunk and other chunks
+already in the system as a whole.  Consequently, operations are also provided for refactoring to reduce dependencies
+between chunks, and debugging, to remove bugs from the feature.  System features can be operated, in turn causing a
+random sequence of feature chunks to be operated.  When this happens, there is the potential for the system to fail, due
+to the manifestation of a bug in a chunk.
 
-Very few restrictions are placed on the design of the problem domain operations.
-Operations can accept a variety of arguments, modify the class state, invoke
-operations on other problem domain classes and return values as desired.
-However The operations on the problem domain should be modelled as atomic and
-independent, allowing them to be safely invoked in any combination.
+Very few restrictions are placed on the design of the problem domain operations.  Operations can accept a variety of
+arguments, modify the class state, invoke operations on other problem domain classes and return values as desired.
+However The operations on the problem domain should be modelled as atomic and independent, allowing them to be safely
+invoked in any combination.
 
-The object oriented problem domain model is implemented as a collection of
-Python classes.  Model state is represented by python instance attributes.
-Operations are implemented as Python methods in the appropriate classes.
-Problem domain classes can be extended with supplementary properties using the
-Python \lstinline!@property! decorator in order to improve readability as
-normal.  The state of the problem domain can therefore be accessed and read as
-desired for measuring behaviour in scenarios, or instrumented to record relevant
-events for later analysis.
+The object oriented problem domain model is implemented as a collection of Python classes.  Model state is represented
+by python instance attributes.  Operations are implemented as Python methods in the appropriate classes.  Problem domain
+classes can be extended with supplementary properties using the Python \lstinline!@property! decorator in order to
+improve readability as normal.  The state of the problem domain can therefore be accessed and read as desired for
+measuring behaviour in scenarios, or instrumented to record relevant events for later analysis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -490,24 +383,19 @@ events for later analysis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The next stage of the method concerns the development of descriptions of
-socio-technical behaviours of actors in the problem domain, using workflows.
-Workflows direct the sequence of actions by an actor on the artefacts in the
-problem domain.  Behaviours are modelled as \emph{idealised} workflows,
-i.e. the behaviour desired or expected of an actor in a socio-technical system
-without concern for contingencies.  Workflows are modelled as activity diagrams,
-which enables the construction of a hierarchy of workflow descriptions,
-supporting modularity and reuse.
+The next stage of the method concerns the development of descriptions of socio-technical behaviours of actors in the
+problem domain, using workflows.  Workflows direct the sequence of actions by an actor on the artefacts in the problem
+domain.  Behaviours are modelled as \emph{idealised} workflows, i.e. the behaviour desired or expected of an actor in a
+socio-technical system without concern for contingencies.  Workflows are modelled as activity diagrams, which enables
+the construction of a hierarchy of workflow descriptions, supporting modularity and reuse.
 
-Two related workflows are illustrated in Figure \ref{fig:workflow-partial}.
-Figure \ref{fig:workflow-tdd} illustrates a Test Driven Development workflow, in
-which a software developer specifies an implementation, creates a test case,
-implements and debugs the feature and finally refactors the functional
-implementation.  Figure \ref{fig:workflow-refactoring} illustrates the more fine
-grained workflow for refactoring.  A developer, continues to refactor the
-feature until the measured coupling rate is less than a desired maximum.  Both
-workflows are executed by invoking operations on a \lstinline!Developer!
-instance that tracks the cost of performing actions on the development project.
+Two related workflows are illustrated in Figure \ref{fig:workflow-partial}.  Figure \ref{fig:workflow-tdd} illustrates a
+Test Driven Development workflow, in which a software developer specifies an implementation, creates a test case,
+implements and debugs the feature and finally refactors the functional implementation.  Figure
+\ref{fig:workflow-refactoring} illustrates the more fine grained workflow for refactoring.  A developer, continues to
+refactor the feature until the measured coupling rate is less than a desired maximum.  Both workflows are executed by
+invoking operations on a \lstinline!Developer!  instance that tracks the cost of performing actions on the development
+project.
 
 \begin{figure*}
   \centering
@@ -527,26 +415,21 @@ instance that tracks the cost of performing actions on the development project.
     \label{fig:workflow-refactoring}
   \end{subfigure}
   
-\
+  \
 
-  \caption{Partial socio-technical workflows for software development expressed
-    as UML activity diagrams.}
+  \caption{Partial socio-technical workflows for software development expressed as UML activity diagrams.}
 
   \label{fig:workflow-partial}
 \end{figure*}
 
-We currently limit the use of activity diagram notation to begin, end, activity
-and conditional branches, with transitions indicating the flow of control
-between steps.  Fuzzi Moss does not currently support concurrent behaviours that
-would be represented by fork and join nodes, although this feature is discussed
-in Section \ref{sec:conclusions}.  The workflow models are implemented as
-collections of Python functions.  As for the domain actions, implementation of
-the workflow functions is flexible. Workflow functions can be parameterised
-and may also return values as desired.  Workflow functions can be encapsulated
-into classes to support model maintenance, although this is not necessary for
-the method itself.  One restriction that is made is that workflow functions
-should not contain nested function definitions, as these may be inadvertently
-fuzzed by the Fuzzi Moss mechanism.
+We currently limit the use of activity diagram notation to begin, end, activity and conditional branches, with
+transitions indicating the flow of control between steps.  Fuzzi Moss does not currently support concurrent behaviours
+that would be represented by fork and join nodes, although this feature is discussed in Section \ref{sec:conclusions}.
+The workflow models are implemented as collections of Python functions.  As for the domain actions, implementation of
+the workflow functions is flexible. Workflow functions can be parameterised and may also return values as desired.
+Workflow functions can be encapsulated into classes to support model maintenance, although this is not necessary for the
+method itself.  One restriction that is made is that workflow functions should not contain nested function definitions,
+as these may be inadvertently fuzzed by the Fuzzi Moss mechanism.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -554,42 +437,32 @@ fuzzed by the Fuzzi Moss mechanism.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The workflow functions implemented in Python are denoted as eligible for fuzzing
-by applying the \lstinline!@fuzz! decorator provided in the Fuzzi Moss
-package. The decorator's constructor accepts one argument, a pointer to a
-\emph{fuzzer} function, that will be used in the fuzzing mechanism described
-below.  An example of the application of a fuzzer (identity) is shown in Figure
-\ref{fig:fuzz}. Python's decorator mechanism intercepts invocations of the
-decorated function and allows these to be substituted with an alternative
-function to be invoked.  The Fuzzi Moss decorator exploits this mechanism by
-defining and returning a \lstinline!wrap()!  function that is able to
-dynamically fuzz the decorated function each time it is invoked.  The wrap
-function accepts the same set of arguments as the decorated function and should
-be expected to return the same values. The decorator's \lstinline!__call__()!
-method, which intercepts the invocation of the decorated function, defines the
-wrap function as follows.
+The workflow functions implemented in Python are denoted as eligible for fuzzing by applying the \lstinline!@fuzz!
+decorator provided in the Fuzzi Moss package. The decorator's constructor accepts one argument, a pointer to a
+\emph{fuzzer} function, that will be used in the fuzzing mechanism described below.  An example of the application of a
+fuzzer (identity) is shown in Figure \ref{fig:fuzz}. Python's decorator mechanism intercepts invocations of the
+decorated function and allows these to be substituted with an alternative function to be invoked.  The Fuzzi Moss
+decorator exploits this mechanism by defining and returning a \lstinline!wrap()!  function that is able to dynamically
+fuzz the decorated function each time it is invoked.  The wrap function accepts the same set of arguments as the
+decorated function and should be expected to return the same values. The decorator's \lstinline!__call__()!  method,
+which intercepts the invocation of the decorated function, defines the wrap function as follows.
 
 \begin{enumerate}
 
-\item The abstract syntax tree (AST) for the decorated function is constructed,
-  using the Python \lstinline!inspect! package to recover the function's source
-  code and the \lstinline!ast!  package to build the AST from the source.  This
+\item The abstract syntax tree (AST) for the decorated function is constructed, using the Python \lstinline!inspect!
+  package to recover the function's source code and the \lstinline!ast!  package to build the AST from the source.  This
   reference AST is then cached for future reference.
 
-\item A copy of the AST is made.  An AST visitor (called a transformer) is then
-  constructed and given the decorator's fuzzer attribute as an argument.  The
-  copied syntax tree is then passed to the visitor.
+\item A copy of the AST is made.  An AST visitor (called a transformer) is then constructed and given the decorator's
+  fuzzer attribute as an argument.  The copied syntax tree is then passed to the visitor.
 
-\item The visitor identifies the function definition node in the AST and applies
-  the fuzzer to the function definition's body.  The body is represented as a
-  list of Python statements in the AST.  The function body is replaced by the
-  value returned by the fuzzer.
+\item The visitor identifies the function definition node in the AST and applies the fuzzer to the function definition's
+  body.  The body is represented as a list of Python statements in the AST.  The function body is replaced by the value
+  returned by the fuzzer.
 
-\item Finally, the now fuzzed AST is compiled to Python byte code.  The byte
-  code of the fuzzed function is then substituted for the decorated function's
-  byte code and the function is invoked with its original parameters.  Control
-  is then passed back to the Python interpreter, allowing any returned values to
-  be passed back as normal.
+\item Finally, the now fuzzed AST is compiled to Python byte code.  The byte code of the fuzzed function is then
+  substituted for the decorated function's byte code and the function is invoked with its original parameters.  Control
+  is then passed back to the Python interpreter, allowing any returned values to be passed back as normal.
 
 \end{enumerate}
 
@@ -597,126 +470,100 @@ wrap function as follows.
  \begin{figure}
    \centering
   \begin{lstlisting}
-@fuzz(identity)
-def _refactor_feature(developer, feature):
-    while len(feature.dependencies) > \
-        self.target_dependencies_per_feature:
-        developer.refactor(feature)
-  \end{lstlisting}
+@fuzz(identity) def _refactor_feature(developer, feature): while len(feature.dependencies) > \
+self.target_dependencies_per_feature: developer.refactor(feature)
+\end{lstlisting}
   
-  \caption{Example fuzz decorator applied to a software development workflow.}
-  \label{fig:fuzz}
-\end{figure}
+   \caption{Example fuzz decorator applied to a software development workflow.}
+   \label{fig:fuzz}
+ \end{figure}
 
-The generic definition of the fuzzer function (accept and return a list of
-Python statement ASTs) allows a user to define a wide range of fuzzing
-mechanisms to suit their problem domain.  To demonstrate this flexibility, a
-suite of fuzzers is provided in Fuzzi Moss that allow the modular construction
-of more complex fuzzer behaviours.  The behaviour of each of the fuzzers
-available in Fuzzi Moss are described in the following sub sections.
+ The generic definition of the fuzzer function (accept and return a list of Python statement ASTs) allows a user to
+ define a wide range of fuzzing mechanisms to suit their problem domain.  To demonstrate this flexibility, a suite of
+ fuzzers is provided in Fuzzi Moss that allow the modular construction of more complex fuzzer behaviours.  The behaviour
+ of each of the fuzzers available in Fuzzi Moss are described in the following sub sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Simple Fuzzers}
+ \subsection{Simple Fuzzers}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-A simple fuzzer accepts and returns a list of \lstinline!ast.Statement! objects
-and can be declared for use directly within a fuzz decorator.  The following
-simple fuzzers are defined in Fuzzi Moss.
+ A simple fuzzer accepts and returns a list of \lstinline!ast.Statement! objects and can be declared for use directly
+ within a fuzz decorator.  The following simple fuzzers are defined in Fuzzi Moss.
 
-\begin{FunctionList}
+ \begin{FunctionList}
 
-\item\lstinline!identity! returns the input list of statements.  The identity
-  fuzzer is used as a default for the fuzz decorator, but is also useful when
-  building composite fuzzers.
+ \item\lstinline!identity! returns the input list of statements.  The identity fuzzer is used as a default for the fuzz
+   decorator, but is also useful when building composite fuzzers.
 
-\item\lstinline!replace_steps_with_passes! returns a list of \lstinline!pass!
-  statements of the same length as the input.  Replacing statements with pass is
-  safer than removing the statement, since a Python function must be defined
-  with at least one statement.
+ \item\lstinline!replace_steps_with_passes! returns a list of \lstinline!pass!  statements of the same length as the
+   input.  Replacing statements with pass is safer than removing the statement, since a Python function must be defined
+   with at least one statement.
 
-\item\lstinline!duplicate_steps! returns a list containing the input sequence
-  repeated twice.
+ \item\lstinline!duplicate_steps! returns a list containing the input sequence repeated twice.
 
-\item\lstinline!shuffle_steps! returns a randomly shuffled list of the input.  A
-  Python Random object \lstinline!fuzzi_moss_random! is used as a random source.
+ \item\lstinline!shuffle_steps! returns a randomly shuffled list of the input.  A Python Random object
+   \lstinline!fuzzi_moss_random! is used as a random source.
 
-\item \lstinline!swap_if_blocks! switches the body and orelse blocks of all if
-  statements in the input.
+ \item \lstinline!swap_if_blocks! switches the body and orelse blocks of all if statements in the input.
 
-\end{FunctionList}
+ \end{FunctionList}
 
-The application of simple fuzzers was demonstrated in Figure \ref{fig:fuzz}.
-Note that the fuzzer is supplied to the fuzz decorator as a function pointer,
-rather than as an evaluated function call.
+ The application of simple fuzzers was demonstrated in Figure \ref{fig:fuzz}.  Note that the fuzzer is supplied to the
+ fuzz decorator as a function pointer, rather than as an evaluated function call.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Fuzzing Filters}
+ \subsection{Fuzzing Filters}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Sometimes it is desirable to restrict the application of simple fuzzers to
-particular portions of the body of a workflow function.  In this situation the
-\lstinline!filter_steps()! fuzzer can be used.  Filter steps takes two
-arguments: a filter function pointer and a fuzzer function pointer.  These are
-used to define a nested \lstinline!_filter_step! fuzzer that behaves like a
-simple fuzzer as described above.
+ Sometimes it is desirable to restrict the application of simple fuzzers to particular portions of the body of a
+ workflow function.  In this situation the \lstinline!filter_steps()! fuzzer can be used.  Filter steps takes two
+ arguments: a filter function pointer and a fuzzer function pointer.  These are used to define a nested
+ \lstinline!_filter_step! fuzzer that behaves like a simple fuzzer as described above.
 
-A filter function accepts a list of statements and returns a list of tuples.
-Each tuple denotes the start and end index for a block of statements in the
-input.  Each block is then fuzzed using the supplied fuzzer.  Blocks not
-specified by the filter are not affected by the fuzzer, such that the returned
-sequence of statements may contain a mix of fuzzed and un-fuzzed statements.
+ A filter function accepts a list of statements and returns a list of tuples.  Each tuple denotes the start and end
+ index for a block of statements in the input.  Each block is then fuzzed using the supplied fuzzer.  Blocks not
+ specified by the filter are not affected by the fuzzer, such that the returned sequence of statements may contain a mix
+ of fuzzed and un-fuzzed statements.
 
-The following filters are available for use in conjunction with a fuzzer.
+ The following filters are available for use in conjunction with a fuzzer.
 
-\begin{FunctionList}
+ \begin{FunctionList}
 
-\item \lstinline!choose_last_step! returns the start and end index of the last
-  statement in the input, i.e. \lstinline!input[-2:-1]!
+ \item \lstinline!choose_last_step! returns the start and end index of the last statement in the input,
+   i.e. \lstinline!input[-2:-1]!
 
-\item \lstinline!choose_random_steps(n)!  returns $n$ length 1 sub-blocks
-  randomly selected from the input steps.
+ \item \lstinline!choose_random_steps(n)!  returns $n$ length 1 sub-blocks randomly selected from the input steps.
 
-\item \lstinline!exclude_control_structures(target)! permits the exclusion of
-  control structure statements by type as specified by the target input
-  argument. Supported structures are \lstinline!for!, \lstinline!while!,
-  \lstinline!if!, \lstinline!try!-\lstinline!except! and \lstinline!return!.
+ \item \lstinline!exclude_control_structures(target)! permits the exclusion of control structure statements by type as
+   specified by the target input argument. Supported structures are \lstinline!for!, \lstinline!while!, \lstinline!if!,
+   \lstinline!try!-\lstinline!except! and \lstinline!return!.
 
-\end{FunctionList}
+ \end{FunctionList}
 
-An invert filter is also provided which inverts the selection provided by its
-argument. Several pre-defined filtering fuzzers are implemented in Fuzzi Moss
-combining some of the predefined filters and simple fuzzers.  These provide
-commonly required fuzzers, including removing or duplicating the last step or a
-random step. A \lstinline!choose_identity! filter is also included for
-completeness.  Figure \ref{fig:filter} illustrates the application of a filter
-steps fuzzer that randomly shuffles all but the last step.
+ An invert filter is also provided which inverts the selection provided by its argument. Several pre-defined filtering
+ fuzzers are implemented in Fuzzi Moss combining some of the predefined filters and simple fuzzers.  These provide
+ commonly required fuzzers, including removing or duplicating the last step or a random step. A
+ \lstinline!choose_identity! filter is also included for completeness.  Figure \ref{fig:filter} illustrates the
+ application of a filter steps fuzzer that randomly shuffles all but the last step.
 
 \begin{figure}
   \centering
 
 \begin{lstlisting}
-@fuzz(
-  filter_steps(
-    invert(choose_last_step),
-    shuffle_steps
-  )
-)
-def work(self, system, developer, schedule):
+@fuzz( filter_steps( invert(choose_last_step), shuffle_steps ) ) def work(self, system, developer, schedule):
 
-  self.complete_specification(schedule, system)
-  self.implement_features(developer, system)
-  self.implement_test_suite(developer, system)
-  self.debug_system(developer, system)
-  self.refactor_system(developer, system)
+self.complete_specification(schedule, system) self.implement_features(developer, system)
+self.implement_test_suite(developer, system) self.debug_system(developer, system) self.refactor_system(developer,
+system)
 
 \end{lstlisting}
 
-\caption{Using filters to control the application of step replacement to all but
-  the last step in a Waterfall software development workflow.}
+  \caption{Using filters to control the application of step replacement to all but the last step in a Waterfall software
+    development workflow.}
   \label{fig:filter}
 \end{figure}
 
@@ -726,55 +573,41 @@ def work(self, system, developer, schedule):
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-More complex fuzzers can be assembled using composite fuzzing functions that are
-implemented in a similar manner to filtering.  
+More complex fuzzers can be assembled using composite fuzzing functions that are implemented in a similar manner to
+filtering.
 
 
 \begin{FunctionList}
-\item \lstinline!in_sequence(fuzzers)! applies each fuzzer found in the input
-  list of fuzzers in sequence to a function body.
+\item \lstinline!in_sequence(fuzzers)! applies each fuzzer found in the input list of fuzzers in sequence to a function
+  body.
 
-\item \lstinline!choose_from(distribution)! selects a fuzzer to apply at random
-  from the supplied probability distribution.  The distribution is defined as a
-  list of weight, fuzzer tuples.
+\item \lstinline!choose_from(distribution)! selects a fuzzer to apply at random from the supplied probability
+  distribution.  The distribution is defined as a list of weight, fuzzer tuples.
 
 \item \lstinline!on_condition_that(condition, fuzzer)! %
-  applies the specified fuzzer if the specified condition holds.  The condition
-  may be a literal Boolean value, a function pointer or a Python expression.
-  Lambda expressions are not supported.
+  applies the specified fuzzer if the specified condition holds.  The condition may be a literal Boolean value, a
+  function pointer or a Python expression.  Lambda expressions are not supported.
 
-\item \lstinline!recurse_into_nested_steps(target)! identifies
-  control structure statements and applies the supplied fuzzer to their body
-  blocks.  The recursion can be limited to particular control structures using
-  the option \lstinline!target! argument.
+\item \lstinline!recurse_into_nested_steps(target)! identifies control structure statements and applies the supplied
+  fuzzer to their body blocks.  The recursion can be limited to particular control structures using the option
+  \lstinline!target! argument.
 \end{FunctionList}
 
-An example of applying a composite fuzzer to a workflow is shown in Figure
-\ref{fig:composite}.  The figure shows a workflow for enhancing the quality of a
-software system.  A developer adds a test to a feature in order to detect the
-presence of bugs, or prevent the introduction of bugs during refactoring.  The
-developer then performs some debugging work, followed by some refactoring.  The
-fuzzer applied to the workflow is the \lstinline!choose_from!.  The supplied
-distribution will fuzz the workflow 5\% of the time on average, removing one
-step at random when it does so.  The figure therefore shows a convenient way of
-modelling the occasional random omission of steps in a workflow.
+An example of applying a composite fuzzer to a workflow is shown in Figure \ref{fig:composite}.  The figure shows a
+workflow for enhancing the quality of a software system.  A developer adds a test to a feature in order to detect the
+presence of bugs, or prevent the introduction of bugs during refactoring.  The developer then performs some debugging
+work, followed by some refactoring.  The fuzzer applied to the workflow is the \lstinline!choose_from!.  The supplied
+distribution will fuzz the workflow 5\% of the time on average, removing one step at random when it does so.  The figure
+therefore shows a convenient way of modelling the occasional random omission of steps in a workflow.
 
 \begin{figure}
   \centering
 
 \begin{lstlisting}
-@fuzz(
-  choose_from([
-    (0.95, identity),
-    (0.05, remove_random_step)
-  ])
-)
-def _enhance_system_quality(
-    self, feature, developer):
+@fuzz( choose_from([ (0.95, identity), (0.05, remove_random_step) ]) ) def _enhance_system_quality( self, feature,
+developer):
 
-  developer.add_test(feature)
-  self._debug_feature(developer, feature)
-  self._refactor_feature(developer, feature) 
+developer.add_test(feature) self._debug_feature(developer, feature) self._refactor_feature(developer, feature)
 \end{lstlisting}
   
   \caption{Application of a composite fuzzer to a workflow.}
@@ -787,30 +620,24 @@ def _enhance_system_quality(
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The final set of fuzzers provide for manipulation of control structure
-conditions and iterators.  Both of these fuzzers inspect the input list of
-statements for compatible statement types to fuzz and apply the fuzzing to every
-one found.
+The final set of fuzzers provide for manipulation of control structure conditions and iterators.  Both of these fuzzers
+inspect the input list of statements for compatible statement types to fuzz and apply the fuzzing to every one found.
 
 \begin{FunctionList}
 
-\item \lstinline!replace_condition_with(condition)! replaces conditions
-  discovered in control structure statements with the specified condition.  The
-  condition may be a literal Boolean value, a function pointer or a Python
-  expression defined in a string.  Lambda expressions are not supported.
+\item \lstinline!replace_condition_with(condition)! replaces conditions discovered in control structure statements with
+  the specified condition.  The condition may be a literal Boolean value, a function pointer or a Python expression
+  defined in a string.  Lambda expressions are not supported.
 
-\item \lstinline!replace_for_iterator_with(iterator)! replaces iterators
-  discovered in for loops with the specified iterator.  The replacement iterator
-  must be specified as a list containing numerical or string literal types only.
+\item \lstinline!replace_for_iterator_with(iterator)! replaces iterators discovered in for loops with the specified
+  iterator.  The replacement iterator must be specified as a list containing numerical or string literal types only.
 
 \end{FunctionList}
 
-Control structure fuzzers are useful for introducing variability in decision
-making into a workflow.  For example, a developer may decide to stop working on
-refactoring a feature before the number of dependencies on other parts of a
-system are reduced below the specified level, even if this is required by the
-idealised workflow.  Similarly, a developer may skip the application of a task
-to a feature through an error of omission.
+Control structure fuzzers are useful for introducing variability in decision making into a workflow.  For example, a
+developer may decide to stop working on refactoring a feature before the number of dependencies on other parts of a
+system are reduced below the specified level, even if this is required by the idealised workflow.  Similarly, a
+developer may skip the application of a task to a feature through an error of omission.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -818,44 +645,35 @@ to a feature through an error of omission.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Experiments in Fuzzi Moss are created by defining scenarios with initial
-conditions (available resources, participants and so on), as well as a schedule
-of work items.  The schedule of work items is specified as part of the problem
-domain, so may be altered during the execution of a workflow, or as a result of
-external events during a simulation.  For example, the specified set of features
-for a software system may be altered as development proceeds and requirements
+Experiments in Fuzzi Moss are created by defining scenarios with initial conditions (available resources, participants
+and so on), as well as a schedule of work items.  The schedule of work items is specified as part of the problem domain,
+so may be altered during the execution of a workflow, or as a result of external events during a simulation.  For
+example, the specified set of features for a software system may be altered as development proceeds and requirements
 become better understood.
 
-By convention, workflows are organised as Python classes, and contain a
-top-level \lstinline!work()! method to initiate activity.  Invoking this method
-causes the simulation to be executed.  Additional behaviour may also be
-simulated in order to evaluate the behaviour of the workflow.  For example, a
-software system may be operated within a simulation after a development workflow
-has been executed in order to estimate quality assurance characteristics such as
-mean operations to failure.
+By convention, workflows are organised as Python classes, and contain a top-level \lstinline!work()! method to initiate
+activity.  Invoking this method causes the simulation to be executed.  Additional behaviour may also be simulated in
+order to evaluate the behaviour of the workflow.  For example, a software system may be operated within a simulation
+after a development workflow has been executed in order to estimate quality assurance characteristics such as mean
+operations to failure.
 
-The Fuzzi Moss package exposes variables that can be used to configure the
-global behaviour of the fuzz decorator and support the management of
-experiments. Specifically:
+The Fuzzi Moss package exposes variables that can be used to configure the global behaviour of the fuzz decorator and
+support the management of experiments. Specifically:
 
 \begin{itemize}
-\item A Python random object, \lstinline!fuzzi_moss_random!.  This object is
-  used as a source of randomness where required by the Fuzzi Moss fuzzers.  The
-  object can be seeded or even completely replaced as desired by the modeller.
+\item A Python random object, \lstinline!fuzzi_moss_random!.  This object is used as a source of randomness where
+  required by the Fuzzi Moss fuzzers.  The object can be seeded or even completely replaced as desired by the modeller.
 
-\item A Boolean variable, \lstinline!enable_fuzzings! is provided, which can be
-  used to control whether fuzzings are applied.  This feature is useful for
-  executing the fuzzed workflows in their idealised state, since this provides
-  for comparison with fuzzed workflows.
+\item A Boolean variable, \lstinline!enable_fuzzings! is provided, which can be used to control whether fuzzings are
+  applied.  This feature is useful for executing the fuzzed workflows in their idealised state, since this provides for
+  comparison with fuzzed workflows.
 
 \end{itemize}
 
-The dynamic application of fuzzings to socio-technical behaviours in Fuzzi Moss,
-mean that different sets of fuzzings may be applied to different runs of the
-same scenario.  Many problem domains will also incorporate some form of
-probabilistic functionality in order to represent stochastic elements of a
-problem domain.  Therefore, it is anticipated that the characteristics of a
-workflow should be measured across multiple runs of the same scenario.
+The dynamic application of fuzzings to socio-technical behaviours in Fuzzi Moss, mean that different sets of fuzzings
+may be applied to different runs of the same scenario.  Many problem domains will also incorporate some form of
+probabilistic functionality in order to represent stochastic elements of a problem domain.  Therefore, it is anticipated
+that the characteristics of a workflow should be measured across multiple runs of the same scenario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -864,17 +682,13 @@ workflow should be measured across multiple runs of the same scenario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section describes the results of a case study that was undertaken to
-evaluate the efficacy of executable workflow fuzzing for modelling, simulating
-and predicting behaviours in software systems.  Software development was the
-problem domain chosen for the case study, because the familiarity of the authors
-with the domain and associated workflows mitigated the risk of infidelity in the
-domain model.  This allowed the evaluation to focus on the efficacy of the
-fuzzing method, rather than the validity of the case study model. The problem
-domain model is illustrated in Figure \ref{fig:full-class-diagram}.  The
-relationships between features, chunks and bugs have already been described in
-Section \ref{sec:fuzzi-moss}.  Aspects of the model that have not yet been
-described are given below.
+This section describes the results of a case study that was undertaken to evaluate the efficacy of executable workflow
+fuzzing for modelling, simulating and predicting behaviours in software systems.  Software development was the problem
+domain chosen for the case study, because the familiarity of the authors with the domain and associated workflows
+mitigated the risk of infidelity in the domain model.  This allowed the evaluation to focus on the efficacy of the
+fuzzing method, rather than the validity of the case study model. The problem domain model is illustrated in Figure
+\ref{fig:full-class-diagram}.  The relationships between features, chunks and bugs have already been described in
+Section \ref{sec:fuzzi-moss}.  Aspects of the model that have not yet been described are given below.
 
 \begin{figure*}
   \centering
@@ -888,63 +702,50 @@ described are given below.
 \end{figure*}
 
 
-The \lstinline!Test! class represents unit tests that are developed against
-system specifications detailed by the \lstinline!Feature! class.  The detection
-of bugs in a feature by tests is set probabilistically, but is deterministic
-(once set, a test will either always or never reveal a bug when exercised).  By
-contrast the introduction of bugs into chunks by modification; the relationship
-between bugs and chunk operation; and the introduction of dependencies between
+The \lstinline!Test! class represents unit tests that are developed against system specifications detailed by the
+\lstinline!Feature! class.  The detection of bugs in a feature by tests is set probabilistically, but is deterministic
+(once set, a test will either always or never reveal a bug when exercised).  By contrast the introduction of bugs into
+chunks by modification; the relationship between bugs and chunk operation; and the introduction of dependencies between
 chunks are stochastic and modelled by probabilistic functions.
 
-Software systems are characterised by a collection of features and associated
-tests.  Like features, software systems can be operated.  When this happens,
-features are selected randomly and their own \lstinline!operate()!  operation
-invoked.  This feature selection and operation continues until either a maximum
-trace size is reached, an incomplete feature is operated, or a bug is
-manifested.  Software systems also record logs of traces of feature operations
-and other characteristics implemented as Python properties, including mean
-operations to failure of historic trace runs.  Developers perform the work on a
-software system in terms of development, debugging and refactoring features.
-All of these tasks consume available person time, measured in person time units
-(ptu), which is tracked as a \lstinline!Developer! class attribute.  Developers
-are associated with software systems by the \lstinline!SoftwareProject! class,
-which encapsulates a particular run of a software development workflow and
-subsequent operation.  Finally, software projects for the same scenario are
-grouped together in the \lstinline!SoftwareProjectGroup! class in order to
-obtain averaged metrics across multiple runs of the same simulation.
+Software systems are characterised by a collection of features and associated tests.  Like features, software systems
+can be operated.  When this happens, features are selected randomly and their own \lstinline!operate()!  operation
+invoked.  This feature selection and operation continues until either a maximum trace size is reached, an incomplete
+feature is operated, or a bug is manifested.  Software systems also record logs of traces of feature operations and
+other characteristics implemented as Python properties, including mean operations to failure of historic trace runs.
+Developers perform the work on a software system in terms of development, debugging and refactoring features.  All of
+these tasks consume available person time, measured in person time units (ptu), which is tracked as a
+\lstinline!Developer! class attribute.  Developers are associated with software systems by the
+\lstinline!SoftwareProject! class, which encapsulates a particular run of a software development workflow and subsequent
+operation.  Finally, software projects for the same scenario are grouped together in the
+\lstinline!SoftwareProjectGroup! class in order to obtain averaged metrics across multiple runs of the same simulation.
 
-Two software development workflows were selected for evaluation in the case
-study: Waterfall \citep{benington83production} and Test Driven Development (TDD)
-\citep{beck02test}.  Again, these workflows were selected due to their
-familiarity to the authors.  To gain additional assurance, unit tests were
-developed for each of the problem domain and workflow classes to document the
-expected behaviour of each class independently (using mocks to replace
-dependencies) and to gain assurance that the exhibited behaviour without fuzzing
-was that intended by the authors.
+Two software development workflows were selected for evaluation in the case study: Waterfall
+\citep{benington83production} and Test Driven Development (TDD) \citep{beck02test}.  Again, these workflows were
+selected due to their familiarity to the authors.  To gain additional assurance, unit tests were developed for each of
+the problem domain and workflow classes to document the expected behaviour of each class independently (using mocks to
+replace dependencies) and to gain assurance that the exhibited behaviour without fuzzing was that intended by the
+authors.
 
-The implementation of the two workflows, decorated with fuzzers is illustrated
-in Figure \ref{fig:workflow-impl}.  Although the two workflows describe
-different behaviours, the implementation has been chosen to enable comparison
-between the workflow structures and fuzzers chosen.  Fuzzers were applied based
-on the judgement of the authors regarding the typical variance that occurs in
-software development activities, in terms of omitted or re-ordered steps.
+The implementation of the two workflows, decorated with fuzzers is illustrated in Figure \ref{fig:workflow-impl}.
+Although the two workflows describe different behaviours, the implementation has been chosen to enable comparison
+between the workflow structures and fuzzers chosen.  Fuzzers were applied based on the judgement of the authors
+regarding the typical variance that occurs in software development activities, in terms of omitted or re-ordered steps.
 Following implementation, it was hypothesised that:
 
 \begin{itemize}
 
-\item The waterfall workflow would achieve higher completion rates for features
-  than test driven development, given the upfront implementation of
-  functionality.
+\item The waterfall workflow would achieve higher completion rates for features than test driven development, given the
+  upfront implementation of functionality.
 
-\item TDD would realise higher software quality (expressed as mean operations to
-  failure) due to the emphasis on delivering working software.
+\item TDD would realise higher software quality (expressed as mean operations to failure) due to the emphasis on
+  delivering working software.
 
-\item Waterfall would consume less resources in the context of excess resources,
-  due to the termination of the workflow as soon as planned quality objectives
-  are met.
+\item Waterfall would consume less resources in the context of excess resources, due to the termination of the workflow
+  as soon as planned quality objectives are met.
 
-\item The behaviour of TDD would be less susceptible to socio-technical variance
-  due to the application of workflow fuzzing, due to it's iterative nature.
+\item The behaviour of TDD would be less susceptible to socio-technical variance due to the application of workflow
+  fuzzing, due to it's iterative nature.
 
 \end{itemize}
 
@@ -954,76 +755,27 @@ Following implementation, it was hypothesised that:
   
   \begin{subfigure}[b]{.45\linewidth}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-@fuzz(choose_from(
- [(0.95, identity), (0.05, remove_random_step)]
- )
-)
-def work(system, developer, schedule):
- _complete_specification(schedule, system)
- _implement_features(developer, system)
- _implement_test_suite(developer, system)
- _debug_system(developer, system)
- _refactor_system(developer, system)
+@fuzz(choose_from( [(0.95, identity), (0.05, remove_random_step)] ) ) def work(system, developer, schedule):
+_complete_specification(schedule, system) _implement_features(developer, system) _implement_test_suite(developer,
+system) _debug_system(developer, system) _refactor_system(developer, system)
 
-@fuzz(choose_from(
- [(0.95, identity),
-  (0.05, remove_random_step)]
- )
-)
-def _complete_specification(
-  schedule, system):
-  for feature_size in schedule:
-    system.add_feature(feature_size)
+@fuzz(choose_from( [(0.95, identity), (0.05, remove_random_step)] ) ) def _complete_specification( schedule, system):
+for feature_size in schedule: system.add_feature(feature_size)
 
-@fuzz(choose_from(
- [(0.99, identity),
-  (0.01, replace_condition_with(False))]
- )
-)
-def _implement_features(
- developer, system):
-  for feature in system.features:
-    while not feature.is_implemented:
-      developer.extend_feature(feature)
+@fuzz(choose_from( [(0.99, identity), (0.01, replace_condition_with(False))] ) ) def _implement_features( developer,
+system): for feature in system.features: while not feature.is_implemented: developer.extend_feature(feature)
 
-@fuzz(choose_from(
- [(0.95, identity),
-  (0.05, replace_condition_with(False))]
- )
-)
-def _implement_test_suite(
-  developer, system):
-  for feature in system.features:
-    while feature.test_coverage < \
-      target_test_coverage_per_feature:
-      developer.add_test(feature)
+@fuzz(choose_from( [(0.95, identity), (0.05, replace_condition_with(False))] ) ) def _implement_test_suite( developer,
+system): for feature in system.features: while feature.test_coverage < \ target_test_coverage_per_feature:
+developer.add_test(feature)
 
-@fuzz(
- choose_from(
- [(0.99, identity), 
-  (0.01, replace_condition_with(False))]
- )
-)
-def _debug_system(developer, system):
-  for test in system.tests:
-    while True:
-      try:
-        test.exercise()
-        break
-      except BugEncounteredException as e:
-        developer.debug(test.feature, e.bug)
+@fuzz( choose_from( [(0.99, identity), (0.01, replace_condition_with(False))] ) ) def _debug_system(developer, system):
+for test in system.tests: while True: try: test.exercise() break except BugEncounteredException as e:
+developer.debug(test.feature, e.bug)
 
-@fuzz(
-  choose_from(
-  [(0.99, identity), 
-   (0.01, replace_condition_with(False))]
- )
-)
-def _refactor_system(developer, system):
-  for feature in system.features:
-    while len(feature.dependencies) > \
-      target_dependencies_per_feature:
-      developer.refactor(feature)
+@fuzz( choose_from( [(0.99, identity), (0.01, replace_condition_with(False))] ) ) def _refactor_system(developer,
+system): for feature in system.features: while len(feature.dependencies) > \ target_dependencies_per_feature:
+developer.refactor(feature)
 
 
 
@@ -1037,81 +789,31 @@ def _refactor_system(developer, system):
   \hfill
   \begin{subfigure}[b]{.45\linewidth}
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
-@fuzz(
-  recurse_into_nested_steps(
-    target_structures={ast.For, ast.TryExcept},
-    fuzzer=filter_steps(
-      exclude_control_structures(),
-      fuzzer=choose_from(
-      [(0.95, identity), 
-       (0.05, remove_random_step)])
-    )
-  )
-)
-def work(system, developer, schedule):
+@fuzz( recurse_into_nested_steps( target_structures={ast.For, ast.TryExcept}, fuzzer=filter_steps(
+exclude_control_structures(), fuzzer=choose_from( [(0.95, identity), (0.05, remove_random_step)]) ) ) ) def work(system,
+developer, schedule):
 
-  for feature_size in schedule:
-    try:
-      feature = \
-        system.add_feature(feature_size)
-      _ensure_sufficient_tests(developer, feature)
-      _complete_feature(developer, feature)
-      _refactor_feature(developer, feature)
-    except DeveloperExhaustedException:
-      system.features.remove(feature)
+for feature_size in schedule: try: feature = \ system.add_feature(feature_size) _ensure_sufficient_tests(developer,
+feature) _complete_feature(developer, feature) _refactor_feature(developer, feature) except DeveloperExhaustedException:
+system.features.remove(feature)
 
-  while True:
-    try:
-      feature = choice(system.features)
-      _enhance_system_quality(feature, developer)
-    except DeveloperExhaustedException:
-      break
+while True: try: feature = choice(system.features) _enhance_system_quality(feature, developer) except
+DeveloperExhaustedException: break
 
-@fuzz(choose_from(
-  [(0.95, identity), 
-   (0.05, replace_condition_with(False))]))
-def _ensure_sufficient_tests(developer, feature):
-  while feature.test_coverage <\
-    target_test_coverage_per_feature:
-    developer.add_test(feature)
+@fuzz(choose_from( [(0.95, identity), (0.05, replace_condition_with(False))])) def _ensure_sufficient_tests(developer,
+feature): while feature.test_coverage <\ target_test_coverage_per_feature: developer.add_test(feature)
 
-@fuzz(choose_from(
-  [(0.99, identity), 
-   (0.01, replace_condition_with(False))]))
-def _complete_feature(developer, feature):
-  while not feature.is_implemented:
-    developer.extend_feature(feature)
-    _debug_feature(developer, feature)
+@fuzz(choose_from( [(0.99, identity), (0.01, replace_condition_with(False))])) def _complete_feature(developer,
+feature): while not feature.is_implemented: developer.extend_feature(feature) _debug_feature(developer, feature)
 
-@fuzz(choose_from(
-  [(0.95, identity), 
-   (0.05, remove_random_step)]))
-def _enhance_system_quality(feature, developer):
-  developer.add_test(feature)
-  _debug_feature(developer, feature)
-  _refactor_feature(developer, feature)
+@fuzz(choose_from( [(0.95, identity), (0.05, remove_random_step)])) def _enhance_system_quality(feature, developer):
+developer.add_test(feature) _debug_feature(developer, feature) _refactor_feature(developer, feature)
 
-@fuzz(choose_from(
- [(0.99, identity), 
-  (0.01, replace_condition_with(False))]
-))
-def _debug_feature(developer, feature):
-  while True:
-    try:
-      feature.exercise_tests()
-      break
-    except BugEncounteredException as e:
-      developer.debug(feature, e.bug)
+@fuzz(choose_from( [(0.99, identity), (0.01, replace_condition_with(False))] )) def _debug_feature(developer, feature):
+while True: try: feature.exercise_tests() break except BugEncounteredException as e: developer.debug(feature, e.bug)
 
-@fuzz(
- choose_from(
-  [(0.99, identity), 
-   (0.01, replace_condition_with(False))]
-))
-def _refactor_feature(developer, feature):
-  while len(feature.dependencies) >\
-   target_dependencies_per_feature:
-    developer.refactor(feature)
+@fuzz( choose_from( [(0.99, identity), (0.01, replace_condition_with(False))] )) def _refactor_feature(developer,
+feature): while len(feature.dependencies) >\ target_dependencies_per_feature: developer.refactor(feature)
 
 ''''''
 \end{lstlisting}
@@ -1123,31 +825,24 @@ def _refactor_feature(developer, feature):
   \label{fig:workflow-impl}
 \end{figure*}
 
-A default scenario was configured in which a single developer was tasked with
-building a software system with a schedule comprising three features, of three,
-five and seven chunks in order of priority.  Both workflows aimed to achieve a
-target test coverage of 100\% of code chunks and a inter-feature dependency rate
-of 0.  Dependencies between chunks within features were unregulated.  Each
-system was constructed following the specified workflow behaviour, applying any
-specified fuzzings.  Then, each resulting system was operated 50 times, allowing
-for a maximum trace of 750 features per operation. Each overall build-operate
-sequence was executed 10 times, resulting in 500 system operation traces per
+A default scenario was configured in which a single developer was tasked with building a software system with a schedule
+comprising three features, of three, five and seven chunks in order of priority.  Both workflows aimed to achieve a
+target test coverage of 100\% of code chunks and a inter-feature dependency rate of 0.  Dependencies between chunks
+within features were unregulated.  Each system was constructed following the specified workflow behaviour, applying any
+specified fuzzings.  Then, each resulting system was operated 50 times, allowing for a maximum trace of 750 features per
+operation. Each overall build-operate sequence was executed 10 times, resulting in 500 system operation traces per
 configuration.
 
-The workflows scenarios were evaluated in twelve configurations, parameterised
-by workflow type, resource availability and the presence of fuzzing.  Initially,
-the experiment was calibrated to determine an adequate resourcing level for the
-Waterfall methodology to complete, by executing the Waterfall workflow and
-determining an average resource consumption.  This was found to be approximately
-250ptu.  Then, two further resource parameters were specified: inadequate
-resources (50ptu) and excess resources (500ptu).  Each of these three resource
-configurations were run with workflow fuzzing disabled and enabled.  Average
-mean times to failure (feature operation trace length), remaining person time
-resources, completed features and simulation run time were recorded and
-tabulated as shown in Table \ref{tab:results}.
+The workflows scenarios were evaluated in twelve configurations, parameterised by workflow type, resource availability
+and the presence of fuzzing.  Initially, the experiment was calibrated to determine an adequate resourcing level for the
+Waterfall methodology to complete, by executing the Waterfall workflow and determining an average resource consumption.
+This was found to be approximately 250ptu.  Then, two further resource parameters were specified: inadequate resources
+(50ptu) and excess resources (500ptu).  Each of these three resource configurations were run with workflow fuzzing
+disabled and enabled.  Average mean times to failure (feature operation trace length), remaining person time resources,
+completed features and simulation run time were recorded and tabulated as shown in Table \ref{tab:results}.
 
 \begin{table}
- \caption{%
+  \caption{%
     Results for twelve simulation runs of Fuzzi Moss on the software development
     problem domain.  The table shows workflow type, resources allocated (excess,
     adequate, inadequate), whether fuzzings were applied, mean feature operations
@@ -1170,58 +865,44 @@ tabulated as shown in Table \ref{tab:results}.
     TDD & 250 & No & 680 & 1 & 3.0 & 28 \\
     TDD & 500 & No & 750 & 1 & 3.0 & 56 \\
     TDD & 50 & Yes & 259 & 1 & 1.5 & 10 \\
-   TDD & 250 & Yes & 513 & 1 & 3.0 & 34 \\
+    TDD & 250 & Yes & 513 & 1 & 3.0 & 34 \\
     TDD & 500 & Yes & 750 & 1 & 3.0 & 70 \\ \hline
  
 
   \end{tabular}
 \end{table}
 
-As expected, without fuzzing, the TDD workflows consume all available resource,
-in contrast to the plan driven approach followed by Waterfall.  These results
-confirm the hypothesis that TDD is a `greedy' workflow, absorbing available
-resources allocated to a project (\citet{sommerville10software} has argued that
-this characteristic makes agile like methodologies such as TDD difficult to
-develop contracts for).  Note that the similarity in results between the
-adequate and excess resource requirements for Waterfall is likely explained by
-the workflow terminating once the minimum resources required (250) are consumed,
-regardless of the excess availability.
+As expected, without fuzzing, the TDD workflows consume all available resource, in contrast to the plan driven approach
+followed by Waterfall.  These results confirm the hypothesis that TDD is a `greedy' workflow, absorbing available
+resources allocated to a project (\citet{sommerville10software} has argued that this characteristic makes agile like
+methodologies such as TDD difficult to develop contracts for).  Note that the similarity in results between the adequate
+and excess resource requirements for Waterfall is likely explained by the workflow terminating once the minimum
+resources required (250) are consumed, regardless of the excess availability.
 
-The results also confirm the hypotheses that without fuzzing, the simulated TDD
-workflow achieves higher software quality than the simulated Waterfall workflow,
-at the cost of a reduction of features incorporated in the system.  TDD achieves
-a mean operation to failure that is higher than Waterfall even when comparing
-execution of constrained TDD resources with unconstrained Waterfall (259 vs
-114).  This difference is explained by the far greater presence of bugs and
-greater complexity of systems built following the Waterfall driven approach, as
-well as the presence of incomplete features in the systems built following the
-Waterfall workflow.  This distinction is particularly marked in the context of
-constrained resources, in which test driven development achieves a far higher
-mean operations to failure (259 vs 14), but fewer features are delivered (1.5 vs
-3.0).
+The results also confirm the hypotheses that without fuzzing, the simulated TDD workflow achieves higher software
+quality than the simulated Waterfall workflow, at the cost of a reduction of features incorporated in the system.  TDD
+achieves a mean operation to failure that is higher than Waterfall even when comparing execution of constrained TDD
+resources with unconstrained Waterfall (259 vs 114).  This difference is explained by the far greater presence of bugs
+and greater complexity of systems built following the Waterfall driven approach, as well as the presence of incomplete
+features in the systems built following the Waterfall workflow.  This distinction is particularly marked in the context
+of constrained resources, in which test driven development achieves a far higher mean operations to failure (259 vs 14),
+but fewer features are delivered (1.5 vs 3.0).
 
-The result of applying fuzzing to the workflows reveals both expected and
-unexpected behaviours.  On the one hand, the results support the hypothesis that
-TDD is relatively resistant to workflow fuzzing, since the
-measured characteristics (MOF and Features implemented) are not dramatically
-affected by the application of fuzzing.  In contrast, the measurements for the
-Waterfall model are changed considerably.  However, unexpectedly, fuzzing does
-not appear to have reduced quality, but rather to have altered the
-characteristics to be closer to the behaviour of TDD, with
-reduced features implemented and greater software quality.  This result may be
-explained by the relatively small number of features to be implemented.  In this
-circumstance, forgetting to implement a feature (simulated by a fuzzer replacing
-this step with a pass) will cause the number of dependencies to be reduced and
-hence the likelihood of manifesting a bug.
+The result of applying fuzzing to the workflows reveals both expected and unexpected behaviours.  On the one hand, the
+results support the hypothesis that TDD is relatively resistant to workflow fuzzing, since the measured characteristics
+(MOF and Features implemented) are not dramatically affected by the application of fuzzing.  In contrast, the
+measurements for the Waterfall model are changed considerably.  However, unexpectedly, fuzzing does not appear to have
+reduced quality, but rather to have altered the characteristics to be closer to the behaviour of TDD, with reduced
+features implemented and greater software quality.  This result may be explained by the relatively small number of
+features to be implemented.  In this circumstance, forgetting to implement a feature (simulated by a fuzzer replacing
+this step with a pass) will cause the number of dependencies to be reduced and hence the likelihood of manifesting a
+bug.
 
-Finally, the results show the extent to which Fuzzi Moss increases the runtime
-for a simulation.  This is most noticeable for the excess resource simulations
-that operate systems to the specified trace limit.  In the TDD scenario, Fuzzi
-Moss adds 20\% to the runtime of the simulation.  Much of this additional cost
-will be attributable to the dynamic recompilation of workflow functions each
-time a fuzzer is applied.  Further investigation with more complex workflow
-models and large scenarios is required to assess this cost and determine whether
-optimisations are necessary.
+Finally, the results show the extent to which Fuzzi Moss increases the runtime for a simulation.  This is most
+noticeable for the excess resource simulations that operate systems to the specified trace limit.  In the TDD scenario,
+Fuzzi Moss adds 20\% to the runtime of the simulation.  Much of this additional cost will be attributable to the dynamic
+recompilation of workflow functions each time a fuzzer is applied.  Further investigation with more complex workflow
+models and large scenarios is required to assess this cost and determine whether optimisations are necessary.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1231,66 +912,51 @@ optimisations are necessary.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This paper has presented and evaluated the use of executable workflow fuzzing to
-the problem of modelling and simulating variance in socio-technical system
-behaviours.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi
-Moss, and applied it in a case study of software development workflows.  The
-workflow tool was demonstrated to introduce realistic variance into idealised
-workflows in accordance with expectations of software development workflow in
+This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modelling and simulating
+variance in socio-technical system behaviours.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi
+Moss, and applied it in a case study of software development workflows.  The workflow tool was demonstrated to introduce
+realistic variance into idealised workflows in accordance with expectations of software development workflow in
 practice.
 
-The proof of concept has created a substantial research agenda in the
-application of fuzzing techniques to socio-technical system modelling.  Within
-the scope of the Fuzzi Moss project, several immediate next steps are proposed:
+The proof of concept has created a substantial research agenda in the application of fuzzing techniques to
+socio-technical system modelling.  Within the scope of the Fuzzi Moss project, several immediate next steps are
+proposed:
 
 \begin{itemize}
 
-\item Evaluate Fuzzi Moss further by extending the current case study to
-  incorporate more complex aspects of software development (such as change
-  management). Other case studies such as the e-counting system described in
-  detail by \citet{lock07observations} will also be investigated.  A more
-  complex case study will allow the identification of required new fuzzers, as
-  well as areas in which the methodology can be optimised.
+\item Evaluate Fuzzi Moss further by extending the current case study to incorporate more complex aspects of software
+  development (such as change management). Other case studies such as the e-counting system described in detail by
+  \citet{lock07observations} will also be investigated.  A more complex case study will allow the identification of
+  required new fuzzers, as well as areas in which the methodology can be optimised.
 
-\item The implementation of support for concurrent workflows.  Fuzzi Moss
-  simulations are currently executed as a single thread.  However, real world
-  socio-technical systems are most conveniently modelling as a collection of
-  concurrently interacting workflows.  The modular implementation of Fuzzi Moss
-  should make this extension straight forward.
+\item The implementation of support for concurrent workflows.  Fuzzi Moss simulations are currently executed as a single
+  thread.  However, real world socio-technical systems are most conveniently modelling as a collection of concurrently
+  interacting workflows.  The modular implementation of Fuzzi Moss should make this extension straight forward.
 
-\item Experimentation with the Fuzzi Moss API (aspects) and extension of fuzz
-  operator capability.  In some respects, the current specifications of fuzzers
-  using function decorators is unsatisfactory, since it prevents flexible
-  experimentation with different fuzzer configurations.  An aspect-oriented
-  style approach \citep{filman01aspect}, with problem domain models oblivious to
-  the application of fuzzers may be more appropriate for this purpose.
+\item Experimentation with the Fuzzi Moss API (aspects) and extension of fuzz operator capability.  In some respects,
+  the current specifications of fuzzers using function decorators is unsatisfactory, since it prevents flexible
+  experimentation with different fuzzer configurations.  An aspect-oriented style approach \citep{filman01aspect}, with
+  problem domain models oblivious to the application of fuzzers may be more appropriate for this purpose.
 
-\item The development of more rigorous methods for identifying and validating
-  suitable fuzzers for application to workflows.  One possibility is the
-  development of recommendations based on the internal structure of a workflow.
-  An alternative option is methods that allow the interactive specification of
-  workflows with project stakeholders.  Workflows could be developed through the
-  narration of a scenario by a stakeholder, similar to the act of literate
+\item The development of more rigorous methods for identifying and validating suitable fuzzers for application to
+  workflows.  One possibility is the development of recommendations based on the internal structure of a workflow.  An
+  alternative option is methods that allow the interactive specification of workflows with project stakeholders.
+  Workflows could be developed through the narration of a scenario by a stakeholder, similar to the act of literate
   programming \cite{knuth84literate}.
 
 \end{itemize}
 
-More widely, fuzzing techniques may be applicable for other socio-technical
-modelling formalisms.  For example, fuzzing goal oriented models such as
-\emph{i*} could be used to simulate the shifting goals of actors over time as
-priorities and focus varies.  Similarly, fuzzing enterprise modelling techniques
-such as OBASHI could provide means of assessing the resilience of critical
-infrastructures when subject to unexpected behaviours, similar to HAZOPS like
-techniques that have been applied manually to responsibility models
-\cite{lock09modelling}. The proof of concept in this research demonstrates the
-potential for the development of realistic simulations of socio-technical
-systems with predictive power.  The availability of such tools would do much to
-progress the current craft of large scale systems engineering.
+More widely, fuzzing techniques may be applicable for other socio-technical modelling formalisms.  For example, fuzzing
+goal oriented models such as \emph{i*} could be used to simulate the shifting goals of actors over time as priorities
+and focus varies.  Similarly, fuzzing enterprise modelling techniques such as OBASHI could provide means of assessing
+the resilience of critical infrastructures when subject to unexpected behaviours, similar to HAZOPS like techniques that
+have been applied manually to responsibility models \cite{lock09modelling}. The proof of concept in this research
+demonstrates the potential for the development of realistic simulations of socio-technical systems with predictive
+power.  The availability of such tools would do much to progress the current craft of large scale systems engineering.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\bibliographystyle{abbrvnat}
-\bibliography{lib}
+\bibliographystyle{abbrvnat} \bibliography{lib}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
