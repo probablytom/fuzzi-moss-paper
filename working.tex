@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass{sig-alternate}
 
@@ -15,6 +15,8 @@
 \usepackage{listings}
 \usepackage{subcaption}
 
+\usepackage{pgf}
+
 \lstset{language=python}
 \lstset{basicstyle=\ttfamily\small}
 \lstset{keywordstyle=\ttfamily\bfseries}
@@ -30,7 +32,7 @@
 \hyphenation{poli-cies}
 %\hyphenation{tech-ni-cal}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title{Simulating Variance in Socio-Technical Behaviours using Executable Workflow Fuzzing}
 
@@ -49,17 +51,20 @@
 
 % \date{}    Do we want a date on the paper? Don't know how these things are done. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \maketitle
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
+  %% TODO SHORTEN!
+
+
   The engineering of large scale, complex software based socio-technical systems is still very much a craft, dependent
   on methods based on trial, error and subsequent revision.  A particular difficulty is the lack of modelling tools that
   support the analysis and prediction of actor behaviours in and around socio-technical systems.  Existing notations
@@ -85,38 +90,36 @@
   evaluate our approach to simulating socio-technical behaviours by applying Fuzzi Moss to a socio-technical system case
   study.  The results of the case study demonstrate the feasibility of the fuzzing method.  Finally, We explore the
   wider applications of fuzzing in socio-technical systems modelling and discuss the next steps for the research.
+
 \end{abstract}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
 \label{sec:introduction}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Modelling and simulating in large scale, complex socio-technical systems development projects is an on-going research
-challenge \citep{baxter08learning}.  Socio-technical systems are characterised by the interactions between a variety of
-actor types within a system's scope, including individual human operators, organisational units and technical artifacts
-\citep{Susman1976,elhassan07role,sommerville08socio}. For the purposes of this research, sociotechnical systems are
-defined to be systems where the inner workings are combinations of human and computational/technological
-activities. These systems also incorporate a complex variety of structures that direct or influence actor and system
-behaviour, including workflow descriptions, organisational hierarchies, regulatory or legal standards, organisational
-policies and culture, interpersonal relationships and actor responsibilities
+\emph{Socio-technical systems} are large scale, complex models, representing the interactions between a diverse set of
+actors including individual technical artifacts, human operators, organisational structures
+\citep{Susman1976,elhassan07role,sommerville08socio}.  The behaviour of such systems are influenced by a complex
+interplay of factors, including formally defined business processses, legal or regulatory standards, technological
+evolution, organisational culture or norms and interpersonal relationships and responsibilities
 \citep{bade07structures,pentland05organisational}. Examples of such systems with complex workflows involving multiple
 actors include emergency vehicle dispatch \citep{robinson96limited}, electronic voting systems
 \citep{bryans04towards,lock07observations}, patient care in a neo-natal unit \citep{baxter07evaluating} and electronic
 stock exchange infrastructures \citep{cftc-sec10findings}.  Systems of this form confound traditional approaches to
-modelling, simulating and predicting behaviour for several reasons.
+modelling, simulating and predicting behaviour for several reasons:
 
 \begin{itemize}
 
-\item Socio-technical systems are typically very large, constituted of autonomous actors and components, each with their
-  own behaviour that may be influenced by other actors in the system \cite{crabtree00ethnomethodologically}.  This
-  intrinsic scale and complexity makes refinement, reduction and abstraction, the conventional tools of the systems
-  engineer, difficult to apply, since individual behaviours are difficult to classify and aggregate.  One study has
-  advocated the development of systems engineering methods based on the metaphor of city maintenance, rather than
-  individual building construction \citep{feiler06ultra} to meet this system-of-systems challenge, although no methods
-  are presented for making this transition.
+\item Socio-technical systems are simultaneously \emph{very large and heterogeneous}, comprising a a mix of autonomous
+  actors, each with their own behaviours \cite{crabtree00ethnomethodologically}.  Systems engineering has traditionally
+  approached the problem of scale through the development of models that abstract complex behaviours and model them as
+  emergent system properties \cite{vespignani11model}.  However, these stochastic treatments do not capture the complex
+  interactions that occur between heterogeneous actors, with interactions occurring across different scales of activity.
+  For example, \citet{lock07observations} observed the disruptions caused to a national election in Scotland caused by a
+  variety of small scale technical system defects.
 
 \item The behaviour is contingent on unpredictable circumstances, including both factors in the environment and
   concerning the system actors.  For example, the time and manner in which a task, such as developing a new feature for
@@ -137,24 +140,45 @@ modelling, simulating and predicting behaviour for several reasons.
 
 \end{itemize}
 
-Due to these challenges, modelling socio-technical system behaviours using conventional techniques will typically either
-result in a model that is tractable, but lacks the necessary detail of the underlying system to provide informative
-results; so narrow in scope as to be uninformative about the behaviour of the wider system of interest; or so large and
-complex as to be intractable for analysis, whether manual or automated.  The design and construction of systems at this
-scale is still very much a craft, lacking the methods and tools to support modelling and predictive simulation available
-in other engineering disciplines.
+We contend that due to these challenges, modelling socio-technical system behaviours using conventional systems
+engineering methods will typically either result in a model that is tractable, but lacks the necessary detail of the
+underlying system to provide informative results; so narrow in scope as to be uninformative about the behaviour of the
+wider system of interest; or so large and complex as to be intractable for analysis, whether manual or automated.
+Consequently, the design and construction of systems at this scale is still very much a craft, lacking the methods and
+tools to support modelling and predictive simulation available in other engineering disciplines.
 
-The contribution of this paper is to present and evaluate a novel approach to simulating variance in socio-technical
-behaviours on overall system performance, based on the automated \emph{fuzzing} of executable workflow descriptions.
-The paper presents a method for describing socio-technical systems as object-oriented domain models, implemented in the
-Python programming language.  These models are manipulated by system actors, who are directed by idealised workflow
-descriptions, encoded as collections of Python functions.  Workflow variance is simulated by automatically and
-dynamically fuzzing the workflow descriptions using code fuzzing.
+The research contribution of this paper is to present and evaluate a novel environment, Fuzzi Moss, for simulating
+complex and contingent behaviour in socio-technical systems which addresses this challenge.  In our approach, we provide
+for a separation of concerns between the model of a problem domain, models of idealised socio-technical actor behaviour
+and the influence of contingent factors that complicate the actual execution of idealised workflows in practice.  The
+separation of concerns is achieved by modelling:
 
-A proof of concept fuzzing library, Fuzzi Moss is developed and presented.  To evaluate the proposed approach an example
-case study, software development workflows was created using Fuzzi Moss.  The case study compares the performance of
-different software development processes (resources expended, features implemented and system quality) when following
-idealised workflows and when following workflows that have been subject to code fuzzing induced variance.
+\begin{itemize}
+
+\item The problem domain as collection of classes implemented in the Python programming language.
+
+\item Idealised workflows descriptions as executable Python classes in the agent oriented modelling framework,
+  Theatre\_Ag \citep{theatreag}.
+
+\item Contingent behaviour as \emph{dynamic fuzzing aspects} that can alter the flow of execution in workflow
+  descriptions during the execution of a simulation, using the PyDySoFu library \citep{wallis2017pydysofu}.
+
+\end{itemize}
+
+Both the Theatre\_Ag framework and PyDySoFu libraries were implemented specifically for this work.
+
+Critical to the approach is our hypothesis that:
+
+\begin{quotation}
+  Hypothesis: Dynamic fuzzing of workflow descriptions can represent the effect of complex and contingent behaviour by
+  actors in socio-technical systems, when following idealised workflows.
+\end{quotation}
+
+To test this hypothesis, an example socio-technical case study of team based software development was developed.  The
+case study compares the performance of different software development processes when a software development team follows
+idealised workflows that have been subject to contingent behaviour.  Development processes are compared based on their
+effect on the emergent properties of the simulated system under development, specifically features implemented and mean
+time to failure.
 
 The rest of this paper is structured as follows.  Section \ref{sec:related} discusses related work, covering existing
 techniques for modelling socio-technical workflows and other applications of code fuzzing in software engineering.
@@ -164,13 +188,13 @@ details for Fuzzi Moss.  Section \ref{sec:evaluation} presents the case study ev
 \ref{sec:conclusions} discusses conclusions and future work, as well as noting the potential for applying fuzzing to
 other forms of socio-technical models.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Related Work}
 
 \label{sec:related}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This section presents a literature review of the development of models and of behaviours in socio-technical systems.
 The difficulties of developing modelling techniques that accommodate the inherent scale, complexity, contingency and
@@ -278,21 +302,178 @@ mutants are generated statically, prior to program execution.  Our own implement
 the desire to simulate dynamic contingent behaviour, that can vary from the idealised model each time a fuzzed step in a
 workflow is executed.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problem Domain Model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In this section we introduce our approach to modelling a problem domain and associated idealised workflows in
+socio-technical systems.  We have chosen to present the approach through an example case study of team based software
+development, in which we will explore the efficacy of two development workflows: waterfall and test driven development.
+We have adopted an object-oriented approach to modelling the elements of the problem domain \citep{bennett06object}, so
+that the elements of the domain are described as a collection of Python classes.  Figure \ref{fig:feature-class-diagram}
+shows the class diagram for the case study.  The diagram shows classes for:
+
+\begin{figure}
+  
+  \centering
+  \includegraphics{floats/class-diagram-1}
+  
+  \caption{Class diagram of the software development problem domain case study, using the UML notation.}
+  \label{fig:feature-class-diagram}
+  
+\end{figure}
+
+
+\begin{itemize}
+\item Features, representing user-facing specifications of the system's functionality.
+\item Code chunks, representing the implementation details of the features, which may have dependencies on other chunks
+  in the system.
+\item Bugs introduced into chunks during the completion of features.  
+\item Software systems which aggregate all the source artefacts of a software project, including features, chunks, bugs
+  and tests.
+\item Version control servers and clients for coordinating distributed development of a project.
+
+\end{itemize}
+
+Methods are implemented for these classes that provide them with behaviours in the problem domain. Many of these
+behaviours have side effects which are modelled stochastically. For example:
+
+\begin{itemize}
+
+\item Features can be extended through the addition of code chunks.  Each time a new chunk is added to a feature other
+  chunks may also need to be modified, potentially creating further dependencies between chunks or introducing bugs.
+
+\item Tests can be exercised resulting in the detection of bugs.  The more tests created for a feature, the greater the
+  probability of detecting a given bug.
+
+\item Features can be debugged (resulting in the removal of bugs) or refactored (resulting in the reduction in the
+  number of dependencies).
+
+\item Software systems can be operated, which may cause bugs in the system to manifest themselves, causing a system
+  halt.
+
+\end{itemize}
+
+Very few restrictions are placed on the implementation of the problem domain classes.  Operations can accept a variety
+of arguments, modify object state, invoke operations on other problem domain classes and return values as desired.
+However The operations on the problem domain should be modelled as atomic and independent, allowing them to be safely
+invoked in any combination.  The \lstinline!@Property! decorator can be used to improve the readability of code, as
+normal.
+
+Idealised socio-technical workflows are collections of tasks that operate on a common state.  Tasks are implemented as
+Python methods, with all the tasks associated with the same workflow and operating on the same state collected together
+in a single Python class.  For the purposes of the software development case study, workflows were created for
+interacting with a version control server in an update-merge-commit cycle; specification of new features in a system;
+implementation of features; development of tests to exercise features; and debugging tests that revealed bugs and
+refactoring of features.  Workflows can also be organised hierarchically, so for example, the workflows for modifying
+the system artefacts depend on the change management workflow in order to coordinate changes within a team.  Further
+workflows were implemented for coordinating the overall team activities by following the waterfall and test driven
+development methodologies.  Figure \ref{fig:debugging} shows the Python code for the debuggin workflow, while
+\ref{fig:tdd} shows the Python code for the Test Driven Development workflow.
+
+\begin{figure*}
+
+  \begin{subfigure}{\linewidth}
+\begin{lstlisting}
+class Debugging(object):
+
+    is_workflow = True
+
+    @default_cost(1)
+    def debug(self, feature, bug, random):
+        feature.debug(random, bug)
+
+    @default_cost()
+    def debug_test(self, test, random):
+        while True:
+            try:
+                test.exercise()
+                break
+            except BugEncounteredException as e:
+                self.debug(test.feature, e.bug, random)
+                self.change_management.commit_changes(random)
+
+    @default_cost()
+    def debug_feature(self, logical_name, random):
+
+        self.change_management.checkout()
+
+        feature = self.change_management.centralised_vcs_client.working_copy.get_feature(logical_name)
+
+        for test in feature.tests:
+            self.debug_test(test, random)
+
+    @default_cost()
+    def debug_system(self, random):
+        self.change_management.checkout()
+        for test in self.change_management.centralised_vcs_client.working_copy.tests:
+            self.debug_test(test, random)
+
+\end{lstlisting}
+
+    \caption{Debugging workflow}
+    \label{fig:debugging}
+  \end{subfigure}
+
+
+  \vspace{10pt}
+
+  \begin{subfigure}{\linewidth}
+\begin{lstlisting}
+class TestDrivenDevelopment(object):
+
+    is_workflow = True
+
+    @default_cost()
+    def implement_feature_tdd(self, user_story, random):
+        self.specification.add_feature(user_story.logical_name, user_story.size, random)
+        self.testing.test_per_chunk_ratio(user_story.logical_name, random)
+        self.implementation.implement_feature(user_story.logical_name, random)
+        self.debugging.debug_feature(user_story.logical_name, random)
+        self.refactoring.refactor_feature(user_story.logical_name, random)
+
+    @default_cost()
+    def work_from_backlog(self, product_backlog, random):
+        while True:
+            try:
+                user_story = product_backlog.get(block=False)
+                self.implement_feature_tdd(user_story, random)
+            except Empty:
+                break
+\end{lstlisting}
+    \caption{Test Driven Development workflow}
+    \label{fig:tdd}
+  \end{subfigure}
+
+  \vspace{10pt}
+
+  \caption{Examples of workflow classes implemented in Theatre\_Ag.  Constructors are omitted for brevity.}
+\end{figure*}
+
+Theatre\_Ag represents simulations as \emph{episodes}, which provide a cast of actors with an initial set of directions
+called an \emph{improvisation} to operate on a problem domain model.  Two improvisations were implemented for the
+software development case study in order to initiate simulations for the waterfall and test driven development
+workflows.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Workflow Fuzzing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Specification of socio-technical workflow fuzzers using aspects implemented using the pydysofu
+fuzzing framework 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Method and Implementation}
 \label{sec:fuzzi-moss}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In this section we introduce our approach to modelling idealised workflows in socio-technical systems and introducing
-variance in their execution through dynamic fuzzing. The method comprises: construction of an object oriented model of
-the problem domain; construction of an idealised representation of socio-technical workflows that specify the behaviours
-of actors in the problem domain; annotation of the workflows with fuzzers to introduce variance; execution of the
-workflows in scenarios; and measurement of outcomes in the scenarios through observation of the problem domain
-state. Each stage of the method is described in more detail below, using the task of developing software as an
-illustrative example the full case study is presented in Section \ref{sec:evaluation}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Implementation details of the the proof of concept library, Fuzzi Moss, are also presented.  Source code for the Fuzzi
 Moss library is available from the project's GitHub repository \citep{wallis2016fuzzi-moss-scm}.  The library was
@@ -306,82 +487,12 @@ lines. Source code for the case study is also available in a separate GitHub rep
 fragments shown below have been modified to ease explanation (removing self arguments from function definitions, for
 example).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Problem Domain Modelling}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The initial step in the Fuzzi Moss method is to develop a model of the target socio-technical problem domain.  The model
-represents the invariant `physics' of the problem domain that cannot be altered because it represent hard constraints in
-the real world.  The model may represent constraints imposed by natural laws, such as the conservation of energy;
-deliberate technical system design, such as an access control client that limits access to a software system to those
-who know an appropriate username and password combination; or emergent phenomena that can be modelled stochastically,
-such as the tendency for the implementation of new features in a software system to introduce bugs.
-
-We have adopted an object-oriented approach to modelling the elements of the problem domain \citep{bennett06object}, so
-that domain artefacts are represented as instances of classes.  The state of a particular scenario in a problem domain
-is therefore represented by a collection of inter-related Python objects constructed from the classes specified in the
-domain model.  Figure \ref{fig:feature-class-diagram} shows part of a class diagram for the software development problem
-domain case study.  The diagram shows classes for system features, representing user-facing specifications of the
-system's functionality; code chunks, representing the implementation details of the system; and bugs introduced into
-chunks during the completion of features.  Figure \ref{fig:feature-instance-diagram} illustrates an example state for
-the same problem domain using an object diagram, showing a feature implemented with two chunks, one of which contains a
-bug.
-
-\begin{figure}
-  \centering
-
-  \begin{subfigure}{\linewidth}
-    \centering
-    \includegraphics{floats/class-diagram-1}
-    \caption{Class Diagram}
-    \label{fig:feature-class-diagram}
-  \end{subfigure}
-
-  \vspace{10pt}
-
-  \begin{subfigure}{\linewidth}
-    \centering
-    \includegraphics{floats/object-diagram-1}
-    \caption{Object diagram}
-    \label{fig:feature-instance-diagram}
-  
-  \end{subfigure}
-
-  \vspace{10pt}
-
-  
-  \caption{Object oriented models of a software development problem domain, using the UML notation.}
-
-\end{figure}
-
-The state of the problem domain can only be altered through explicit actions on the domain (referred to as domain
-actions here), that are modelled as operations on the domain classes.  In the example given in Figure
-\ref{fig:feature-class-diagram}, the state of a feature can be altered by invoking the \lstinline!extend()!  operation.
-This adds a new chunk to the feature's implementation and also has two side effects. The addition of new chunks may
-introduce bugs into the newly created chunk, as well as create dependencies between the new chunk and other chunks
-already in the system as a whole.  Consequently, operations are also provided for refactoring to reduce dependencies
-between chunks, and debugging, to remove bugs from the feature.  System features can be operated, in turn causing a
-random sequence of feature chunks to be operated.  When this happens, there is the potential for the system to fail, due
-to the manifestation of a bug in a chunk.
-
-Very few restrictions are placed on the design of the problem domain operations.  Operations can accept a variety of
-arguments, modify the class state, invoke operations on other problem domain classes and return values as desired.
-However The operations on the problem domain should be modelled as atomic and independent, allowing them to be safely
-invoked in any combination.
-
-The object oriented problem domain model is implemented as a collection of Python classes.  Model state is represented
-by python instance attributes.  Operations are implemented as Python methods in the appropriate classes.  Problem domain
-classes can be extended with supplementary properties using the Python \lstinline!@property! decorator in order to
-improve readability as normal.  The state of the problem domain can therefore be accessed and read as desired for
-measuring behaviour in scenarios, or instrumented to record relevant events for later analysis.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Workflow Modelling}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The next stage of the method concerns the development of descriptions of socio-technical behaviours of actors in the
 problem domain, using workflows.  Workflows direct the sequence of actions by an actor on the artefacts in the problem
@@ -431,11 +542,11 @@ Workflow functions can be encapsulated into classes to support model maintenance
 method itself.  One restriction that is made is that workflow functions should not contain nested function definitions,
 as these may be inadvertently fuzzed by the Fuzzi Moss mechanism.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Specifying the Fuzzers for a Workflow}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The workflow functions implemented in Python are denoted as eligible for fuzzing by applying the \lstinline!@fuzz!
 decorator provided in the Fuzzi Moss package. The decorator's constructor accepts one argument, a pointer to a
@@ -483,11 +594,11 @@ self.target_dependencies_per_feature: developer.refactor(feature)
  fuzzers is provided in Fuzzi Moss that allow the modular construction of more complex fuzzer behaviours.  The behaviour
  of each of the fuzzers available in Fuzzi Moss are described in the following sub sections.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  \subsection{Simple Fuzzers}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  A simple fuzzer accepts and returns a list of \lstinline!ast.Statement! objects and can be declared for use directly
  within a fuzz decorator.  The following simple fuzzers are defined in Fuzzi Moss.
@@ -513,11 +624,11 @@ self.target_dependencies_per_feature: developer.refactor(feature)
  The application of simple fuzzers was demonstrated in Figure \ref{fig:fuzz}.  Note that the fuzzer is supplied to the
  fuzz decorator as a function pointer, rather than as an evaluated function call.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  \subsection{Fuzzing Filters}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  Sometimes it is desirable to restrict the application of simple fuzzers to particular portions of the body of a
  workflow function.  In this situation the \lstinline!filter_steps()! fuzzer can be used.  Filter steps takes two
@@ -554,7 +665,8 @@ self.target_dependencies_per_feature: developer.refactor(feature)
   \centering
 
 \begin{lstlisting}
-@fuzz( filter_steps( invert(choose_last_step), shuffle_steps ) ) def work(self, system, developer, schedule):
+@fuzz( filter_steps( invert(choose_last_step), shuffle_steps ) )
+def work(self, system, developer, schedule):
 
 self.complete_specification(schedule, system) self.implement_features(developer, system)
 self.implement_test_suite(developer, system) self.debug_system(developer, system) self.refactor_system(developer,
@@ -567,11 +679,11 @@ system)
   \label{fig:filter}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Composite Fuzzers}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 More complex fuzzers can be assembled using composite fuzzing functions that are implemented in a similar manner to
 filtering.
@@ -614,11 +726,11 @@ developer.add_test(feature) self._debug_feature(developer, feature) self._refact
   \label{fig:composite}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Control Structure Fuzzers}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The final set of fuzzers provide for manipulation of control structure conditions and iterators.  Both of these fuzzers
 inspect the input list of statements for compatible statement types to fuzz and apply the fuzzing to every one found.
@@ -639,11 +751,11 @@ developer may decide to stop working on refactoring a feature before the number 
 system are reduced below the specified level, even if this is required by the idealised workflow.  Similarly, a
 developer may skip the application of a task to a feature through an error of omission.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Defining and Evaluating Scenarios}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Experiments in Fuzzi Moss are created by defining scenarios with initial conditions (available resources, participants
 and so on), as well as a schedule of work items.  The schedule of work items is specified as part of the problem domain,
@@ -675,12 +787,21 @@ may be applied to different runs of the same scenario.  Many problem domains wil
 probabilistic functionality in order to represent stochastic elements of a problem domain.  Therefore, it is anticipated
 that the characteristics of a workflow should be measured across multiple runs of the same scenario.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Evaluation}
 \label{sec:evaluation}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}
+  \centering
+    \input{floats/Average-Features-Implemented-against-Total-Fuzzings.pgf}
+  \caption{Scatter plot and trend lines of average features implemented versus total fuzzings during simulation for
+    selected configurations of feature (2 and 4) and project size (1 - 6 features). Test driven development simulations
+    are denoted in blue, Waterfall simulations are in red.}
+\end{figure*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This section describes the results of a case study that was undertaken to evaluate the efficacy of executable workflow
 fuzzing for modelling, simulating and predicting behaviours in software systems.  Software development was the problem
@@ -905,12 +1026,12 @@ recompilation of workflow functions each time a fuzzer is applied.  Further inve
 models and large scenarios is required to assess this cost and determine whether optimisations are necessary.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
 \label{sec:conclusions}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modelling and simulating
 variance in socio-technical system behaviours.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi
@@ -954,12 +1075,12 @@ have been applied manually to responsibility models \cite{lock09modelling}. The 
 demonstrates the potential for the development of realistic simulations of socio-technical systems with predictive
 power.  The availability of such tools would do much to progress the current craft of large scale systems engineering.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \bibliographystyle{abbrvnat} \bibliography{lib}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \end{document}
