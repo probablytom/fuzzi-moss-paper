@@ -1,6 +1,6 @@
 input metauml;
 
-filenametemplate "%j-%c.mps";
+filenametemplate "%j-%c.eps";
 
 prologues:= 3;
 
@@ -25,7 +25,7 @@ beginfig(1);
 
   Class.SoftwareSystem("SoftwareSystem")()("add_test()", "add_feature()", "operate()");
 
-  Class.SoftwareProject("SoftwareProject")()("build_and_operate()");
+  Class.SoftwareProject("SoftwareProject")()("deploy_and_operate()");
 
   Class.SoftwareProjectGroup("SoftwareProjectGroup")()("build_and_operate()");
 
@@ -33,9 +33,14 @@ beginfig(1);
 
   Class.Test("Test")()("exercise()");
 
+  Class.VCSServer("VCSServer")("checkout()", "receive_commit()")();
+
+  Class.VCSClient("VCSClient")("update()", "commit()", "resolve()")();
+
+
   leftToRight(30)(Feature, Chunk);
 
-  topToBottom(30)(Developer,Feature);
+  
 
   leftToRight(30)(SoftwareProject,Developer);
 
@@ -43,12 +48,15 @@ beginfig(1);
 
   Test.c = (xpart Feature.c, ypart Bug.c);
 
-  SoftwareSystem.c = (xpart SoftwareProject.c, ypart Feature.c);
+  leftToRight(30)(SoftwareSystem, Feature);
 
-  topToBottom(25)(SoftwareProjectGroup, SoftwareProject);
+  topToBottom(25)(VCSServer, VCSClient, SoftwareSystem);
 
-  drawObjects(SoftwareProject,SoftwareSystem,Developer,Feature, Chunk, Bug, Test,SoftwareProjectGroup);
+  leftToRight(30)(VCSServer,SoftwareProject, SoftwareProjectGroup);
 
+  drawObjects(SoftwareProject,SoftwareSystem,Feature, Chunk, Bug, Test, VCSClient, VCSServer);
+
+  
   clink(association)(Feature, Chunk);
 
   clink(association)(Chunk, Bug);
@@ -70,17 +78,22 @@ beginfig(1);
   item(iAssoc)("*")(obj.se = Bug.w);
   item(iAssoc)("*")(obj.sw = Test.e);
 
-  clink(association)(SoftwareSystem, SoftwareProject);
   clink(association)(SoftwareSystem, Feature);
   link(associationUni)(pathStepX(SoftwareSystem.s, Test.w, 0));
   item(iAssoc)("*")(obj.se = Test.w);
   item(iAssoc)("*")(obj.se = Feature.w);
 
-  clink(association)(SoftwareProject, Developer);
-  item(iAssoc)("*")(obj.se = Developer.w);
+  clink(association)(SoftwareProject, VCSServer);
 
-  clink(associationUni)(SoftwareProjectGroup, SoftwareProject);
-  item(iAssoc)("*")(obj.se = SoftwareProject.n);
+  clink(associationUni)(VCSServer, VCSClient);
+  item(iAssoc)("*")(obj.se = VCSClient.n);
+
+  clink(association)(VCSClient, SoftwareSystem);
+  item(iAssoc)("working_copy")(obj.se = SoftwareSystem.n);
+
+  link(associationUni)(pathStepX(VCSServer.w, SoftwareSystem.w, -25));
+  item(iAssoc)("master")(obj.se = SoftwareSystem.w);
+
   
 endfig;
 
