@@ -33,14 +33,11 @@ beginfig(1);
 
   Class.Test("Test")()("exercise()");
 
-  Class.VCSServer("VCSServer")("checkout()", "receive_commit()")();
+  Class.VCSServer("VCSServer")()("checkout()", "receive_commit()");
 
-  Class.VCSClient("VCSClient")("update()", "commit()", "resolve()")();
-
+  Class.VCSClient("VCSClient")()("update()", "commit()", "resolve()");
 
   leftToRight(30)(Feature, Chunk);
-
-  
 
   leftToRight(30)(SoftwareProject,Developer);
 
@@ -50,9 +47,9 @@ beginfig(1);
 
   leftToRight(30)(SoftwareSystem, Feature);
 
-  topToBottom(25)(VCSServer, VCSClient, SoftwareSystem);
+  topToBottom(45)(VCSClient, SoftwareSystem);
 
-  leftToRight(30)(VCSServer,SoftwareProject, SoftwareProjectGroup);
+  leftToRight(30)(VCSClient, VCSServer,SoftwareProject);
 
   drawObjects(SoftwareProject,SoftwareSystem,Feature, Chunk, Bug, Test, VCSClient, VCSServer);
 
@@ -85,14 +82,14 @@ beginfig(1);
 
   clink(association)(SoftwareProject, VCSServer);
 
-  clink(associationUni)(VCSServer, VCSClient);
-  item(iAssoc)("*")(obj.se = VCSClient.n);
+  clink(association)(VCSServer, VCSClient);
+  item(iAssoc)("*")(obj.sw = VCSClient.e);
 
-  clink(association)(VCSClient, SoftwareSystem);
+  clink(associationUni)(VCSClient, SoftwareSystem);
   item(iAssoc)("working_copy")(obj.se = SoftwareSystem.n);
 
-  link(associationUni)(pathStepX(VCSServer.w, SoftwareSystem.w, -25));
-  item(iAssoc)("master")(obj.se = SoftwareSystem.w);
+  link(associationUni)(pathStepY(VCSServer.s, SoftwareSystem.n + (15,0), -25));
+  item(iAssoc)("master")(obj.sw = SoftwareSystem.n + (15,0));
 
   
 endfig;
