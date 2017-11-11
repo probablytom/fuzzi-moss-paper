@@ -1,0 +1,7 @@
+
+
+ * A software framework for simulating socio-technical systems that allows for the separate modelling of idealised workflows and the effects contingent behaviours on those workflows.
+
+ * A demonstration of the
+
+ * Simulation evidence drawn from the case study which supports the industry consensus regarding TDD.
