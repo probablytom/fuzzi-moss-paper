@@ -203,7 +203,7 @@ The representation of cross cutting concerns as aspects has been extensively stu
 literature \citep{Ali2012Aspect}.  However, we are unaware of any research that utilises aspect oriented programming
 techniques in simulation models, either for socio-technical user behaviours or elsewhere.  Similarly, the use of code
 fuzzing techniques have been employed extensively in quality assurance practices, to assess the impact of variable
-behaviour on software systems, including fuzzing of compiler options \cite{fuzzing-compiler}, mutation testing of test
+behaviour on software systems, including fuzzing of compiler options \citep{fuzzing-compiler}, mutation testing of test
 suites \cite{demillo78hints} and fuzzing of inputs test data to search for software security vulnerabilities
 \citep{takanen08fuzzing}.  However, we have not discovered any similar work on the application of fuzzing techniques to
 dynamically inject variation into a simulation model at runtime.
@@ -273,7 +273,7 @@ of code, as normal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In Theatre\_Ag user behaviour workflows are implemented as Python classes, collating related tasks to operate on a
+In Theatre\_Ag, user behaviour workflows are implemented as Python classes, collating related tasks to operate on a
 common state. For the purposes of the software development case study, a change management workflow were created for
 interacting with a version control server in an update-resolve-commit cycle, as shown as the first class in Figure
 \ref{fig:workflows}.  The state for the workflow is the target centralized version control server and a client that
@@ -398,12 +398,14 @@ implemented from the project backlog and implement them following TDD.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Theatre\_Ag framework provides for the modeling and simulation of idealized socio-technical workflows.  However,
-these idealized descriptions do not reflect the variability of real work, and so simulations will not capture the
-behaviour of such workflows in realistic conditions. In this section we describe our approach to modeling the effects of
-variable behaviour such as confusion and distraction using aspect oriented dynamic fuzzing of task descriptions
-implemented as Python methods.  To achieve this, we implemented behaviour fuzzing using our implementation of a
-dynamic fuzzing library for Python, PyDySoFu \cite{storer2016pydysofu-scm}. 
+In this section we describe our approach to modeling the effects of variable behaviour such as distraction using aspect
+oriented dynamic fuzzing of task descriptions.  To achieve this, we exploit our implementation of a dynamic fuzzing
+library for Python, PyDySoFu \cite{storer2016pydysofu-scm}.  This library allows users to specify fuzzers that should be
+applied to specific methods in workflow describing classes.  When the simulation executes, method invocations in
+workflows are intercepted at runtime.  The simulation thread is then paused and the abstract syntax tree and context of the 
+
+  Method invocations of workflow classes are intercepted at
+runtime.  Workflow execution is paused and a
 
 PyDySoFu intercepts the invocation of methods in fuzzed classes at runtime.  Each time a method that can be fuzzed
 executes, PyDySoFu pauses execution and searches a user provided dictionary of advice for a suitable fuzzing aspect. The
@@ -418,7 +420,7 @@ constructed and parameterized.  This library includes aspects for removing steps
 aspect conditionally, replacing conditions, filtering steps to apply another aspect, recursing into control structures
 and applying sequences of aspects to a single method.
 
-In order to evaluate the feasibility of our approach, we implemented an aspect that mimics \emph{distraction} in using
+In order to evaluate the feasibility of our approach, we implemented an aspect that mimics \emph{distraction}  using
 the PyDySoFu library.  The distraction aspect represents variable behavior when an actor engaged in one task becomes
 distracted by another, irrelevant activity.  The probability of distraction increases as the simulation proceeds,
 i.e. the probability of moving to an irrelevant task increases the longer a simulation has been executing.  For example,
@@ -610,7 +612,7 @@ immune to fuzzing up to the removal of approximately 100 statements, after which
 steeper declines for Waterfall.
 
 Figure \ref{fig:fuzzing-mtf} investigates the effect of distraction fuzzing on MTF, again distinguishing between
-Waterfall (blue) and TDD (red) SDLCs.  In these plots both fuzzing configurations described in Table \ref{tab:variables}
+Waterfall (blue) and TDD (red) SDLCs.  In these plots both fuzzing configurations described at the start of this Section
 are combined, as their effects are similar.  Small and large feature projects are plotted separately, as these were
 identified as having characteristically different mean time to failures when considering projects without fuzzing.
 Similar to the plots of feature completion, the plots of MTF suggest that TDD is more resilient to fuzzing than
