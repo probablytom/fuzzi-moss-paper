@@ -84,8 +84,8 @@ cannot be attributed to either purely user behaviour or information system failu
 both factors within the overall socio-technical system.
 
 Our contention is that these failures arise because systems engineers lack the tools and methods to efficiently model
-and simulate the interaction between the information systems and the wider organisation of users within the overall
-socio-technical system.  Without these facilities, systems engineers cannot predict potential socio-technical system
+and simulate the interaction between the information systems and their organisational context, which comprise a socio-
+technical system. Without these facilities, systems engineers cannot predict potential socio-technical system
 behaviour, during information system design. Simulating this interaction between the information system and users is
 hard because user behaviour is heterogeneous, contingent and evolutionary.  Different users have different abilities,
 training and experiences and can experience phenomena such as distraction, misjudgments, exhaustion and confusion that
@@ -105,8 +105,10 @@ to anticipate that a novice developer's behaviour will gradually evolve into tha
 experience.As a consequence, the de facto behavior exhibited within a system may differ from that envisaged by system
 architects in idealized workflows.
 
-Conventional systems engineering notations for describing user behaviour, such as BPMN \citep{omg2011omgbpmn}, activity
-diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for efficiently modelling these
+A system architect must model their workflows as they are intended to be executed in practice, yet due to their
+organisational context any information system expresses contingent properties which are fundamental to their accurate
+simulation. Conventional systems engineering notations for describing user behaviour, such as BPMN \citep{omg2011omgbpmn},
+activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for efficiently modelling these
 characteristics.  Attempting to model the heterogeneity, contingency and evolution of user behaviour using these
 approaches inevitably results in models that are either too abstract or narrow to be informative, or too complex to be
 tractable.  Alternative approaches that abstract the complexity of user behaviour, such as i* \citep{yu1995social},
@@ -115,14 +117,17 @@ generate executable simulations.
 
 %% TODO What is the insight - link to contributions
 
-The key insight of this paper is that the same cause may affect many different workflows in similar ways.  Conversely, a
-given user's behaviour is affected by a composition of causes.  Therefore, \emph{we propose and demonstrate the separate
-  modelling of influences on user interactions with an information system as cross cutting concerns to be applied to
-  idealised workflow descriptions}.
+The key insight of this paper is that the same deviation in behaviour often affects a number of possible actions.
+Conversely, a given user's behaviour is a composition of their expected behaviour and the set of irregularities that
+affect how the specific user exhibits that behaviour.  Therefore, \emph{we propose and demonstrate the separate
+modelling of behavioural irregularities from workflows themselves, showing that they are cross-cutting concerns which can
+be applied to an idealised workflow model}.
+
+Specifically, in this paper we present:
 
 \begin{itemize}
 
-\item A method and supporting software framework for simulating socio-technical systems that allows for the separate
+\item A method --- and supporting software framework --- for simulating socio-technical systems that allows for the separate
   modelling of idealised workflows and the effects of contingent human behaviours on those workflows.  We use an
   aspect-oriented technique \citep{filman01aspect} to model the effects of variable human behaviour on the execution of
   workflows.  Within an aspect, the method uses a dynamic code-fuzzing \citep{takanen08fuzzing} technique to represent
@@ -132,19 +137,22 @@ given user's behaviour is affected by a composition of causes.  Therefore, \emph
   Development (TDD) software development workflows.  The case study provides evidence for the industry consensus that
   TDD provides for better software productivity and quality
   \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.
-  Specifically, the simulation results show that (a) the compared workflows provide for similar outcomes in idealised
-  circumstances, (b) that the introduction of contingent behaviour into simulations causes a decline in both
-  productivity and resulting software quality in both workflows and (c) that the TDD workflow is more resilient to the
-  occurrence of contingent behaviour than Waterfall.
+
+  Specifically, the simulation results show that:
+	\begin{itemize}
+		\item the compared workflows provide for similar outcomes in idealised circumstances
+		\item the introduction of contingent behaviour into simulations causes a decline in both productivity and resulting software quality in both workflows
+		\item the TDD workflow is more resilient to the occurrence of contingent behaviour than Waterfall.
+	\end{itemize}
 
 \end{itemize}
 
 The rest of this paper is structured as follows.  Section \ref{sec:related} discusses related work, covering existing
 techniques for modeling socio-technical workflows and the limitations encountered in the literature.  Section
-\ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach and presents the method
+\ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach, and presents the method
 for constructing models of socio-technical systems and associated workflows. Section \ref{sec:fuzzing} describes the
-development of aspect oriented fuzzing of workflow descriptions of user behaviour and the software tool developed for
-this purpose.  Section 5 presents our evaluation of the case study and Section 6 discusses conclusions and future work,
+development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed for
+this purpose.  Section \ref{sec:evaluation} presents our evaluation of the case study and Section \ref{sec:conclusions} discusses conclusions and future work,
 as well as noting the potential for applying fuzzing to other forms of socio-technical models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -490,6 +498,7 @@ recursion.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Evaluation}
+\label{sec:evaluation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -640,6 +649,7 @@ the life-cycle, rather than only at the end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
+\label{sec:conclusions}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
