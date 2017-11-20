@@ -2,6 +2,10 @@
 
 \documentclass{llncs}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{calc}
+\usepackage{showframe}
+
 \usepackage[lighttt]{lmodern}
 
 \usepackage[british]{babel}%
@@ -12,9 +16,17 @@
 \usepackage{cleveref}%
 \usepackage[numbers]{natbib}
 
+\newlength\listinglinewidth
+\setlength\listinglinewidth\linewidth
+\addtolength\listinglinewidth{-0.5cm}
+
 \usepackage{listings}
 
 \lstset{language=python}
+\lstset{lineskip=-4pt}
+\lstset{linewidth=\listinglinewidth}
+\lstset{xleftmargin=0.25cm}
+\lstset{basewidth=0.5em}
 \lstset{basicstyle=\ttfamily\footnotesize}
 \lstset{keywordstyle=\ttfamily\bfseries}
 \lstset{frame=single}
@@ -39,8 +51,6 @@
   \email{twallisgm@gmail.com},\\
   \email{timothy.storer@glasgow.ac.uk},
 }
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -77,12 +87,12 @@ Our contention is that these failures arise because systems engineers lack the t
 and simulate the interaction between the information systems and the wider organisation of users within the overall
 socio-technical system.  Without these facilities, systems engineers cannot predict potential socio-technical system
 behaviour, during information system design. Simulating this interaction between the information system and users is
-hard because user behaviour is heterogeneous, contingent and evolutionary.  Different users have different psychological
-characteristics, abilities, training and experiences that can have significant influence on how and when a user
-completes a task.  For example, a novice developer working within a large team may be unaware of software development
-best practices described in a workflow, perhaps forgetting to make frequent commits to a version control server.
-Conversely, an experienced developer may omit steps, such as peer reviews of their code, they consider unnecessary to
-optimise their performance.
+hard because user behaviour is heterogeneous, contingent and evolutionary.  Different users have different abilities,
+training and experiences and can experience phenomena such as distraction, misjudgments, exhaustion and confusion that
+can have significant influence on how and when a user completes a task.  For example, a novice developer working within
+a large team may be unaware of software development best practices described in a workflow, perhaps forgetting to make
+frequent commits to a version control server.  Conversely, an experienced developer may omit steps, such as peer reviews
+of their code, they consider unnecessary to optimise their performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
 system, the behaviour of other users or the enviroment \citep{sommerville09deriving}.  In our example scenario, a
@@ -206,17 +216,17 @@ dynamically inject variation into a simulation model at runtime.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section we introduce our approach to modeling a problem domain and associated idealized workflows in
-socio-technical systems using Theatre\_Ag, an agent oriented simulation framework, implemented in Python.  Terminology for
-simulations follows a theatrical drama metaphor, with casts of actors performing in episodes which take place in
-settings and according to directions. We have chosen to present the approach through an example case study of team based
-software development, in which we will explore the efficacy of two software development lifecycle (SDLC) workflows:
-Waterfall and Test Driven Development (TDD).  The case study was chosen as representative of a socio-technical system,
-combining different actor roles, technical components and a variety of formal workflows.  Further, there is a growing
-consensus amongst software development professionals that TDD is a more resilient SDLC than Waterfall. However, there is
-little empirical research in this area, due to the difficulty of conducting controlled experiments at the required scale
-\cite{George2004TestDrivenDevelopment}. The case study therefore provides an opportunity to explore the benefits of
-simulating a real world system that is difficult or impossible to observe directly. Code examples of the case study are
-provided as examples, but the full source code is also available for inspection in the case study's repository on GitHub
+socio-technical systems.  We have chosen to present the approach through an example case study of team based software
+development, in which we will explore the efficacy of two software development lifecycle (SDLC) workflows: Waterfall and
+Test Driven Development (TDD).  The case study was chosen as representative of a socio-technical system, combining
+different user roles (developer, project manager), information systems (version control server and client) and a variety
+of well defined idealised workflows (implementation, testing, debugging etc.).  Further, there is a growing consensus
+amongst software development professionals that TDD is a more resilient SDLC than Waterfall to variable human behaviour
+\citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The case
+study therefore provides an opportunity to test whether the approach presented can be used to distinguish between the
+effects of idealised and realistic user behaviours in a socio-technical system.  The modelling approach is implemented
+in an agent oriented framework (Theatre\_Ag) written in Python.  Code examples of the case study are provided as
+examples, but the full source code is also available for inspection in the case study's repository on GitHub
 \cite{storer2016softdev-workflow-scm}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -225,50 +235,37 @@ provided as examples, but the full source code is also available for inspection 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In Theatre\_Ag, the problem domain is referred to as the setting for a simulation.  The setting represents the inviolable
-‘physics’ of the problem domain that are not subject to contingency or variability. An object oriented approach to
-modeling is adopted \cite{bennett06object}, with artifacts in the domain implemented as collection of Python classes.
-Figure \ref{fig:domain} shows the class diagram for the case study.
+The first step in the modelling approach is to represent the problem domain, describing the inviolable `physics' that
+are not subject to variability. An object oriented approach to modeling is adopted \cite{bennett06object}, with
+artifacts in the domain implemented as collection of Python classes.  Figure \ref{fig:domain} shows the class diagram
+for the problem domain in the case study.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
-  \includegraphics{floats/full-class-diagram-1}
+  \includegraphics[width=12cm]{floats/full-class-diagram-1}
   \caption{Domain model for software development case study, showing artifacts to be manipulated by execution of
     socio-technical workflows.}
   \label{fig:domain}
 \end{figure}
 
-
-The diagram shows classes for:
-
-\begin{itemize}
-\item Features, representing user-facing specifications of the system's functionality.  Features may be of varying size,
-  requiring more or fewer code chunks to be implemented in order to be operational.
-
-\item Code chunks, representing the implementation details of the features. Chunks may have dependencies on other chunks
-  in the system.  Each time a new chunk is added to a feature other chunks may also need to be modified, potentially
-  creating further dependencies between chunks or introducing bugs.
-
-\item Bugs introduced into chunks during the completion of features.  Bugs may manifest themselves when the feature they
-  are associated with is operated or tested.  Features can be debugged (resulting in the removal of bugs).
-
-\item Tests can be exercised resulting in the detection of bugs.  The more tests created for a feature, the greater the
-  probability of detecting a given bug, easing the process of debugging a feature or overall system.
-
-\item Software systems which aggregate all the source artifacts of a software project, including features, chunks, bugs
-  and tests.
-
-\item Version control servers and clients for coordinating distributed development of a project.
-\end{itemize}
+A software development effort is hosted on a version control system (VCS) server.  Software developers interact with the
+server via VCS client.  Both the server and clients maintain copies of the software system, which must be coordinated
+through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features, representing
+user-facing specifications of the system's functionality.  Features may be of varying size, requiring more or fewer code
+chunks to be implemented in order to be operational.  Chunks may have dependencies on other chunks in the system.  Each
+time a new chunk is added to a feature other chunks may also need to be modified, potentially creating further
+dependencies between chunks or introducing bugs.  Bugs may manifest themselves when the feature they are associated with
+is operated or exercised through the execution of tests.  Features can be debugged, resulting in the removal of detected
+bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting a given bug, easing
+the process of debugging a feature or overall system.
 
 The behaviors described above are implemented as methods in the Python classes, as shown in the diagram.  Many of the
 effects of these behaviors have side effects which are modeled stochastically. For example, the introduction of bugs and
-dependencies during the implementation of a feature occurs with a certain probability.
-
-No restrictions are placed on the implementation of the problem domain classes within the Python language, providing the
-modeler with significant flexibility.  For example, operations can accept a variety of arguments, modify object state,
-invoke operations on other problem domain classes and return values as desired. The @Property decorator can also be used
-to improve the readability of code, as normal.
+dependencies during the implementation of a feature occurs with a certain probability. No restrictions are placed on the
+implementation of the problem domain classes within the Python language, providing the modeler with significant
+flexibility.  For example, operations can accept a variety of arguments, modify object state, invoke operations on other
+problem domain classes and return values as desired. The @Property decorator can also be used to improve the readability
+of code, as normal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -276,19 +273,17 @@ to improve the readability of code, as normal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Idealized socio-technical workflows are collections of task descriptions that operate on a common state.  In Theatre\_Ag,
-tasks are implemented as Python methods, with all the tasks associated with the same workflow and operating on the same
-state collected together in a single Python class.  For the purposes of the software development case study, a change
-management workflow were created for interacting with a version control server in an update-resolve-commit cycle, as
-shown in Figure \ref{fig:change-management-workflow}.  The state for the workflow is the target centralized version
-control server and a client that manages the working copy.  Separate task methods are provided for checking out the
-client, committing working copy changes to the server and resolving conflicts that arise during a commit task.
+In Theatre\_Ag user behaviour workflows are implemented as Python classes, collating related tasks to operate on a
+common state. For the purposes of the software development case study, a change management workflow were created for
+interacting with a version control server in an update-resolve-commit cycle, as shown as the first class in Figure
+\ref{fig:workflows}.  The state for the workflow is the target centralized version control server and a client that
+manages the working copy.  Separate task methods are provided for checking out the client, committing working copy
+changes to the server and resolving conflicts that arise during a commit task.
 
 \begin{figure}
   \centering
 \begin{lstlisting}
 class ChangeManagement(object):
-
     def __init__(self, vcs_server):
         self.vcs_server = vcs_server
         self.vcs_client = None
@@ -312,34 +307,9 @@ class ChangeManagement(object):
     @default_cost(0)
     def checkout(self):
         self.vcs_client = self.vcs_server.checkout()
-\end{lstlisting}
-  
-  \caption{Python code for a workflow to describe change management.}
-  \label{fig:change-management-workflow}
-\end{figure}
 
-Further workflows were implemented for common software development activities: the Specification and Implementation of
-features in the system; Testing; Debugging and Refactoring (reducing dependencies).  Since workflows are modular they
-can also be organized hierarchically, so the new workflows make use of the change management workflow, rather than
-needing to do re-implement change management for each aspect of development.  Figure \ref{fig:implementation-workflow}
-shows how this modularity is exploited for the implementation workflow. In this example, the workflows for modifying the
-structure of a software system (for adding chunks or tests and so on) depend on the change management workflow in order
-to coordinate the distribution of changes within a team.
 
-Two further workflows, Waterfall and Test Driven Development (TDD) were implemented to investigate the performance of
-different team based software development lifecycles (SDLC)when subject to variable behavior.  The Waterfall SDLC
-\cite{benington83production} describes a linear staged approach to system development, in which specification of all
-features is followed by system implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD
-\cite{beck02test} prescribes the definition of tests for each feature, before proceeding to implementation and
-refactoring.  Advocates of TDD argue that such an approach results in software that is delivered quicker and of higher
-quality because tests are explicitly linked to the specification and features are not committed without a passing test
-suite.
-
-\begin{figure}
-  \centering
-\begin{lstlisting}
- class Implementation(object):
-
+class Implementation(object):
     def __init__(self, change_management):
         self.change_management = change_management
 
@@ -364,15 +334,32 @@ suite.
     @default_cost()
     def implement_system(self, rand):
         self.change_management.checkout()
-
         for feature in self.working_copy:
             self.implement_feature(feature, rand)
 
 \end{lstlisting}
-  \caption{Python code for a workflow describe software implementation.}
-  \label{fig:implementation-workflow}
+  \caption{Python code for workflows describing software implementation and change management.}
+  \label{fig:workflows}
 
 \end{figure}
+
+Further workflows were implemented for common software development activities: the Specification and Implementation of
+features in the system; Testing; Debugging and Refactoring (reducing dependencies).  Since workflows are modular they
+can also be organized hierarchically, so the new workflows make use of the change management workflow, rather than
+needing to do re-implement change management for each aspect of development.  Figure \ref{fig:workflows} also shows how
+this modularity is exploited for the implementation workflow. In this example, the workflows for modifying the structure
+of a software system (for adding chunks or tests and so on) depend on the change management workflow in order to
+coordinate the distribution of changes within a team.
+
+Two further workflows, Waterfall and Test Driven Development (TDD) were implemented to investigate the performance of
+different team based software development lifecycles (SDLC)when subject to variable behavior.  The Waterfall SDLC
+\cite{benington83production} describes a linear staged approach to system development, in which specification of all
+features is followed by system implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD
+\cite{beck02test} prescribes the definition of tests for each feature, before proceeding to implementation and
+refactoring.  Advocates of TDD argue that such an approach results in software that is delivered quicker and of higher
+quality because tests are explicitly linked to the specification and features are not committed without a passing test
+suite.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -380,89 +367,67 @@ suite.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Theatre\_Ag episodes (simulations) proceed via the execution of tasks in workflows by actors.  An episode is initiated by
-passing directions (an initial set of tasks) to the cast of actors.  These tasks are references to methods in workflow
-instances.  From the initial directions, execution of a task may result in new workflow instances being created and
-tasks being passed to other actors.  Also, the execution of one task in a workflow may result in other sub-tasks being
-initiated, so each actor maintains a trace of tasks executed during a simulation in a tree structure for later
-inspection.
+Theatre\_Ag simulations proceed via the execution of tasks in workflows by agents representin the users of the
+information system.  A simulation is initiated by configuring a set of actors with an initial set of tasks.  These tasks
+are references to methods in workflow instances.  From the initial configuration, execution of a task may result in new
+workflow instances being created and tasks being passed to other actors.  Also, the execution of one task in a workflow
+may result in other sub-tasks being initiated, so each actor maintains a trace of tasks executed during a simulation in
+a tree structure for later inspection.
 
 The Theatre\_Ag framework is designed for simulating socio-technical systems, and so provides for both the explicit
 representation of problem domain time for controlling task execution; and concurrent execution of tasks by actors.  Each
-actor in the cast executes their tasks as a separate thread, but synchronizes on a central clock that measures time in
-discrete ticks of domain specific precision.  Task execution proceeds without interruption in the episode until a task
-with cost greater than 0 is encountered.  Task costs are denoted using the \lstinline!@default_cost! decorator in a
-workflow as shown in Figures \ref{fig:change-management-workflow} and \ref{fig:implementation-workflow}.  The actor
-pauses execution of a task until sufficient ticks from the centralized clock have been received and then resumes
-execution.  This mechanism is implemented transparently with respect to workflow classes, easing the modeling burden for
-the user.
+agent executes their tasks as a separate thread, but synchronizes on a central clock that measures time in discrete
+ticks of domain specific precision.  Task execution proceeds without interruption until a task with cost greater than 0
+is encountered.  Task costs are denoted using the \lstinline!@default_cost! decorator in a workflow as shown in Figure
+\ref{fig:workflows}.  The actor pauses execution of a task until sufficient ticks from the centralized clock have been
+received and then resumes execution.  This mechanism is implemented transparently with respect to workflow classes,
+easing the modeling burden for the user.
 
-The timing model is partly inspired by the work on timing and precision in socio-technical systems by
-\citet{baxter07evaluating}.  The model guarantees inter-tick determinism, but allows for intra-tick non-deterministic
-behavior.  This means that, for example a task started in tick 1 with duration 4 will terminate in tick 5.  However,
-where two events occur within the same tick the ordering of these events within the tick is non-deterministic in the
-simulation.
-
-In the case study, episodes were configured by representing the team of software developers as the cast of actors in the
-episode.  Episodes were developed for both types of SDLC in the case study.  For Waterfall, the initial direction
-specified an actor in the cast with the role of project manager.  This actor is directed to allocate tasks for each
+In the case study, simulations were configured to represent a team of software developers working on a software
+project. Simulations were developed for both types of SDLC in the case study.  For Waterfall, the initial configuration
+specified an agent in the team with the role of project manager.  This agent is directed to allocate tasks for each
 stage of the software development process (specification, implementation, testing, debugging, refactoring) to other
-actors in the team and waits for all tasks in each stage of the development process to be complete before allocating
-tasks in the next stage.  For TDD, all members of the software development were directed to draw features to be
+agents in the team and waits for all tasks in each stage of the development process to be complete before allocating
+tasks in the next stage.  For TDD, all members of the software development were configured to draw features to be
 implemented from the project backlog and implement them following TDD.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Introducing Variability into Workflows using Fuzzing}
+\section{Modelling Variability as Workflows Aspects}
 \label{sec:fuzzing}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The Theatre\_Ag framework provides for the modeling and simulation of idealized socio-technical workflows.  However, these
-idealized descriptions do not reflect the variability of real work, and so simulations will not capture the performance
-of such workflows in realistic conditions.  A key insight in our work is that the causes and effects of variability,
-such as distraction, misjudgments, exhaustion and confusion by human operators are common across many different
-workflows.  In this section we describe our approach to modeling these phenomena using aspect oriented dynamic fuzzing
-of task descriptions implemented as Python methods.  To achieve this, we implement socio-technical fuzzing using our
-implementation of a dynamic fuzzing library for Python, Fuzzi\_Moss.
+The Theatre\_Ag framework provides for the modeling and simulation of idealized socio-technical workflows.  However,
+these idealized descriptions do not reflect the variability of real work, and so simulations will not capture the
+behaviour of such workflows in realistic conditions. In this section we describe our approach to modeling the effects of
+variable behaviour such as confusion and distraction using aspect oriented dynamic fuzzing of task descriptions
+implemented as Python methods.  To achieve this, we implemented behaviour fuzzing using our implementation of a
+dynamic fuzzing library for Python, PyDySoFu \cite{storer2016pydysofu-scm}. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+PyDySoFu intercepts the invocation of methods in fuzzed classes at runtime.  Each time a method that can be fuzzed
+executes, PyDySoFu pauses execution and searches a user provided dictionary of advice for a suitable fuzzing aspect. The
+aspect is a function that accepts the context (i.e. the Python self reference) of a method invocation and the abstract
+syntax tree of the body of the method to be invoked.  The aspect may access and/or alter the context if desired and
+return an altered method body.  If an aspect is found, PyDySoFu constructs the abstract syntax tree for the method body
+and passes this and the method context to the aspect to obtain the fuzzed method body as an AST.  PyDySoFu then
+recompiles the code object for the method from the fuzzed AST and resumes execution.  Further implementation details are
+omitted for brevity, but the full source code is available in the project repository for inspection
+\cite{storer2016pydysofu-scm}. PyDySoFu is accompanied by a library of aspects from which more complex aspects can be
+constructed and parameterized.  This library includes aspects for removing steps, inserting extra steps, applying an
+aspect conditionally, replacing conditions, filtering steps to apply another aspect, recursing into control structures
+and applying sequences of aspects to a single method.
 
-\subsection{Fuzzi\_Moss Fuzzing Library}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Fuzzi\_Moss intercepts the invocation of methods in fuzzed classes at runtime.  Each time a method that can be fuzzed
-executes, Fuzzi\_Moss pauses execution and searches a user provided dictionary of advice for a suitable fuzzing
-aspect. The aspect is a function that accepts the context (i.e. the Python self reference) of a method invocation and
-the abstract syntax tree of the body of the method to be invoked.  The aspect may access and/or alter the context if
-desired and return an altered method body.  If an aspect is found, Fuzzi\_Moss constructs the abstract syntax tree for
-the method body and passes this and the method context to the aspect to obtain the fuzzed method body as an AST.
-Fuzzi\_Moss then recompiles the code object for the method from the fuzzed AST and resumes execution.  Further
-implementation details are omitted for brevity, but the full source code is available in the project repository for
-inspection \cite{wallis2016fuzzi-moss-scm}.
-
-Fuzzi\_Moss is accompanied by a library of aspects from which more complex aspects can be constructed and parameterized.
-This library includes aspects for removing steps, inserting extra steps, applying an aspect conditionally, replacing
-conditions, filtering steps to apply another aspect, recursing into control structures and applying sequences of aspects
-to a single method.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Socio-Technical Fuzzing}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In order to evaluate the feasibility of our approach, we implemented a distraction aspect in TOOLNAME, using the
-Fuzzi\_Moss library.  The distraction aspect represents variable behavior when an actor engaged in one task becomes
-distracted by another, irrelevant activity.  The probability of distraction increases as the simulation proceeds
-(i.e. the probability of moving to an irrelevant task increases the longer a simulation has been executing).  For
-example, a software developer implementing a feature may be distracted by a technology news site as they proceed to
-later activities in the workflow.  Conversely, the aspect also allows the probability of distraction to be reduced by
-increasing the concentration of an actor (i.e. actors with better concentration do not get distracted as easily).  We do
-not contend that the implementation of the aspect is empirically accurate, rather that is representative of a
-qualitatively recognizable phenomena and that the approach allows for the effect of the phenomena on a workflow at
-different severities to be assessed.
+In order to evaluate the feasibility of our approach, we implemented an aspect that mimics \emph{distraction} in using
+the PyDySoFu library.  The distraction aspect represents variable behavior when an actor engaged in one task becomes
+distracted by another, irrelevant activity.  The probability of distraction increases as the simulation proceeds,
+i.e. the probability of moving to an irrelevant task increases the longer a simulation has been executing.  For example,
+a software developer implementing a feature may be distracted by a technology news site as they proceed to later
+activities in the workflow.  Conversely, the aspect also allows the probability of distraction to be reduced by
+increasing the concentration of an actor (i.e. actors with better concentration do not get distracted as easily).  In
+the current work, we do not contend that the implementation of the aspect is empirically accurate, rather that is
+representative of a qualitatively recognizable phenomena and that the approach allows for the effect of the phenomena on
+a workflow at different severities to be assessed.
 
 The implementation of the \lstinline!incomplete_procedure! fuzzing aspect is shown in Figure
 \ref{fig:distraction-fuzzer}.  The fuzzing aspect is parameterized, so the actual aspect is defined inline as
@@ -471,10 +436,10 @@ The implementation of the \lstinline!incomplete_procedure! fuzzing aspect is sho
 simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured by the
 modeler.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
 \begin{lstlisting}
-def default_incomplete_procedure_pmf(concentration=1.0):
+def default_pmf(concentration=1.0):
 
     def _probability_distribution(remaining_time, probability):
         adjusted_probability =\
@@ -485,7 +450,7 @@ def default_incomplete_procedure_pmf(concentration=1.0):
 
     return _probability_distribution
 
-def incomplete_procedure(random, pmf=default_incomplete_procedure_pmf()):
+def incomplete_procedure(random, pmf=default_pmf()):
 
     def _incomplete_procedure(steps, context):
         clock = context.actor.clock
@@ -495,12 +460,15 @@ def incomplete_procedure(random, pmf=default_incomplete_procedure_pmf()):
 
         n = pmf(remaining_time, probability)
 
-        fuzzer = recurse_into_nested_steps(
-                    target_structures={ast.While, ast.For, ast.TryExcept),
-                    fuzzer=filter_steps(
-                        choose_last_steps(n, reapply=False),
-                        replace_steps_with(replacement='self.actor.idling.idle()')
-                    )
+        fuzzer =\
+          recurse_into_nested_steps(
+            target_structures={ast.While, ast.For, ast.TryExcept),
+            fuzzer=filter_steps(
+              choose_last_steps(n, reapply=False),
+              replace_steps_with(
+                replacement='self.actor.idling.idle()'
+              )
+            )
         )
         return fuzzer(steps, context)
 \end{lstlisting}
@@ -514,10 +482,9 @@ The next statement defines an aspect that recurses into nested control structure
 \lstinline!filter_steps! aspect to the bodies of these statements, tail first (i.e. the filter is applied to the most
 nested body found first).  The \lstinline!filter_steps! aspect selects up to \lstinline!n! steps to remove from the body
 and replaces each of them with an invocation of idle, causing the actor executing the workflow to wait one tick for each
-replaced step.  The \lstinline!filter_steps! aspect is then applied successively up through the fuzzed task AST.
-
-The \lstinline!choose_last_steps! filter is configured to track how many steps it has already removed, so that the value
-of \lstinline!n! is calculated across the entire body of the fuzzed task method, rather than at each level in the
+replaced step.  The \lstinline!filter_steps! aspect is then applied successively up through the target AST.  The
+\lstinline!choose_last_steps! filter is configured to track how many steps it has already removed, so that the value of
+\lstinline!n! is calculated across the entire body of the fuzzed task method, rather than at each level in the
 recursion.
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -535,52 +502,19 @@ simulated problem domain in a variety of settings and repeat simulations in orde
 observations.  We will also check for example, for plausibility of simulation results in idealized conditions
 \cite{shull11assuring} and for results that cannot be possible in the real world \cite{weyuker82testing}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Simulation Setup}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Simulations of the problem domain were configured as described in Table 1, giving a total of 480 configurations.  A
-single source of randomness was initialized for each configuration with a seed of 1.0 to provide for repeatability of
-the experiment and to provide for comparison between configurations.
-
-All configurations were executed for a software development team of 3 actors, with simulations executing for a maximum
-of 500 ticks.  Each configuration was run for 25 different projects.  In order to measure the quality of system built by
-a simulation, the system was operated 10 times.  Operation of system entails random selection and operation of features
-for up to 750 features.  If a bug is manifested during operation then the system halts.  The average trace of the 10
-operations of the system was recorded as the system's mean time to failure (MTF).
-
-Software projects consisted of up between 1 and 6 features, with projects divided into small (2 chunks per feature) and
-large (4 chunks per feature). Both the Waterfall and TDD SDLC workflows were simulated.  In either case, the
-incomplete procedure distraction aspect was applied to either the high level software development workflow, or to the
-set of lower level set of development activity workflows (implementation, testing, debugging, refactoring and change
-management).  Specification was excluded as fuzzing this workflow would have prevented evaluation of the effect of
-fuzzing on other development activities.  The \lstinline!incomplete_procedure! distraction fuzzing aspect was applied
-using the default probability mass function described above, with concentrations between 0.001 and 5.0.  Results
-resulting from the simulations are stored in the \lstinline!compare_workflows_result_01! branch of the case study
-repository \citep{storer2016softdev-workflow-scm}.
-
-\begin{table}
-  \centering
-\begin{tabular}{|l|l|}\hline
-Parameter & Values\\ \hline
-Team Size & 3\\
-Max clock tick & 500\\
-Plan & Waterfall, TDD\\
-Feature Size & 2, 4\\
-\#Features to implement & 1, 2, 3, 4, 5, 6\\
-Fuzzed workflows & [Waterfall, Test Driven Development],\\
-& [Change management, Testing, Implementation, Debugging, Refactoring]\\
-Fuzzing concentrations & 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.2, 0.5, 1.0, 5.0 \\
-Projects per configuration & 25 \\
-System operation traces & 10\\
-Max trace length & 750\\ \hline
-\end{tabular}
-
-\caption{Summary of experimental evaluation variables}
-\label{tab:variables}
-\end{table}
+Simulations of the problem domain were configured as follows.  A single source of randomness was initialized for each
+configuration with a seed of 1.0 to provide for repeatability of the experiment and to provide for comparison between
+configurations. All configurations were executed for a software development team of 3 actors, with simulations executing
+for a maximum of 500 ticks.  Each configuration was run for 25 different projects.  In order to measure the quality of
+the development built by the simulation, the system was operated 10 times.  The operation of the simulated development
+entails random selection and operation of features for up to 750 features.  If a bug is manifested during operation then
+the system halts.  The average trace of the 10 operations of the system was recorded as the system's mean time to
+failure (MTF). Software projects consisted of up between 1 and 6 features, with projects divided into small (2 chunks
+per feature) and large (4 chunks per feature). Both the Waterfall and TDD SDLC workflows were simulated.  In either
+case, the incomplete procedure distraction aspect was applied to either the high level software development workflow, or
+to the set of lower level set of development activity workflows (implementation, change management etc.).  The
+distraction fuzzing aspect was applied using developer concentration values between 0.001 and 5.0.  Results from the
+simulations are stored in the study repository \citep{storer2016softdev-workflow-scm}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -611,16 +545,15 @@ domain.  The simplified simulations did not reveal impossible situations, such a
 commits, or MTF declining below zero.  Similarly, without the application of fuzzing, all projects were fully
 implemented and there was little difference between the performance of the Waterfall and TDD SDLCs.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
 
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/commits_against_project_size_for_0_fuzz_simulations}}
     \caption{Commits against project size for small (blue) and large (red) feature projects.}
     \label{fig:no-fuzzing:features}
-
   \end{subfigure}
-  \hfill
+%  \hfill
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/mtf_against_commits_for_0_fuzz_simluations}}
     \caption{Mean time to failure for Waterfall (blue) and TDD (red) projects.}  
@@ -650,14 +583,14 @@ shows the effect of fuzzing lower level activities (change management, implement
 demonstrate that in the simulations increasing fuzzing causes a decline in the number of completed features.  However,
 in both configurations, TDD is more resilient to distraction fuzzing than Waterfall.
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \begin{subfigure}[t]{2.3in}%
     \fbox{\includegraphics{floats/features_against_total_fuzz_WT}}
     \caption{Fuzzing of Waterfall and Test Driven Development SDLC workflows.}
     \label{fig:fuzzing-features:WT}
   \end{subfigure}
-  \hfill
+%  \hfill
   \begin{subfigure}[t]{2.3in}
     \fbox{\includegraphics{floats/features_against_total_fuzz_CTIDR}}
     \caption{Fuzzing of Change Management, Testing, Implementation, Debugging and Refactoring workflows.}  
@@ -686,7 +619,7 @@ the contention of advocates that TDD results in higher quality systems because t
 the life-cycle, rather than only at the end.
 
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/mtf_against_total_fuzz_projects_small}}
@@ -711,7 +644,7 @@ the life-cycle, rather than only at the end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modeling and simulating
-variance in socio-technical system behaviors.  The paper described a proof-of-concept workflow fuzzing tool, TOOLNAME?,
+variance in socio-technical system behaviors.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi\_Moss
 and applied it in a case study of software development workflows.  The approach was demonstrated to introduce realistic
 variance due to distraction into idealized workflows in accordance with expectations of software development workflow in
 practice.
