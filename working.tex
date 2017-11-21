@@ -198,7 +198,7 @@ intents allows the inter-dependencies between actors and the overall behavior of
 the need for explicit models of individual workflows. \citet{herrmann1999vagueness} introduced techniques for annotating
 goal oriented system models with vagueness.  The annotation allows for the distinction between consistent vagueness (due
 to abstraction) and inconsistent vagueness due to omission.  In principle, this approach allows for the identification
-of aspects of a model that are subject to variability.  However, the notation is not accompanied by a formal semantics,
+of aspects of a model that are subject to deviation.  However, the notation is not accompanied by a formal semantics,
 or other means of supporting automated analysis.
 
 Other authors have extended goal oriented approaches to provide greater flexibility. \citet{sommerville09deriving}
@@ -208,7 +208,7 @@ means of describing system behaviors that also capture a variety of contingent b
 relationships between responsibilities and resources in order to identify dependencies within a system was provided.
 Earlier work on responsibility modeling also provided mechanisms for annotating responsibilities with indicative
 workflows, expressing the means by which responsibilities could be executed \citep{dewsbury07responsibility}.  However,
-in the case of both goal oriented and responsibility modelling, the ability to document variability in behaviour is not
+in the case of both goal oriented and responsibility modelling, the ability to document deviation in behaviour is not
 accompanied with a means of evaluating its effects.
 
 The representation of cross cutting concerns as aspects has been extensively studied in the Software Engineering
@@ -244,27 +244,28 @@ but the full source code is also available for inspection in the case study's re
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
 study. An object oriented approach to modeling is adopted \cite{bennett06object}, with artifacts in the domain
-implemented as collection of Python classes.  Figure \ref{fig:domain} %
+implemented as collection of Python classes.  Figure \ref{fig:domain} shows the class diagram for the problem domain in
+the case study.  A software development effort is hosted on a version control system (VCS) server.  Software developers
+interact with the server via VCS client.  Both the server and clients maintain copies of the software system, which must
+be coordinated through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features,
+representing user-facing specifications of the system's functionality.  Features may be of varying size, requiring more
+or fewer code chunks to be implemented in order to be operational.  Chunks may have dependencies on other chunks in the
+system.  Each time a new chunk is added to a feature other chunks may also need to be modified, potentially creating
+further dependencies between chunks or introducing bugs.  Bugs may manifest themselves when the feature they are
+associated with is operated or exercised through the execution of tests.  Features can be debugged, resulting in the
+removal of detected bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting
+a given bug, easing the process of debugging a feature or overall system. All of the information system behaviors
+described above and shown in the diagram are implemented as methods in the Python classes.
+
 \begin{figure}[t]
   \centering
   \includegraphics[scale=0.8]{floats/full-class-diagram-1}
-  \caption{Domain model for software development case study, showing artifacts to be manipulated by execution of
-    socio-technical workflows.}
+  \caption{The software development case study domain model, showing information system artifacts and functions that can
+    be accessed by user workflows.}
   \label{fig:domain}
 
 \end{figure}
-shows the class diagram for the problem domain in the case study.  A software development effort is hosted on a version
-control system (VCS) server.  Software developers interact with the server via VCS client.  Both the server and clients
-maintain copies of the software system, which must be coordinated through a VCS update, conflict-resolve, commit cycle.
-Software systems are composed of features, representing user-facing specifications of the system's functionality.
-Features may be of varying size, requiring more or fewer code chunks to be implemented in order to be operational.
-Chunks may have dependencies on other chunks in the system.  Each time a new chunk is added to a feature other chunks
-may also need to be modified, potentially creating further dependencies between chunks or introducing bugs.  Bugs may
-manifest themselves when the feature they are associated with is operated or exercised through the execution of tests.
-Features can be debugged, resulting in the removal of detected bugs.  Consequently, the more tests created for a
-feature, the greater the probability of detecting a given bug, easing the process of debugging a feature or overall
-system. All of the information system behaviors described above and shown in the diagram are implemented as methods in
-the Python classes.
+
 
 The second modelling step is to define user behaviour workflows. These are also implemented as Python classes, collating
 related tasks to operate on a common state. For the purposes of the software development case study, a change management
@@ -382,51 +383,31 @@ and analysis of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we describe our approach to modeling the effects of variable behaviour such as distraction using aspect
-oriented dynamic fuzzing of task descriptions.  To achieve this, we exploit our implementation of an aspect oriented
-dynamic fuzzing library for Python, PyDySoFu \cite{storer2016pydysofu-scm}.  This library allows users to specify
-fuzzers that are to be applied to specific methods in workflow classes.  When the simulation executes, method
-invocations in workflows are intercepted at runtime.  The simulation thread is then paused and the abstract syntax tree
-and context of the invocation are then passed to the user defined fuzzer-aspect for the method (if any).
+In this section we describe our approach to modeling deviations in user behaviour such as distraction using aspect
+oriented dynamic fuzzing of task descriptions.  To achieve this, deviations are modelled as a \emph{dynamic fuzzing
+  aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu monitors the
+invocation of workflow task methods in the background during the execution of a simulation.  When a workflow task method
+that is subject to deviations is invoked, PyDySoFu pauses the simulation thread of execution and passes the method
+context and structure(represented as the abstract syntax trees of the statements in the method body) to a user defined
+fuzzing function.  The fuzzing function then manipulates the structure of the method AST and context as desired and
+returns the AST to PyDySoFu.  In a final stage, PyDySoFu compiles the altered AST and resumes simulation execution by
+invoking the altered method.  Further implementation details are omitted for brevity, but the full source code of the
+PyDySoFu library is available in the project repository for inspection \cite{storer2016pydysofu-scm}.
 
-
-
-  Method invocations of workflow classes are intercepted at
-runtime.  Workflow execution is paused and a
-
-PyDySoFu intercepts the invocation of methods in fuzzed classes at runtime.  Each time a method that can be fuzzed
-executes, PyDySoFu pauses execution and searches a user provided dictionary of advice for a suitable fuzzing aspect. The
-aspect is a function that accepts the context (i.e. the Python self reference) of a method invocation and the abstract
-syntax tree of the body of the method to be invoked.  
-
-The aspect may access and/or alter the context if desired and
-return an altered method body.  If an aspect is found, PyDySoFu constructs the abstract syntax tree for the method body
-and passes this and the method context to the aspect to obtain the fuzzed method body as an AST.  PyDySoFu then
-recompiles the code object for the method from the fuzzed AST and resumes execution.  Further implementation details are
-omitted for brevity, but the full source code is available in the project repository for inspection
-\cite{storer2016pydysofu-scm}. PyDySoFu is accompanied by a library of aspects from which more complex aspects can be
-constructed and parameterized.  This library includes aspects for removing steps, inserting extra steps, applying an
-aspect conditionally, replacing conditions, filtering steps to apply another aspect, recursing into control structures
-and applying sequences of aspects to a single method.
-
-In order to evaluate the feasibility of our approach, we implemented an aspect that mimics \emph{distraction}  using
-the PyDySoFu library.  The distraction aspect represents variable behavior when an actor engaged in one task becomes
-distracted by another, irrelevant activity.  The probability of distraction increases as the simulation proceeds,
-i.e. the probability of moving to an irrelevant task increases the longer a simulation has been executing.  For example,
-a software developer implementing a feature may be distracted by a technology news site as they proceed to later
-activities in the workflow.  Conversely, the aspect also allows the probability of distraction to be reduced by
-increasing the concentration of an actor (i.e. actors with better concentration do not get distracted as easily).  In
-the current work, we do not contend that the implementation of the aspect is empirically accurate, rather that is
-representative of a qualitatively recognizable phenomena and that the approach allows for the effect of the phenomena on
-a workflow at different severities to be assessed.
+In order to evaluate the feasibility of our approach, a fuzzing aspect that mimics \emph{distraction} was implemented
+using PyDySoFu.  The distraction aspect represents deviations in expected behavior when an actor engaged in one task
+becomes distracted by another, irrelevant activity and so do not complete later steps in the workflow.  The probability
+of distraction increases as the simulation proceeds, i.e. the probability of moving to an irrelevant task increases the
+longer a simulation has been executing.  For example, a software development team may be distracted from the
+implementation of tests and debugging as the pressure to complete a set of features increases, due to an impending
+release deadline.  Conversely, the aspect also allows the probability of distraction to be reduced by increasing the
+concentration of an actor (i.e. actors with better concentration do not get distracted as easily).  In the current work,
+we do not contend that the implementation of the aspect is empirically accurate, rather that it is representative of a
+qualitatively recognizable phenomena and that the approach allows for the effect of the phenomena on a workflow at
+different severities to be assessed.
 
 The implementation of the \lstinline!incomplete_procedure! fuzzing aspect is shown in Figure
-\ref{fig:distraction-fuzzer}.  The fuzzing aspect is parameterized, so the actual aspect is defined inline as
-\lstinline!incomplete_procedure!.  The first four lines of the nested aspect configures a probability mass function
-(PMF) for choosing how many steps should be removed by the aspect, \lstinline!n!, based on the remaining time in the
-simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured by the
-modeler.
-
+\ref{fig:distraction-fuzzer}.%
 \begin{figure}[t]
   \centering
 \begin{lstlisting}
@@ -447,9 +428,7 @@ def incomplete_procedure(random, pmf=default_pmf()):
         clock = context.actor.clock
         remaining_time = clock.max_ticks - clock.current_tick
 
-        probability = random.uniform(0.0, 0.9999)
-
-        n = pmf(remaining_time, probability)
+        n = pmf(remaining_time, random.uniform(0.0, 0.9999))
 
         fuzzer =\
           recurse_into_nested_steps(
@@ -467,13 +446,19 @@ def incomplete_procedure(random, pmf=default_pmf()):
     system.}
   \label{fig:distraction-fuzzer}
 \end{figure}
+  The fuzzing aspect is parameterized, so the actual aspect is defined as the inner
+function \lstinline!_incomplete_procedure!.  The first four lines of the inner function configures a probability mass
+function (PMF) for choosing how many steps should be removed by the aspect, \lstinline!n!, based on the remaining time
+in the simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured
+by the modeler.
 
-
-The next statement defines an aspect that recurses into nested control structures (while, for and try) and applies a
-\lstinline!filter_steps! aspect to the bodies of these statements, tail first (i.e. the filter is applied to the most
-nested body found first).  The \lstinline!filter_steps! aspect selects up to \lstinline!n! steps to remove from the body
-and replaces each of them with an invocation of idle, causing the actor executing the workflow to wait one tick for each
-replaced step.  The \lstinline!filter_steps! aspect is then applied successively up through the target AST.  The
+PyDySoFu is accompanied by a library of aspects from which more complex aspects can be constructed and parameterized.
+This includes functions for recursing into control structures and selecting and replacing steps based on their position
+in the AST.  These features are exploited in the second part of the fuzzer, which recurses into any nested control
+structures (while, for and try) found in the method and applies a filter to the bodies of these statements, tail first .
+The \lstinline!filter_steps! aspect selects up to \lstinline!n! steps to remove from the body and replaces each of them
+with an invocation of \lstinline!idle()!, causing the actor executing the workflow to wait one tick for each replaced
+step.  The \lstinline!filter_steps! aspect is then applied successively up through the target AST.  The
 \lstinline!choose_last_steps! filter is configured to track how many steps it has already removed, so that the value of
 \lstinline!n! is calculated across the entire body of the fuzzed task method, rather than at each level in the
 recursion.
