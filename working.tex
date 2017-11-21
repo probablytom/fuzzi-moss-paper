@@ -85,14 +85,14 @@ both factors within the overall socio-technical system.
 
 Our contention is that these failures arise because systems engineers lack the tools and methods to efficiently model
 and simulate the interaction between the information systems and their organisational context, which comprise a socio-
-technical system. Without these facilities, systems engineers cannot predict potential socio-technical system
-behaviour, during information system design. Simulating this interaction between the information system and users is
-hard because user behaviour is heterogeneous, contingent and evolutionary.  Different users have different abilities,
-training and experiences and can experience phenomena such as distraction, misjudgments, exhaustion and confusion that
-can have significant influence on how and when a user completes a task.  For example, a novice developer working within
-a large team may be unaware of software development best practices described in a workflow, perhaps forgetting to make
-frequent commits to a version control server.  Conversely, an experienced developer may omit steps, such as peer reviews
-of their code, they consider unnecessary to optimise their performance.
+technical system. Without these facilities, systems engineers cannot predict potential socio-technical system behaviour,
+during information system design. Simulating this interaction between the information system and users is hard because
+user behaviour is heterogeneous, contingent and evolutionary, leading to deviations from idealised workflows.  Different
+users have different abilities, training and experiences and can experience phenomena such as distraction, misjudgments,
+exhaustion and confusion that can have significant influence on how and when a user completes a task.  For example, a
+novice developer working within a large team may be unaware of software development best practices described in a
+workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely, an experienced developer
+may omit steps, such as peer reviews of their code, they consider unnecessary to optimise their performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
 system, the behaviour of other users or the environment \citep{sommerville09deriving}.  In our example scenario, a
@@ -106,7 +106,7 @@ experience.As a consequence, the de facto behavior exhibited within a system may
 architects in idealized workflows.
 
 A system architect must model their workflows as they are intended to be executed in practice, yet due to their
-organisational context any information system expresses contingent properties which are fundamental to their accurate
+organisational context any socio-technical system exhibits contingent behaviour which is fundamental to their accurate
 simulation. Conventional systems engineering notations for describing user behaviour, such as BPMN \citep{omg2011omgbpmn},
 activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for efficiently modelling these
 characteristics.  Attempting to model the heterogeneity, contingency and evolution of user behaviour using these
@@ -115,35 +115,29 @@ tractable.  Alternative approaches that abstract the complexity of user behaviou
 Kaos \citep{werneck2009goreistarkaos} and Responsibility Modelling \citep{sommerville09deriving} lack sufficient detail to
 generate executable simulations.
 
-%% TODO What is the insight - link to contributions
-
 The key insight of this paper is that the same deviation in behaviour often affects a number of possible actions.
-Conversely, a given user's behaviour is a composition of their expected behaviour and the set of irregularities that
+Conversely, a given user's behaviour is a composition of their expected ideal behaviour and the set of deviations that
 affect how the specific user exhibits that behaviour.  Therefore, \emph{we propose and demonstrate the separate
 modelling of behavioural irregularities from workflows themselves, showing that they are cross-cutting concerns which can
 be applied to an idealised workflow model}.
 
-Specifically, in this paper we present:
+The two contributions of this paper are as follows:
 
 \begin{itemize}
 
-\item A method --- and supporting software framework --- for simulating socio-technical systems that allows for the separate
-  modelling of idealised workflows and the effects of contingent human behaviours on those workflows.  We use an
-  aspect-oriented technique \citep{filman01aspect} to model the effects of variable human behaviour on the execution of
-  workflows.  Within an aspect, the method uses a dynamic code-fuzzing \citep{takanen08fuzzing} technique to represent
-  alterations to the description of an idealised workflow during execution.
+\item A method for simulating socio-technical systems that allows for the separate modelling of idealised workflows and
+  the effects of deviations in user behaviours on those workflows.  We implement our approach in a supporting software
+  framework, using a combination of aspect oriented programming \cite{filman01aspect} and dynamic code fuzzing
+  \citep{takanen08fuzzing}, allowing us to transparently alter the flow of execution in a workflow description.
 
 \item A demonstration of the efficacy of the framework in a case study comparison of Waterfall and Test Driven
-  Development (TDD) software development workflows.  The case study provides evidence for the industry consensus that
-  TDD provides for better software productivity and quality
+  Development (TDD) software development workflows.  The case study provides evidence for the industry consensus and
+  empirical studies that TDD provides for better software productivity and quality
   \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.
-
-  Specifically, the simulation results show that:
-	\begin{itemize}
-		\item the compared workflows provide for similar outcomes in idealised circumstances
-		\item the introduction of contingent behaviour into simulations causes a decline in both productivity and resulting software quality in both workflows
-		\item the TDD workflow is more resilient to the occurrence of contingent behaviour than Waterfall.
-	\end{itemize}
+  Specifically, the simulation results show that: the compared workflows provide for similar outcomes in idealised
+  circumstances; the introduction of contingent behaviour into simulations causes a decline in both productivity and
+  resulting software quality in both workflows; and the TDD workflow is more resilient to the occurrence of contingent
+  behaviour than Waterfall.
 
 \end{itemize}
 
@@ -151,9 +145,10 @@ The rest of this paper is structured as follows.  Section \ref{sec:related} disc
 techniques for modeling socio-technical workflows and the limitations encountered in the literature.  Section
 \ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach, and presents the method
 for constructing models of socio-technical systems and associated workflows. Section \ref{sec:fuzzing} describes the
-development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed for
-this purpose.  Section \ref{sec:evaluation} presents our evaluation of the case study and Section \ref{sec:conclusions} discusses conclusions and future work,
-as well as noting the potential for applying fuzzing to other forms of socio-technical models.
+development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed
+for this purpose.  Section \ref{sec:evaluation} presents our evaluation of the case study and Section
+\ref{sec:conclusions} discusses conclusions and future work, as well as noting the potential for applying fuzzing to
+other forms of socio-technical models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -210,7 +205,7 @@ accompanied with a means of evaluating its effects.
 The representation of cross cutting concerns as aspects has been extensively studied in the Software Engineering
 literature \citep{Ali2012Aspect}.  However, we are unaware of any research that utilises aspect oriented programming
 techniques in simulation models, either for socio-technical user behaviours or elsewhere.  Similarly, the use of code
-fuzzing techniques have been employed extensively in quality assurance practices, to assess the impact of variable
+fuzzing techniques have been employed extensively in quality assurance practices, to assess the impact of deviations in user
 behaviour on software systems, including fuzzing of compiler options \citep{fuzzing-compiler}, mutation testing of test
 suites \cite{demillo78hints} and fuzzing of inputs test data to search for software security vulnerabilities
 \citep{takanen08fuzzing}.  However, we have not discovered any similar work on the application of fuzzing techniques to
@@ -218,74 +213,55 @@ dynamically inject variation into a simulation model at runtime.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Case Study Problem Domain Model}
+\section{Team Based Software Development Case Study}
 \label{sec:case-study}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we introduce our approach to modeling a problem domain and associated idealized workflows in
-socio-technical systems.  We have chosen to present the approach through an example case study of team based software
-development, in which we will explore the efficacy of two software development lifecycle (SDLC) workflows: Waterfall and
-Test Driven Development (TDD).  The case study was chosen as representative of a socio-technical system, combining
-different user roles (developer, project manager), information systems (version control server and client) and a variety
-of well defined idealised workflows (implementation, testing, debugging etc.).  Further, there is a growing consensus
-amongst software development professionals that TDD is a more resilient SDLC than Waterfall to variable human behaviour
+In this section we demonstrate our approach to modeling a problem domain and associated idealized workflows in
+socio-technical systems through a case study.  We have chosen a case study of team based software development, in which
+we will explore the efficacy of two software development lifecycles (SDLC) workflows: Waterfall and Test Driven
+Development (TDD).  The case study was chosen as representative of a socio-technical system, combining different user
+roles (developer, project manager), information systems (version control server and client, and the software development
+effort itself) and a variety of well defined idealised workflows (implementation, testing, debugging etc.).  Further,
+there is a growing consensus amongst software development professionals and academics that TDD is a more resilient SDLC
+than Waterfall to variable human behaviour
 \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The case
-study therefore provides an opportunity to test whether the approach presented can be used to distinguish between the
+study therefore provides an opportunity to test whether the modelling approach can be used to distinguish between the
 effects of idealised and realistic user behaviours in a socio-technical system.  The modelling approach is implemented
-in an agent oriented framework (Theatre\_Ag) written in Python.  Code examples of the case study are provided as
-examples, but the full source code is also available for inspection in the case study's repository on GitHub
+in an agent oriented framework (Theatre\_Ag) written in Python.  Fragments of the case study are provided as examples,
+but the full source code is also available for inspection in the case study's repository 
 \cite{storer2016softdev-workflow-scm}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Problem Domain Model}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The first step in the modelling approach is to represent the problem domain, describing the inviolable `physics' that
-are not subject to variability. An object oriented approach to modeling is adopted \cite{bennett06object}, with
-artifacts in the domain implemented as collection of Python classes.  Figure \ref{fig:domain} shows the class diagram
-for the problem domain in the case study.
-
+The first step in the modelling approach is to represent the state and functions of the information systems in the case
+study. An object oriented approach to modeling is adopted \cite{bennett06object}, with artifacts in the domain
+implemented as collection of Python classes.  Figure \ref{fig:domain} %
 \begin{figure}[t]
   \centering
-  \includegraphics[width=12cm]{floats/full-class-diagram-1}
+  \includegraphics[scale=0.8]{floats/full-class-diagram-1}
   \caption{Domain model for software development case study, showing artifacts to be manipulated by execution of
     socio-technical workflows.}
   \label{fig:domain}
+
 \end{figure}
+shows the class diagram for the problem domain in the case study.  A software development effort is hosted on a version
+control system (VCS) server.  Software developers interact with the server via VCS client.  Both the server and clients
+maintain copies of the software system, which must be coordinated through a VCS update, conflict-resolve, commit cycle.
+Software systems are composed of features, representing user-facing specifications of the system's functionality.
+Features may be of varying size, requiring more or fewer code chunks to be implemented in order to be operational.
+Chunks may have dependencies on other chunks in the system.  Each time a new chunk is added to a feature other chunks
+may also need to be modified, potentially creating further dependencies between chunks or introducing bugs.  Bugs may
+manifest themselves when the feature they are associated with is operated or exercised through the execution of tests.
+Features can be debugged, resulting in the removal of detected bugs.  Consequently, the more tests created for a
+feature, the greater the probability of detecting a given bug, easing the process of debugging a feature or overall
+system. All of the information system behaviors described above and shown in the diagram are implemented as methods in
+the Python classes.
 
-A software development effort is hosted on a version control system (VCS) server.  Software developers interact with the
-server via VCS client.  Both the server and clients maintain copies of the software system, which must be coordinated
-through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features, representing
-user-facing specifications of the system's functionality.  Features may be of varying size, requiring more or fewer code
-chunks to be implemented in order to be operational.  Chunks may have dependencies on other chunks in the system.  Each
-time a new chunk is added to a feature other chunks may also need to be modified, potentially creating further
-dependencies between chunks or introducing bugs.  Bugs may manifest themselves when the feature they are associated with
-is operated or exercised through the execution of tests.  Features can be debugged, resulting in the removal of detected
-bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting a given bug, easing
-the process of debugging a feature or overall system.
-
-The behaviors described above are implemented as methods in the Python classes, as shown in the diagram.  Many of the
-effects of these behaviors have side effects which are modeled stochastically. For example, the introduction of bugs and
-dependencies during the implementation of a feature occurs with a certain probability. No restrictions are placed on the
-implementation of the problem domain classes within the Python language, providing the modeler with significant
-flexibility.  For example, operations can accept a variety of arguments, modify object state, invoke operations on other
-problem domain classes and return values as desired. The @Property decorator can also be used to improve the readability
-of code, as normal.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Workflows}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-In Theatre\_Ag, user behaviour workflows are implemented as Python classes, collating related tasks to operate on a
-common state. For the purposes of the software development case study, a change management workflow were created for
-interacting with a version control server in an update-resolve-commit cycle, as shown as the first class in Figure
-\ref{fig:workflows}.  The state for the workflow is the target centralized version control server and a client that
-manages the working copy.  Separate task methods are provided for checking out the client, committing working copy
+The second modelling step is to define user behaviour workflows. These are also implemented as Python classes, collating
+related tasks to operate on a common state. For the purposes of the software development case study, a change management
+workflow were created for interacting with a version control server in an update-resolve-commit cycle, as shown as the
+first class in Figure \ref{fig:workflows}.  The state for the workflow is the target version control server and a client
+that manages the working copy.  Separate task methods are provided for checking out the client, committing working copy
 changes to the server and resolving conflicts that arise during a commit task.
 
 \begin{figure}
@@ -351,66 +327,60 @@ class Implementation(object):
 
 \end{figure}
 
-Further workflows were implemented for common software development activities: the Specification and Implementation of
-features in the system; Testing; Debugging and Refactoring (reducing dependencies).  Since workflows are modular they
-can also be organized hierarchically, so the new workflows make use of the change management workflow, rather than
-needing to do re-implement change management for each aspect of development.  Figure \ref{fig:workflows} also shows how
-this modularity is exploited for the implementation workflow. In this example, the workflows for modifying the structure
-of a software system (for adding chunks or tests and so on) depend on the change management workflow in order to
-coordinate the distribution of changes within a team.
+Note that many of the functions of the information system may have side effects that are modelled stochastically, such
+as the possibility that a update from the version control server will result in conflicts with another client's commit.
+The workflows therefore explicitly pass a source or randomness to the information system model when these actions are
+invoked.
+
+Further workflows were implemented for common software development activities: the specification and implementation of
+features in the system; testing; debugging and refactoring (reducing dependencies).  Since workflows are modular they
+can also be organized hierarchically.  Figure \ref{fig:workflows} also shows this modularity is exploited for the
+implementation workflow. In this example, the workflows for modifying the structure of a software system (for adding
+chunks or tests and so on) depend on the change management workflow in order to coordinate the distribution of changes
+within a team.
 
 Two further workflows, Waterfall and Test Driven Development (TDD) were implemented to investigate the performance of
-different team based software development lifecycles (SDLC)when subject to variable behavior.  The Waterfall SDLC
-\cite{benington83production} describes a linear staged approach to system development, in which specification of all
-features is followed by system implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD
-\cite{beck02test} prescribes the definition of tests for each feature, before proceeding to implementation and
-refactoring.  Advocates of TDD argue that such an approach results in software that is delivered quicker and of higher
-quality because tests are explicitly linked to the specification and features are not committed without a passing test
-suite.
+different team based software development lifecycles (SDLC).  The Waterfall SDLC \citep{benington83production} describes
+a linear staged approach to system development, in which specification of all features is followed by system
+implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD \citep{beck02test} prescribes the
+definition of tests for each feature, before proceeding to implementation and refactoring.  Advocates of TDD argue that
+such an approach results in software that is delivered quicker and of higher quality because tests are explicitly linked
+to the specification and features are not committed without a passing test suite.
 
+Once the models of the information systems and workflows are complete, simulations can be executed in Theatre\_Ag, which
+are initiated by allocating an initial set of tasks (individual methods in a workflow) to agents in the system. This may
+lead to the creation and execution of further tasks by agents, or to the allocation of tasks to other agents.  In the
+case study, simulations were configured to represent a team of software developers working on a software project
+following both types of SDLC.  For Waterfall, the initial configuration specified an agent in the team with the role of
+project manager.  This agent is directed to allocate tasks for each stage of the software development process
+(specification, implementation, testing, debugging, refactoring) to other agents in the team and waits for all tasks in
+each stage of the development process to be complete before allocating tasks in the next stage.  For TDD, all members of
+the software development were configured to draw features to be implemented from the project backlog and implement them
+following TDD.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Simulation of work in Theatre\_Ag}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Theatre\_Ag simulations proceed via the execution of tasks in workflows by agents representin the users of the
-information system.  A simulation is initiated by configuring a set of actors with an initial set of tasks.  These tasks
-are references to methods in workflow instances.  From the initial configuration, execution of a task may result in new
-workflow instances being created and tasks being passed to other actors.  Also, the execution of one task in a workflow
-may result in other sub-tasks being initiated, so each actor maintains a trace of tasks executed during a simulation in
-a tree structure for later inspection.
-
-The Theatre\_Ag framework is designed for simulating socio-technical systems, and so provides for both the explicit
-representation of problem domain time for controlling task execution; and concurrent execution of tasks by actors.  Each
-agent executes their tasks as a separate thread, but synchronizes on a central clock that measures time in discrete
-ticks of domain specific precision.  Task execution proceeds without interruption until a task with cost greater than 0
-is encountered.  Task costs are denoted using the \lstinline!@default_cost! decorator in a workflow as shown in Figure
-\ref{fig:workflows}.  The actor pauses execution of a task until sufficient ticks from the centralized clock have been
-received and then resumes execution.  This mechanism is implemented transparently with respect to workflow classes,
-easing the modeling burden for the user.
-
-In the case study, simulations were configured to represent a team of software developers working on a software
-project. Simulations were developed for both types of SDLC in the case study.  For Waterfall, the initial configuration
-specified an agent in the team with the role of project manager.  This agent is directed to allocate tasks for each
-stage of the software development process (specification, implementation, testing, debugging, refactoring) to other
-agents in the team and waits for all tasks in each stage of the development process to be complete before allocating
-tasks in the next stage.  For TDD, all members of the software development were configured to draw features to be
-implemented from the project backlog and implement them following TDD.
+All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
+problem domain time for controlling task execution; and concurrent execution of tasks by actors.  Task costs are denoted
+using the \lstinline!@default_cost! decorator in a workflow as shown in Figure \ref{fig:workflows}.  The agent pauses
+execution of a task until sufficient ticks from the centralized clock have been received and then resumes execution.
+This mechanism is implemented transparently with respect to workflow classes, easing the modeling burden for the user.
+The execution of tasks and their duration is logged in a tree like structure by each agent, supporting later inspection
+and analysis of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Modelling Variability as Workflows Aspects}
+\section{Modelling Deviation in Behaviour as Fuzzing Aspects}
 \label{sec:fuzzing}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section we describe our approach to modeling the effects of variable behaviour such as distraction using aspect
-oriented dynamic fuzzing of task descriptions.  To achieve this, we exploit our implementation of a dynamic fuzzing
-library for Python, PyDySoFu \cite{storer2016pydysofu-scm}.  This library allows users to specify fuzzers that should be
-applied to specific methods in workflow describing classes.  When the simulation executes, method invocations in
-workflows are intercepted at runtime.  The simulation thread is then paused and the abstract syntax tree and context of the 
+oriented dynamic fuzzing of task descriptions.  To achieve this, we exploit our implementation of an aspect oriented
+dynamic fuzzing library for Python, PyDySoFu \cite{storer2016pydysofu-scm}.  This library allows users to specify
+fuzzers that are to be applied to specific methods in workflow classes.  When the simulation executes, method
+invocations in workflows are intercepted at runtime.  The simulation thread is then paused and the abstract syntax tree
+and context of the invocation are then passed to the user defined fuzzer-aspect for the method (if any).
+
+
 
   Method invocations of workflow classes are intercepted at
 runtime.  Workflow execution is paused and a
@@ -418,7 +388,9 @@ runtime.  Workflow execution is paused and a
 PyDySoFu intercepts the invocation of methods in fuzzed classes at runtime.  Each time a method that can be fuzzed
 executes, PyDySoFu pauses execution and searches a user provided dictionary of advice for a suitable fuzzing aspect. The
 aspect is a function that accepts the context (i.e. the Python self reference) of a method invocation and the abstract
-syntax tree of the body of the method to be invoked.  The aspect may access and/or alter the context if desired and
+syntax tree of the body of the method to be invoked.  
+
+The aspect may access and/or alter the context if desired and
 return an altered method body.  If an aspect is found, PyDySoFu constructs the abstract syntax tree for the method body
 and passes this and the method context to the aspect to obtain the fuzzed method body as an AST.  PyDySoFu then
 recompiles the code object for the method from the fuzzed AST and resumes execution.  Further implementation details are
