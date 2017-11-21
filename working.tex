@@ -446,7 +446,7 @@ def incomplete_procedure(random, pmf=default_pmf()):
     system.}
   \label{fig:distraction-fuzzer}
 \end{figure}
-  The fuzzing aspect is parameterized, so the actual aspect is defined as the inner
+The fuzzing aspect is parameterized, so the actual aspect is defined as the inner
 function \lstinline!_incomplete_procedure!.  The first four lines of the inner function configures a probability mass
 function (PMF) for choosing how many steps should be removed by the aspect, \lstinline!n!, based on the remaining time
 in the simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured

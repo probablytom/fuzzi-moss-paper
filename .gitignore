@@ -15,7 +15,8 @@
 # *.ps
 *.eps
 *.mps
-*.pdf
+working.pdf
+floats/*-1.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
