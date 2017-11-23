@@ -268,7 +268,7 @@ further dependencies between chunks or introducing bugs.  Bugs may manifest them
 associated with is operated or exercised through the execution of tests.  Features can be debugged, resulting in the
 removal of detected bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting
 a given bug, easing the process of debugging a feature or overall system. All of the information system behaviors
-described above and shown in the diagram are implemented as methods in the Python classes.
+described above and shown in the diagram are implemented as methods in Python classes.
 
 \begin{figure}[t]
   \centering
@@ -282,7 +282,7 @@ described above and shown in the diagram are implemented as methods in the Pytho
 
 The second modelling step is to define user behaviour workflows. These are also implemented as Python classes, collating
 related tasks to operate on a common state. For the purposes of the software development case study, a change management
-workflow were created for interacting with a version control server in an update-resolve-commit cycle, as shown as the
+workflow was created for interacting with a version control server in an update-resolve-commit cycle, as shown as the
 first class in Figure \ref{fig:workflows}.  The state for the workflow is the target version control server and a client
 that manages the working copy.  Separate task methods are provided for checking out the client, committing working copy
 changes to the server and resolving conflicts that arise during a commit task.
@@ -352,7 +352,7 @@ class Implementation(object):
 
 Note that many of the functions of the information system may have side effects that are modelled stochastically, such
 as the possibility that a update from the version control server will result in conflicts with another client's commit.
-The workflows therefore explicitly pass a source or randomness to the information system model when these actions are
+The workflows therefore explicitly pass a source of randomness to the information system model when these actions are
 invoked.
 
 Further workflows were implemented for common software development activities: the specification and implementation of
@@ -382,12 +382,15 @@ the software development were configured to draw features to be implemented from
 following TDD.
 
 All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
-problem domain time for controlling task execution; and concurrent execution of tasks by actors.  Task costs are denoted
-using the \lstinline!@default_cost! decorator in a workflow as shown in Figure \ref{fig:workflows}.  The agent pauses
-execution of a task until sufficient ticks from the centralized clock have been received and then resumes execution.
+problem domain time for controlling task execution and concurrent execution of these tasks by actors.  Task costs are
+denoted using the \lstinline!@default_cost! decorator in a workflow as shown in Figure \ref{fig:workflows}.  The agent
+pauses execution of a task until sufficient ticks from the centralized clock have been received and then resumes execution.
 This mechanism is implemented transparently with respect to workflow classes, easing the modelling burden for the user.
 The execution of tasks and their duration is logged in a tree like structure by each agent, supporting later inspection
-and analysis of behaviour.
+and analysis of behaviour.\todo{There's an opportunity to talk here about
+  our improvements over the related work; I've not written anything in for space
+and so as not to jumble the document, but let me know in this todonote if you
+think it'd fit.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -401,7 +404,7 @@ oriented dynamic fuzzing of task descriptions.  To achieve this, deviations are 
   aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu monitors the
 invocation of workflow task methods in the background during the execution of a simulation.  When a workflow task method
 that is subject to deviations is invoked, PyDySoFu pauses the simulation thread of execution and passes the method
-context and structure(represented as the abstract syntax trees of the statements in the method body) to a user defined
+context and structure (represented as the abstract syntax trees of the statements in the method body) to a user defined
 fuzzing function.  The fuzzing function then manipulates the structure of the method AST and context as desired and
 returns the AST to PyDySoFu.  In a final stage, PyDySoFu compiles the altered AST and resumes simulation execution by
 invoking the altered method.  Further implementation details are omitted for brevity, but the full source code of the
@@ -502,7 +505,7 @@ the system halts.  The average trace of the 10 operations of the system was reco
 failure (MTF). Software projects consisted of up between 1 and 6 features, with projects divided into small (2 chunks
 per feature) and large (4 chunks per feature). Both the Waterfall and TDD SDLC workflows were simulated.  In either
 case, the incomplete procedure distraction aspect was applied to either the high level software development workflow, or
-to the set of lower level set of development activity workflows (implementation, change management etc.).  The
+to the set of lower level development activity workflows (implementation, change management etc.).  The
 distraction fuzzing aspect was applied using developer concentration values between 0.001 and 5.0.  Results from the
 simulations are stored in the study repository \citep{storer2016softdev-workflow-scm}.
 
@@ -562,7 +565,7 @@ implemented and there was little difference between the performance of the Water
 
 We now proceed to compare the performance of the two software development strategies when subject to variable behavior
 caused by distraction.  There is a general perception amongst software developers that TDD is a more resilient software
-development strategy, although little empirical evidence exists to support this consensus.  Two aspects of the effect of
+development strategy\todo{do you suppose this wants a citation? Maybe something we already have fits.}, although little empirical evidence exists to support this consensus.  Two aspects of the effect of
 fuzzing are therefore explored: feature completion and resulting system mean time to failure (MTF).
 
 Figure \ref{fig:fuzzing-features} shows scatter plots for the effect of distraction fuzzing for subsets of workflows.
@@ -603,9 +606,10 @@ Figure \ref{fig:fuzzing-mtf} investigates the effect of distraction fuzzing on M
 Waterfall (blue) and TDD (red) SDLCs.  In these plots both fuzzing configurations described at the start of this Section
 are combined, as their effects are similar.  Small and large feature projects are plotted separately, as these were
 identified as having characteristically different mean time to failures when considering projects without fuzzing.
-Similar to the plots of feature completion, the plots of MTF suggest that TDD is more resilient to fuzzing than
+Similar to the plots of feature completion, the plots of MTF suggest that TDD is
+more resilient to deviations from ideal developer behaviour than
 Waterfall, which experiences a much more dramatic decline as the number of statements removed increases.  This supports
-the contention of advocates that TDD results in higher quality systems because the explicit quality assurance throughout
+the contention of advocates that TDD results in higher quality systems because of the explicit quality assurance throughout
 the life-cycle, rather than only at the end.
 
 
@@ -636,6 +640,8 @@ the life-cycle, rather than only at the end.
 
 This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modeling and simulating
 variance in socio-technical system behaviors.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi\_Moss
+\todo{This is literally the only time FM is mentioned in the paper --- do we
+  want to refer to FM in section 4 or change this to pydysofu?}
 and applied it in a case study of software development workflows.  The approach was demonstrated to introduce realistic
 variance due to distraction into idealized workflows in accordance with expectations of software development workflow in
 practice.
@@ -664,7 +670,14 @@ the potential for the development of realistic simulations of socio-technical sy
 simulations that can have predictive capabilities suitable for informing systems engineering decisions before resources
 are committed to construction.  The availability of such tools would do much to progress the current craft of large
 scale systems engineering.
-
+\todo{I have to leave the machine as I'm writing this but I'll come back and
+  write something here referring back to what we fix in the relevant
+  ltierature's shortcomings. Might as well prove that this is contributing
+  something novel and this feels like a good palce to do it!}
+i\todo{I'll also come back maybe to refer to uses in simulations of
+  human-centered security and safety critical systems. Maybe simulations of
+  complex adaptive systems too? Unless that's covered by one of the existing
+  things we reference in this para.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
