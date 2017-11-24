@@ -554,19 +554,12 @@ stabilising for projects with more than 12 chunks) as project size increases.  A
 larger projects increases the probability of a bug causing a system failure, although MTF never declines beyond 0.
 These results strengthen the claim that the model of the problem domain is plausible.
 
-%TODO GRAPH BOUNDING BOXES
 
 A further observation from the figures is that TDD and Waterfall workflows perform equivalently when workflows are not
 subject to user distraction.  When ideal workflows are executed for both Waterfall (blue) and TDD (red), the results
 show that a similar number of project commits are recorded and a similar MTF achieved.  This confirms the expectation
 that the simulations of idealised workflows, whilst behaving plausibly, do not conform with expectations from the
 literature that TDD should out perform waterfall.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%\subsection{Simulations with Fuzzing}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 We now proceed to compare the performance of the two software development strategies when subject to deviations in
 behavior caused by distraction. Figure \ref{fig:fuzzing-features} shows scatter plots for the effect of distraction for
@@ -577,7 +570,7 @@ subsets of workflows on productivity.%
   \begin{subfigure}[t]{2.3in}%
     \fbox{\includegraphics{floats/features_against_total_fuzz_WT}}
     \caption{Fuzzing of Waterfall and TDD.}
-    \label{fig:fuzzing-features:WT}
+    \label{fig:fuzzing-features:WF}
   \end{subfigure}
   \hfill
   \begin{subfigure}[t]{2.3in}
@@ -591,7 +584,24 @@ subsets of workflows on productivity.%
     applied to selected workflows.}
   \label{fig:fuzzing-features}
 \end{figure}
+In both plots, the number of features implemented for is plotted against the total number of statements removed by
+fuzzing (Waterfall in blue, TDD in red). Figure \ref{fig:fuzzing-features:WF} shows the effect when only the high level
+software development (Waterfall or TDD) is fuzzed, whereas Figure \ref{fig:fuzzing-features:CTIDR} shows the effect of
+fuzzing lower level activities (change management, implementation, testing, debugging and refactoring). Both figures
+clearly demonstrate that increasing dis- traction causes a decline in the number of completed features. However, in both
+configurations, TDD is more resilient to distraction fuzzing than Waterfall, with a larger proportion of features
+implemented. For fuzzing of the SDLC workflows, the decline in feature implementation appears to be highly linear, with
+a far steeper decline for Waterfall than for TDD. In Figure \ref{fig:fuzzing-features}, both SDLC workflows appear to be
+largely immune to distraction up to the removal of approximately 100 statements, after which feature completion
+declines, with steeper declines for Waterfall.
 
+Figure \ref{fig:fuzzing-mtf} shows the effect of distraction on MTF, again distinguishing between Waterfall (blue) and
+TDD (red) SDLCs.  In these plots, both fuzzing configurations are combined, as their effects are similar.  Small and
+large feature projects are plotted separately, as these have different orders of magnitude MTF.  Similar to the plots
+of feature completion, the plots of MTF suggest that TDD is more resilient to fuzzing than Waterfall, which experiences
+a much more dramatic decline as the number of statements removed increases.  In summary, the two comparisons of
+productivity and quality demonstrate that the application of distraction fuzzing results in more realistic simulations
+of user behaviour in software development workflows, as found in the available literature.
 \begin{figure}[t]
   \centering
   \hfill
@@ -612,13 +622,6 @@ subsets of workflows on productivity.%
   \label{fig:fuzzing-mtf}
 \end{figure}
 
-Figure \ref{fig:fuzzing-mtf} shows the effect of distraction on MTF, again distinguishing between Waterfall (blue) and
-TDD (red) SDLCs.  In these plots, both fuzzing configurations are combined, as their effects are similar.  Small and
-large feature projects are plotted separately, as these have different orders of magnitude MTF.  Similar to the plots
-of feature completion, the plots of MTF suggest that TDD is more resilient to fuzzing than Waterfall, which experiences
-a much more dramatic decline as the number of statements removed increases.  In summary, the two comparisons of
-productivity and quality demonstrate that the application of distraction fuzzing results in more realistic simulations
-of user behaviour in software development workflows, as found in the available literature.
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
