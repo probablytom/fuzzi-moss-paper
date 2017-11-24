@@ -16,11 +16,11 @@
 \usepackage{cleveref}%
 \usepackage[numbers]{natbib}
 
+\usepackage{listings}
+
 \newlength\listinglinewidth
 \setlength\listinglinewidth\linewidth
 \addtolength\listinglinewidth{-0.5cm}
-
-\usepackage{listings}
 
 \lstset{language=python}
 \lstset{lineskip=-4pt}
@@ -35,7 +35,7 @@
 
 % disable with the [disable] option, which will get rid of all of the todos in
 % the document! Alternatively, pass 'final' as an option to the document class.
-\usepackage[textsize=scriptsize,obeyFinal]{todonotes}
+\usepackage[textsize=scriptsize,disable,obeyFinal]{todonotes}
 
 \newcommand{\picalc}{\(\pi\)-calculus }
 
@@ -67,6 +67,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
+\todo{Spell check for consistency.}
 A workflow model of an information system necessitates modelling the contingent interaction between technology and its 
 users. As a result, these models must choose to what degree they will contend
 with unexpected behaviour. Models increase in their complexity as more caveats
@@ -88,41 +89,35 @@ in the workflow.
 
 Information systems are operated within a wider organisational context, characterised by the needs, demands and
 behaviours of individual users, interpersonal relationships, organisational structures, business processes, legal or
-regulatory standards, and cultural norms \citep{susman1976autonomy,bade07structures,pentland05organisational}.  The
+regulatory standards, and cultural norms \citep{bade07structures,pentland05organisational}.  The
 influence of this \emph{socio-technical} interplay on system behaviour (and often failure) has been described in
 multiple and diverse case studies of information systems.  Examples of case studies describing socio-technical system
 failures include automated emergency vehicle dispatch \citep{robinson96limited}, electronic voting
-\citep{lock07observations} and stock market trading systems \citet{cftc-sec10findings}. In each case, system failure
+\citep{lock07observations} and stock market trading systems \citep{cftc-sec10findings}. In each case, system failure
 cannot be attributed to either purely user behaviour or information system failure, but instead to an interplay between
 both factors within the overall socio-technical system.
 
-\todo{I wondered whether it was worth mentioning something about Somerville's
-  Large-Scale Complex IT System work here, which looked at the \$800bn lost to
-  sociotechnical factors on the Dow Jones, but didn't want to confuse our
-  message...? }
-
-Our contention is that these failures arise because systems engineers lack the
-tools and methods to efficiently model and accurately
-simulate the interaction between the information systems and their organisational context, which comprise a socio-
-technical system. Without these facilities, systems engineers cannot predict potential socio-technical system behaviour,
-during information system design. Simulating this interaction between the information system and users is hard because
-user behaviour is heterogeneous, contingent and evolutionary, leading to deviations from idealised workflows.  Different
-users have different abilities, training and experiences and can experience phenomena such as distraction, misjudgments,
-exhaustion and confusion that can have significant influence on how and when a user completes a task.  For example, a
-novice developer working within a large team may be unaware of software development best practices described in a
-workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely, an experienced developer
-may omit steps, such as peer reviews of their code, they consider unnecessary to optimise their performance.
+Our contention is that these failures arise because systems engineers lack the tools and methods to efficiently model
+and accurately simulate the interaction between the information systems and their organisational context, which comprise
+a socio- technical system. Without these facilities, systems engineers cannot predict potential socio-technical system
+behaviour, during information system design. Simulating this interaction between the information system and users is
+hard because user behaviour is heterogeneous, contingent and evolutionary, leading to deviations from idealised
+workflows.  Different users have different abilities, training and experiences and can experience phenomena such as
+distraction, misjudgments, exhaustion and confusion that can have significant influence on how and when a user completes
+a task.  For example, a novice developer working within a large team may be unaware of software development best
+practices described in a workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely,
+an experienced developer may omit steps, such as peer reviews of their code, they consider unnecessary to optimise their
+performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
 system, the behaviour of other users or the environment \citep{sommerville09deriving}.  In our example scenario, a
 software development team may begin reducing quality assurance efforts as a deadline for a release approaches, in an
 effort to ensure all required features are completed \citep{beck02test}. Behavior is also continually evolving, as the
 autonomous actors in a system adapt to new circumstances, discover optimizations to their workflows, adapt the workflow
-to suit local organizational priorities or take shortcuts
-\citep{anderson04heterogeneous,bonen79evolutionary,lyytinen2008explaining}.  In the example scenario, it is reasonable
-to anticipate that a novice developer's behaviour will gradually evolve into that of an expert as they gain more
-experience.  As a consequence, the de facto behavior exhibited within a system may differ from that envisaged by system
-architects in idealized workflows.
+to suit local organizational priorities or take shortcuts \citep{bonen79evolutionary}.  In the example scenario, it is
+reasonable to anticipate that a novice developer's behaviour will gradually evolve into that of an expert as they gain
+more experience.  As a consequence, the de facto behavior exhibited within a system may differ from that envisaged by
+system architects in idealized workflows.
 
 A system architect must model their workflows as they are intended to be executed in practice, yet due to their
 organisational context any socio-technical system exhibits contingent behaviour which is fundamental to their accurate
@@ -144,26 +139,22 @@ The two contributions of this paper are as follows:
 
 \begin{itemize}
 
-\item A method for simulating socio-technical systems that allows for the separate modelling of idealised workflows and
-  the effects of deviations in user behaviours on those workflows.  We implement our approach in a supporting software
-  framework, using a combination of aspect oriented programming \cite{filman01aspect} and dynamic code fuzzing
-  \citep{takanen08fuzzing}, allowing us to alter the flow of execution in a
-  workflow description without sacrificing readability or simplicity.
+\item A method for simulating user interactions with information systems that allows for the separate modelling of
+  idealised descriptions of workflow and the effects of deviations from those workflows.  We implement our approach in
+  an fuzzing aspects software framework, using a combination of aspect oriented programming \cite{filman01aspect} and
+  dynamic code fuzzing \citep{takanen08fuzzing}, allowing us to alter the flow of execution in a workflow description
+  without sacrificing readability or simplicity.
 
-\item A demonstration of the efficacy of the framework in a case study comparison of Test Driven
-  Development (TDD) and Waterfall software development workflows.  The case study provides evidence for the industry consensus and
-  empirical studies that TDD provides for better software productivity and quality
-  \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.
-  \todo{I think we can remove this, so I've moved it into a Todo note...}
-  \todo{Specifically, the simulation results show that: the compared workflows provide for similar outcomes in idealised
-  circumstances; the introduction of contingent behaviour into simulations causes a decline in both productivity and
-  resulting software quality in both workflows; and the TDD workflow is more resilient to the occurrence of contingent
-  behaviour than Waterfall.}
+\item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
+  Waterfall software development workflows.  The case study demonstates that models of idealised behaviour in software
+  development do not conform with the empirical evidence which suggests that TDD out performs Waterfall
+  \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}, but that
+  models which incorporate realistic user behaviour when interacting with information systems do.
 
 \end{itemize}
 
 The rest of this paper is structured as follows.  Section \ref{sec:related} discusses related work, covering existing
-techniques for modeling\todo{modeling or modelling? Seems modeling is US?} socio-technical workflows and the limitations encountered in the literature.  Section
+techniques for modeling socio-technical workflows and the limitations encountered in the literature.  Section
 \ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach, and presents the method
 for constructing models of socio-technical systems and associated workflows. Section \ref{sec:fuzzing} describes the
 development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed
@@ -183,8 +174,7 @@ systems.  Graphical notations have received considerable attention, perhaps due 
 communicating specifications between users, customers and system architects.  Workflow description languages, such as as
 UML activity diagrams \citep{omg07omguml}, BPMN \citep{omg2011omgbpmn} and YAWL \citep{hofstede2010yawl} can be used to
 denote workflows as directed graphs composed of activities.  Various formalisms are used to underpin these notations and
-support analysis.  For example, UML activity diagrams are based on Petri
-Nets\todo[color=cyan]{Really? I thought they were based on flow charts? --Tom.}, as is BPMN, but with a richer notation
+support analysis.  For example, UML activity diagrams are based on Petri Nets, as is BPMN, but with a richer notation
 for expressing more complex aspects of activities, such as differentiating between tasks, activities and transactions;
 triggering and orchestrating concurrent activities using messages; the identification of information resources need to
 realize an activity; and the orchestration of activities across organizational boundaries.  Conversely, YAWL is based on
@@ -198,8 +188,7 @@ can be encapsulated within coarser grained modules.  As argued in Section \ref{s
 behaviors are inherently highly coupled with cross cutting concerns, making such refinement based techniques difficult
 to apply.  As \citet{israilidis13ignorance} have argued, the `unknowns' in a socio-technical system may be far more
 significant than the `knowns'. Several authors have therefore discussed alternative techniques for modeling
-socio-technical systems with support for contingent behavior
-\citep{dardenne93goal,sommerville09deriving,voinov13integronsters,yu1995social}.
+socio-technical systems with support for contingent behavior.
 
 Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modeling socio-technical
 systems \cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
@@ -417,10 +406,7 @@ of distraction increases as the simulation proceeds, i.e. the probability of mov
 longer a simulation has been executing.  For example, a software development team may be distracted from the
 implementation of tests and debugging as the pressure to complete a set of features increases, due to an impending
 release deadline.  Conversely, the aspect also allows the probability of distraction to be reduced by increasing the
-concentration of an actor (i.e. actors with better concentration do not get distracted as easily).  In the current work,
-we do not contend that the implementation of the aspect is empirically accurate, rather that it is representative of a
-qualitatively recognizable phenomena and that the approach allows for the effect of the phenomena on a workflow at
-different severities to be assessed.
+concentration of an actor (i.e. actors with better concentration do not get distracted as easily).
 
 The implementation of the \lstinline!incomplete_procedure! fuzzing aspect is shown in Figure
 \ref{fig:distraction-fuzzer}.%
@@ -453,9 +439,7 @@ def incomplete_procedure(random, pmf=default_pmf()):
               choose_last_steps(n, reapply=False),
               replace_steps_with(
                 replacement='self.actor.idling.idle()'
-              )
-            )
-        )
+              )))
         return fuzzer(steps, context)
 \end{lstlisting}
   \caption{An aspect which dynamically truncates the execution of a workflow to represent a distracted user operating a
@@ -478,6 +462,15 @@ step.  The \lstinline!filter_steps! aspect is then applied successively up throu
 \lstinline!choose_last_steps! filter is configured to track how many steps it has already removed, so that the value of
 \lstinline!n! is calculated across the entire body of the fuzzed task method, rather than at each level in the
 recursion.
+
+Notice that the fuzzing aspect models the effects of distraction \emph{independently} of its application to a particular
+workflow.  This allows the effects of this deviation in behaviour to be applied transparently to any of the different
+user workflows in the simulation. In the current work, it is not claimed that the implementation of the aspect is
+empirically accurate, rather that it is representative of a qualitatively recognizable phenomena and that the approach
+allows for the effect of the phenomena on a workflow at different severities to be assessed.  Also, it is not claimed
+that distraction is the \emph{only} cause of deviations in behaviour in software development workflows.  Rather, we
+present distraction as an example of a cause of deviation that may affect many different workflows in the same way, and
+demonstrate the approach to modelling it separately as a cross-cutting concern.
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -486,14 +479,20 @@ recursion.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section presents the results of applying the socio-technical fuzzing method to the case study.  Evaluating the
+This section presents the results of applying the user behaviour fuzzing method to the case study.  Evaluating the
 correctness of simulation techniques intended for large scale systems is notoriously difficult, as the principle
 rationale for developing the simulation is the lack of available empirical observations of the real world phenomena for
-use in validation \citet{naylor67verification}.  Our evaluation strategy follows that advocated by Naylor and Finger,
-such that we will test and evaluate different observations of the simulation for plausibility.  We will execute the
-simulated problem domain in a variety of settings and repeat simulations in order to limit the impact of noise in
-observations.  We will also check for example, for plausibility of simulation results in idealized conditions
-\cite{shull11assuring} and for results that cannot be possible in the real world \cite{weyuker82testing}.
+use in validation \citet{naylor67verification}.  However, in the context of the case study, some limited empirical
+evidence does exist, suggesting that Test Driven Development outperforms Waterfall in terms of features delivered and
+software quality
+\citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The
+evaluation will therefore adopt a hybrid strategy through the comparision of simulations of ideal and realistic user
+behaviour. Following \citet{naylor67verification}, the model of the problem domain will be tested for
+\emph{plausibility}.  The evaluation will then proceed to test whether two SDLC workflow models perform equivalently
+when executed in ideal circumstances, i.e. that simulations of ideal behaviour do not conform with results presented in
+the literature. Further, the evaluation should demonstrate that the Test Driven Development workflow out-performs
+Waterfall when user behaviour deviates from the ideal workflow due to the effects of distraction, in conformance with
+the results of empirical studies available in the literature.
 
 Simulations of the problem domain were configured as follows.  A single source of randomness was initialized for each
 configuration with a seed of 1.0 to provide for repeatability of the experiment and to provide for comparison between
@@ -505,116 +504,99 @@ the system halts.  The average trace of the 10 operations of the system was reco
 failure (MTF). Software projects consisted of up between 1 and 6 features, with projects divided into small (2 chunks
 per feature) and large (4 chunks per feature). Both the Waterfall and TDD SDLC workflows were simulated.  In either
 case, the incomplete procedure distraction aspect was applied to either the high level software development workflow, or
-to the set of lower level development activity workflows (implementation, change management etc.).  The
-distraction fuzzing aspect was applied using developer concentration values between 0.001 and 5.0.  Results from the
-simulations are stored in the study repository \citep{storer2016softdev-workflow-scm}.
+to the set of lower level development activity workflows (implementation, change management etc.).  The distraction
+fuzzing aspect was applied using developer concentration values between 0.001 and 5.0.  Results from the simulations are
+stored in the study repository \citep{storer2016softdev-workflow-scm}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Simulations with no Fuzzing}
+%\subsection{Simulations of Ideal Behaviour}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-As a first step in evaluating the plausibility of the problem domain representation, configurations where no fuzzing was
-applied were considered.  Two hypotheses were developed to test expectations about the problem domain.
-
-It was first hypothesized that there would be an exponential relationship between the size of a project and the number
-of commits, due to the number of additional modifications, tests, debugging and refactoring activities that would be
-required as the project grew in scale.  Figure \ref{fig:no-fuzzing:features} illustrates that the problem domain
-conforms to this expectation, with total number of commits growing exponentially as the project increases in size.  The
-plot also distinguishes between small (blue) and large (red) feature projects, showing that the total number of commits
-in these types of projects is clearly distinguishable, and that the total number of commits for smaller feature projects
-(i.e. with fewer inter-dependencies within chunks) grows more slowly than for larger feature projects.
-
-A second hypothesis considered the relationship between project size and MTF for projects without fuzzing. It was
-hypothesized that larger projects would have a lower MTF, because the additional complexity experienced by larger
-projects would increase the probability of a bug being manifested.  Again, Figure \ref{fig:no-fuzzing:mtf} confirms this
-expectation, with the MTF of projects declining rapidly towards 4000 ticks and then stabilizing.  The stabilization may
-occur because refactoring efforts limit inter-feature dependency (and so de-coupling features from one another) but not
-intra-feature dependency.
-
-These two assessments suggest the model and workflows developed is plausible and is representative of the problem
-domain.  The simplified simulations did not reveal impossible situations, such as larger projects experiencing fewer
-commits, or MTF declining below zero.  Similarly, without the application of fuzzing, all projects were fully
-implemented and there was little difference between the performance of the Waterfall and TDD SDLCs.
-
+In the first part of the evaluation, simulations of the software development workflow were considered for ideal
+behaviours, without the effects of distraction applied.  Figure \ref{fig:no-fuzzing} illustrates two comparisons of
+simulations to establish problem domain plausibility.  Figure \ref{fig:no-fuzzing:features}%
 \begin{figure}[t]
   \centering
 
+  \hfill
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/commits_against_project_size_for_0_fuzz_simulations}}
-    \caption{Commits against project size for small (blue) and large (red) feature projects.}
+    \caption{Commits against project size.}
     \label{fig:no-fuzzing:features}
   \end{subfigure}
-%  \hfill
+  \hfill
   \begin{subfigure}{2.3in}
-    \fbox{\includegraphics{floats/mtf_against_commits_for_0_fuzz_simluations}}
-    \caption{Mean time to failure for Waterfall (blue) and TDD (red) projects.}  
+    \fbox{\includegraphics{floats/mtf_against_project_size_for_0_fuzz_simluations}}
+    \caption{Mean time to failure.}  
     \label{fig:no-fuzzing:mtf}
   \end{subfigure}
-  
-  \caption{Scatter plots of software development simulations without fuzzing.}
+  \hfill
+
+  \caption{Scatter plots of software development simulations without fuzzing for Waterfall (blue) and TDD (red)
+    projects.}
   \label{fig:no-fuzzing}
 \end{figure}
+shows that there is an exponential increase in the number of commits to the version control server as project size
+increases.  This result is to be expected due to the exponential increase in the number of additional modifications,
+tests, debugging and refactoring activities that would be required as a project grows in scale.  Similarly, Figure
+\ref{fig:no-fuzzing:mtf} shows a decline in project quality (a reduction in the MTF from 300 to around 0 and then
+stabilising for projects with more than 12 chunks) as project size increases.  Again, the additional complexity of
+larger projects increases the probability of a bug causing a system failure, although MTF never declines beyond 0.
+These results strengthen the claim that the model of the problem domain is plausible.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Simulations with Fuzzing}
+A further observation from the figures is that TDD and Waterfall workflows perform equivalently when workflows are not
+subject to user distraction.  When ideal workflows are executed for both Waterfall (blue) and TDD (red), the results
+show that a similar number of project commits are recorded and a similar MTF achieved.  This confirms the expectation
+that the simulations of idealised workflows, whilst behaving plausibly, do not conform with expectations from the
+literature that TDD should out perform waterfall.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-We now proceed to compare the performance of the two software development strategies when subject to variable behavior
-caused by distraction.  There is a general perception amongst software developers that TDD is a more resilient software
-development strategy\todo{do you suppose this wants a citation? Maybe something we already have fits.}, although little empirical evidence exists to support this consensus.  Two aspects of the effect of
-fuzzing are therefore explored: feature completion and resulting system mean time to failure (MTF).
-
-Figure \ref{fig:fuzzing-features} shows scatter plots for the effect of distraction fuzzing for subsets of workflows.
-In both plots, the number of features completed for Waterfall directed projects is plotted in red and in blue for TDD
-against the total number of statements removed by fuzzing.  Figure \ref{fig:fuzzing-features:WT} shows the effect when
-only the high level software development (Waterfall or TDD) is fuzzed, whereas Figure \ref{fig:fuzzing-features:CTIDR}
-shows the effect of fuzzing lower level activities (change management, implementation etc.).  Both figures clearly
-demonstrate that in the simulations increasing fuzzing causes a decline in the number of completed features.  However,
-in both configurations, TDD is more resilient to distraction fuzzing than Waterfall.
-
+We now proceed to compare the performance of the two software development strategies when subject to deviations in
+behavior caused by distraction. Figure \ref{fig:fuzzing-features} shows scatter plots for the effect of distraction for
+subsets of workflows on productivity.%
 \begin{figure}[t]
   \centering
+  \hfill
   \begin{subfigure}[t]{2.3in}%
     \fbox{\includegraphics{floats/features_against_total_fuzz_WT}}
-    \caption{Fuzzing of Waterfall and Test Driven Development SDLC workflows.}
-    \label{fig:fuzzing-features:WT}
+    \caption{Fuzzing of Waterfall and TDD.}
+    \label{fig:fuzzing-features:WF}
   \end{subfigure}
-%  \hfill
+  \hfill
   \begin{subfigure}[t]{2.3in}
     \fbox{\includegraphics{floats/features_against_total_fuzz_CTIDR}}
-    \caption{Fuzzing of Change Management, Testing, Implementation, Debugging and Refactoring workflows.}  
+    \caption{Fuzzing of low-level workflows.}  
   \label{fig:fuzzing-features:CTIDR}
   \end{subfigure}
-  
-  \caption{Scatter plots and trend lines of the effect of statements removed on subsets of workflows on feature
-    completion. Plots distinguish between Waterfall (blue) and TDD (red).  Smaller project sizes (by feature count) are
-    plotted in fainter colors.}
+  \hfill
+
+  \caption{Scatter plots and trend lines of feature completion for Waterfall (blue) and TDD (red) for distraction
+    applied to selected workflows.}
   \label{fig:fuzzing-features}
 \end{figure}
+In both plots, the number of features implemented for is plotted against the total number of statements removed by
+fuzzing (Waterfall in blue, TDD in red). Figure \ref{fig:fuzzing-features:WF} shows the effect when only the high level
+software development (Waterfall or TDD) is fuzzed, whereas Figure \ref{fig:fuzzing-features:CTIDR} shows the effect of
+fuzzing lower level activities (change management, implementation, testing, debugging and refactoring). Both figures
+clearly demonstrate that increasing dis- traction causes a decline in the number of completed features. However, in both
+configurations, TDD is more resilient to distraction fuzzing than Waterfall, with a larger proportion of features
+implemented. For fuzzing of the SDLC workflows, the decline in feature implementation appears to be highly linear, with
+a far steeper decline for Waterfall than for TDD. In Figure \ref{fig:fuzzing-features}, both SDLC workflows appear to be
+largely immune to distraction up to the removal of approximately 100 statements, after which feature completion
+declines, with steeper declines for Waterfall.
 
-
-For fuzzing of SDLC workflows, the decline in feature implementation appears to be highly linear, with a far steeper
-decline for Waterfall than for TDD.  In Figure \ref{fig:fuzzing-features}, both SDLC workflows appear to be largely
-immune to fuzzing up to the removal of approximately 100 statements, after which feature completion declines, with
-steeper declines for Waterfall.
-
-Figure \ref{fig:fuzzing-mtf} investigates the effect of distraction fuzzing on MTF, again distinguishing between
-Waterfall (blue) and TDD (red) SDLCs.  In these plots both fuzzing configurations described at the start of this Section
-are combined, as their effects are similar.  Small and large feature projects are plotted separately, as these were
-identified as having characteristically different mean time to failures when considering projects without fuzzing.
-Similar to the plots of feature completion, the plots of MTF suggest that TDD is
-more resilient to deviations from ideal developer behaviour than
-Waterfall, which experiences a much more dramatic decline as the number of statements removed increases.  This supports
-the contention of advocates that TDD results in higher quality systems because of the explicit quality assurance throughout
-the life-cycle, rather than only at the end.
-
-
+Figure \ref{fig:fuzzing-mtf} shows the effect of distraction on MTF, again distinguishing between Waterfall (blue) and
+TDD (red) SDLCs.  In these plots, both fuzzing configurations are combined, as their effects are similar.  Small and
+large feature projects are plotted separately, as these have different orders of magnitude MTF.  Similar to the plots
+of feature completion, the plots of MTF suggest that TDD is more resilient to fuzzing than Waterfall, which experiences
+a much more dramatic decline as the number of statements removed increases.  In summary, the two comparisons of
+productivity and quality demonstrate that the application of distraction fuzzing results in more realistic simulations
+of user behaviour in software development workflows, as found in the available literature.
 \begin{figure}[t]
   \centering
+  \hfill
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/mtf_against_total_fuzz_projects_small}}
     \caption{Small projects.}
@@ -624,11 +606,14 @@ the life-cycle, rather than only at the end.
     \fbox{\includegraphics{floats/mtf_against_total_fuzz_projects_large}}
     \caption{Large projects.}  
   \end{subfigure}
-  
-  \caption{Scatter plots and trend lines of the effect of all fuzzing configurations on the mean time to failure of
-    simulated software systems.  Plots distinguish between Waterfall (blue) and TDD (red)..}
+  \hfill
+
+  \caption{Scatter plots and trend lines of MTF for Waterfall (blue) and TDD (red) for distraction applied to all
+    workflow combinations.}
+
   \label{fig:fuzzing-mtf}
 \end{figure}
+
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -638,46 +623,26 @@ the life-cycle, rather than only at the end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modeling and simulating
-variance in socio-technical system behaviors.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi\_Moss
-\todo{This is literally the only time FM is mentioned in the paper --- do we
-  want to refer to FM in section 4 or change this to pydysofu?}
-and applied it in a case study of software development workflows.  The approach was demonstrated to introduce realistic
-variance due to distraction into idealized workflows in accordance with expectations of software development workflow in
-practice.
+This paper has presented and evaluated a novel approach to modelling and simulating realistic user behaviours when
+interacting with information systems, through the use of model fuzzing aspects.  The novelty of this appraoch is the
+ability to model the causes of realistic user behaviour (such as distraction) separately as aspects that can
+subsequently applied flexibly to many different workflows in a simulation. The efficacy of the approach is demonstrated
+in a by showing that the introduction of realistic user behaviour into simulations of software development workflows
+gives results that better conform with empirical evidence available in the literature.
 
-The proof of concept has created a substantial research agenda in the application of fuzzing techniques to
-socio-technical system modeling.  In the context of the software development case study, there is a need to understand
-why the effects on feature completion and MTF caused by fuzzing were observed.  For example, investigation is needed as
-to whether the fuzzing of a particular software development activity, such as change management is the dominant effect
-in causing a decline in MTF or feature completion.  Such insights could be invaluable in designing and deploying future
-software engineering practices.
+The proof of concept presents the opportunity for a substantial research agenda in the modelling and simulation of user
+interaction with information systems, in order to better predict emergent socio-technical system properties. Further
+research is necessary to test the viability of the approach when applied to larger, more complex scale socio-technical
+systems, such as the election e-counting system described by \citet{lock07observations}, comprising whole information
+infrastructures and hundreds or thousands of diverse users.  This will provide opportunities to experiment with a
+variety of other causes of variability in socio-technical system behavior, such as subjective misjudgments, exhaustion,
+misordering of steps and shortcut taking.  Further interdisciplinary research is required to develop and validate the
+realism of socio-technical fuzzing aspects that implement these behaviors. There is a need to link empirical evidence of
+the causes and occurrence of these behaviors to their impact on the operation of workflows.  The overall aim of this
+research agenda is towards simulation techniques that can have predictive capabilities suitable for informing systems
+engineering decisions before resources are committed to construction.  The availability of such tools would do much to
+progress the current craft of large scale socio-technical systems engineering.
 
-More broadly, now that we have validated the approach with an initial case study, more complex socio-technical systems
-such as the e-counting system described by \citet{lock07observations} can be considered.  These will provide
-opportunities to experiment with a variety of other causes of variability in socio-technical system behavior, such as
-subjective misjudgments, exhaustion, misordering of steps and shortcut taking.  Further interdisciplinary research is
-required to develop and validate the realism of socio-technical fuzzing aspects that implement these behaviors. There is
-a need to link empirical evidence of the causes and occurrence of these behaviors to their impact on the operation of
-workflows.
-
-Fuzzing techniques may also be applicable to other socio-technical modeling notations.  For example, fuzzing goal
-oriented models such as i* could be used to simulate the shifting goals of actors over time as priorities and focus
-varies.  Similarly, fuzzing enterprise modeling techniques such as OBASHI could provide means of assessing the
-resilience of critical infrastructures when subject to unexpected behaviors, similar to HAZOPS like techniques that have
-been applied manually to responsibility models \citep{lock09modelling}. The proof of concept in this research demonstrates
-the potential for the development of realistic simulations of socio-technical systems. The research agenda is towards
-simulations that can have predictive capabilities suitable for informing systems engineering decisions before resources
-are committed to construction.  The availability of such tools would do much to progress the current craft of large
-scale systems engineering.
-\todo{I have to leave the machine as I'm writing this but I'll come back and
-  write something here referring back to what we fix in the relevant
-  ltierature's shortcomings. Might as well prove that this is contributing
-  something novel and this feels like a good palce to do it!}
-i\todo{I'll also come back maybe to refer to uses in simulations of
-  human-centered security and safety critical systems. Maybe simulations of
-  complex adaptive systems too? Unless that's covered by one of the existing
-  things we reference in this para.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
