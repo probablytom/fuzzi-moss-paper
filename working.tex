@@ -205,21 +205,24 @@ or other means of supporting automated analysis.
 Other authors have extended goal oriented approaches to provide greater flexibility. \citet{sommerville09deriving}
 argued that stakeholders often struggle to express their behavior within a socio-technical system in terms of goals.
 Instead, they argue that the concept of responsibilities, the duties held by an actor in a system, are a more intuitive
-means of describing system behaviors that also capture a variety of contingent behaviors.  A notation for expressing the
-relationships between responsibilities and resources in order to identify dependencies within a system was provided.
-Earlier work on responsibility modeling also provided mechanisms for annotating responsibilities with indicative
-workflows, expressing the means by which responsibilities could be executed \citep{dewsbury07responsibility}.  However,
-in the case of both goal oriented and responsibility modelling, the ability to document deviation in behaviour is not
-accompanied with a means of evaluating its effects.
+means of describing system behaviors that also capture a variety of contingent behaviors.  Various notational features
+have been provided for extending responsibility modelling, including for linking between responsibilities and required
+resources and for associating indicative workflows \citep{dewsbury07responsibility}.  However, these are not accompanied
+with a means of evaluating the effects.
 
-The representation of cross cutting concerns as aspects has been extensively studied in the Software Engineering
-literature \citep{Ali2012Aspect}.  However, we are unaware of any research that utilises aspect oriented programming
-techniques in simulation models, either for socio-technical user behaviours or elsewhere.  Similarly, the use of code
-fuzzing techniques have been employed extensively in quality assurance practices, to assess the impact of deviations in user
-behaviour on software systems, including fuzzing of compiler options \citep{fuzzing-compiler}, mutation testing of test
-suites \cite{demillo78hints} and fuzzing of inputs test data to search for software security vulnerabilities
-\citep{takanen08fuzzing}.  However, we have not discovered any similar work on the application of fuzzing techniques to
-dynamically inject variation into a simulation model at runtime.
+The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstate the recognition of
+the need for methods which capture the complexity of user interactions with information systems.  However, to the best
+of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
+behaviour on the overall system.  Our approach, in recognising that the causes of deviation in a workflow as a cross
+cutting concern leverages off methods established in Software Engineering. The representation of cross cutting concerns
+as aspects has been extensively studied in the Software Engineering literature \citep{Ali2012Aspect}.  However, we are
+unaware of any research that utilises aspect oriented programming techniques in simulation models, either for
+socio-technical user behaviours or elsewhere.  Similarly, the use of code fuzzing techniques have been employed
+extensively in quality assurance practices, to assess the impact of deviations in user behaviour on software systems,
+including fuzzing of compiler options \citep{fuzzing-compiler}, mutation testing of test suites \cite{demillo78hints}
+and fuzzing of inputs test data to search for software security vulnerabilities \citep{takanen08fuzzing}.  However, we
+have not discovered any similar work on the application of fuzzing techniques to dynamically inject variation into a
+simulation model at runtime.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
