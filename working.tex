@@ -578,11 +578,12 @@ subsets of workflows on productivity.%
     applied to selected workflows.}
   \label{fig:fuzzing-features}
 \end{figure}
+
 In both plots, the number of features implemented for is plotted against the total number of statements removed by
 fuzzing (Waterfall in blue, TDD in red). Figure \ref{fig:fuzzing-features:WF} shows the effect when only the high level
 software development (Waterfall or TDD) is fuzzed, whereas Figure \ref{fig:fuzzing-features:CTIDR} shows the effect of
 fuzzing lower level activities (change management, implementation, testing, debugging and refactoring). Both figures
-clearly demonstrate that increasing dis- traction causes a decline in the number of completed features. However, in both
+clearly demonstrate that increasing distraction causes a decline in the number of completed features. However, in both
 configurations, TDD is more resilient to distraction fuzzing than Waterfall, with a larger proportion of features
 implemented. For fuzzing of the SDLC workflows, the decline in feature implementation appears to be highly linear, with
 a far steeper decline for Waterfall than for TDD. In Figure \ref{fig:fuzzing-features}, both SDLC workflows appear to be
@@ -596,6 +597,7 @@ of feature completion, the plots of MTF suggest that TDD is more resilient to fu
 a much more dramatic decline as the number of statements removed increases.  In summary, the two comparisons of
 productivity and quality demonstrate that the application of distraction fuzzing results in more realistic simulations
 of user behaviour in software development workflows, as found in the available literature.
+
 \begin{figure}[t]
   \centering
   \hfill
@@ -615,7 +617,6 @@ of user behaviour in software development workflows, as found in the available l
 
   \label{fig:fuzzing-mtf}
 \end{figure}
-
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
