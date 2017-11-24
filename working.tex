@@ -623,46 +623,26 @@ of user behaviour in software development workflows, as found in the available l
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This paper has presented and evaluated the use of executable workflow fuzzing to the problem of modeling and simulating
-variance in socio-technical system behaviors.  The paper described a proof-of-concept workflow fuzzing tool, Fuzzi\_Moss
-\todo{This is literally the only time FM is mentioned in the paper --- do we
-  want to refer to FM in section 4 or change this to pydysofu?}
-and applied it in a case study of software development workflows.  The approach was demonstrated to introduce realistic
-variance due to distraction into idealized workflows in accordance with expectations of software development workflow in
-practice.
+This paper has presented and evaluated a novel approach to modelling and simulating realistic user behaviours when
+interacting with information systems, through the use of model fuzzing aspects.  The novelty of this appraoch is the
+ability to model the causes of realistic user behaviour (such as distraction) separately as aspects that can
+subsequently applied flexibly to many different workflows in a simulation. The efficacy of the approach is demonstrated
+in a by showing that the introduction of realistic user behaviour into simulations of software development workflows
+gives results that better conform with empirical evidence available in the literature.
 
-The proof of concept has created a substantial research agenda in the application of fuzzing techniques to
-socio-technical system modeling.  In the context of the software development case study, there is a need to understand
-why the effects on feature completion and MTF caused by fuzzing were observed.  For example, investigation is needed as
-to whether the fuzzing of a particular software development activity, such as change management is the dominant effect
-in causing a decline in MTF or feature completion.  Such insights could be invaluable in designing and deploying future
-software engineering practices.
+The proof of concept presents the opportunity for a substantial research agenda in the modelling and simulation of user
+interaction with information systems, in order to better predict emergent socio-technical system properties. Further
+research is necessary to test the viability of the approach when applied to larger, more complex scale socio-technical
+systems, such as the election e-counting system described by \citet{lock07observations}, comprising whole information
+infrastructures and hundreds or thousands of diverse users.  This will provide opportunities to experiment with a
+variety of other causes of variability in socio-technical system behavior, such as subjective misjudgments, exhaustion,
+misordering of steps and shortcut taking.  Further interdisciplinary research is required to develop and validate the
+realism of socio-technical fuzzing aspects that implement these behaviors. There is a need to link empirical evidence of
+the causes and occurrence of these behaviors to their impact on the operation of workflows.  The overall aim of this
+research agenda is towards simulation techniques that can have predictive capabilities suitable for informing systems
+engineering decisions before resources are committed to construction.  The availability of such tools would do much to
+progress the current craft of large scale socio-technical systems engineering.
 
-More broadly, now that we have validated the approach with an initial case study, more complex socio-technical systems
-such as the e-counting system described by \citet{lock07observations} can be considered.  These will provide
-opportunities to experiment with a variety of other causes of variability in socio-technical system behavior, such as
-subjective misjudgments, exhaustion, misordering of steps and shortcut taking.  Further interdisciplinary research is
-required to develop and validate the realism of socio-technical fuzzing aspects that implement these behaviors. There is
-a need to link empirical evidence of the causes and occurrence of these behaviors to their impact on the operation of
-workflows.
-
-Fuzzing techniques may also be applicable to other socio-technical modeling notations.  For example, fuzzing goal
-oriented models such as i* could be used to simulate the shifting goals of actors over time as priorities and focus
-varies.  Similarly, fuzzing enterprise modeling techniques such as OBASHI could provide means of assessing the
-resilience of critical infrastructures when subject to unexpected behaviors, similar to HAZOPS like techniques that have
-been applied manually to responsibility models \citep{lock09modelling}. The proof of concept in this research demonstrates
-the potential for the development of realistic simulations of socio-technical systems. The research agenda is towards
-simulations that can have predictive capabilities suitable for informing systems engineering decisions before resources
-are committed to construction.  The availability of such tools would do much to progress the current craft of large
-scale systems engineering.
-\todo{I have to leave the machine as I'm writing this but I'll come back and
-  write something here referring back to what we fix in the relevant
-  ltierature's shortcomings. Might as well prove that this is contributing
-  something novel and this feels like a good palce to do it!}
-\todo{I'll also come back maybe to refer to uses in simulations of
-  human-centered security and safety critical systems. Maybe simulations of
-  complex adaptive systems too? Unless that's covered by one of the existing
-  things we reference in this para.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
