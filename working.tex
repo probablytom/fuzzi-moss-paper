@@ -66,7 +66,7 @@
   \todo{Spell check for consistency.}
 
   In this paper we contend that the engineering of information systems is hampered by a paucity of tools to tractably
-  model, simulate and predict the impact of \emph{realistically flawed} user behaviours on the emergent properties of
+  model, simulate and predict the impact of \emph{realistic} user behaviours on the emergent properties of
   a socio-technical system, evidenced by the plethora of case studies of system failure in the literature.  We
   address this gap by presenting a novel approach that models ideal user behaviour as workflows, and introduces
   deviation to that behaviour as aspects which fuzz the model. We demonstrate the success of this approach through a
@@ -97,7 +97,7 @@ a socio- technical system. Without these facilities, systems engineers cannot pr
 behaviour, during information system design. Simulating this interaction between the information system and users is
 hard because user behaviour is heterogeneous, contingent and evolutionary, leading to deviations from idealised
 workflows.  Different users have different abilities, training and experiences and can experience phenomena such as
-distraction, misjudgments, exhaustion and confusion that can have significant influence on how and when a user completes
+distraction, misjudgements, exhaustion and confusion that can have significant influence on how and when a user completes
 a task.  For example, a novice developer working within a large team may be unaware of software development best
 practices described in a workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely,
 an experienced developer may omit steps, such as peer reviews of their code, they consider unnecessary to optimise their
@@ -106,12 +106,12 @@ performance.
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
 system, the behaviour of other users or the environment \citep{sommerville09deriving}.  In our example scenario, a
 software development team may begin reducing quality assurance efforts as a deadline for a release approaches, in an
-effort to ensure all required features are completed \citep{beck02test}. Behavior is also continually evolving, as the
+effort to ensure all required features are completed \citep{beck02test}. Behaviour is also continually evolving, as the
 autonomous actors in a system adapt to new circumstances, discover optimizations to their workflows, adapt the workflow
-to suit local organizational priorities or take shortcuts \citep{bonen79evolutionary}.  In the example scenario, it is
+to suit local organisational priorities or take shortcuts \citep{bonen79evolutionary}.  In the example scenario, it is
 reasonable to anticipate that a novice developer's behaviour will gradually evolve into that of an expert as they gain
-more experience.  As a consequence, the de facto behavior exhibited within a system may differ from that envisaged by
-system architects in idealized workflows.
+more experience.  As a consequence, the de facto behaviour exhibited within a system may differ from that envisaged by
+system architects in idealised workflows.
 
 A system architect must model their workflows as they are intended to be executed in practice, yet due to their
 organisational context any socio-technical system exhibits contingent behaviour which is fundamental to their accurate
@@ -140,7 +140,7 @@ The two contributions of this paper are as follows:
   without sacrificing readability or simplicity.
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
-  Waterfall software development workflows.  The case study demonstates that models of idealised behaviour in software
+  Waterfall software development workflows.  The case study demonstrates that models of idealised behaviour in software
   development do not conform with the empirical evidence which suggests that TDD out performs Waterfall
   \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}, but that
   models which incorporate realistic user behaviour when interacting with information systems do.
@@ -148,7 +148,7 @@ The two contributions of this paper are as follows:
 \end{itemize}
 
 The rest of this paper is structured as follows.  \Cref{sec:related} discusses related work, covering existing
-techniques for modeling socio-technical workflows and the limitations encountered in the literature.  Section
+techniques for modelling socio-technical workflows and the limitations encountered in the literature.  Section
 \ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach, and presents the method
 for constructing models of socio-technical systems and associated workflows. \Cref{sec:fuzzing} describes the
 development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed
@@ -171,7 +171,7 @@ denote workflows as directed graphs composed of activities.  Various formalisms 
 support analysis.  For example, UML activity diagrams are based on Petri Nets, as is BPMN, but with a richer notation
 for expressing more complex aspects of activities, such as differentiating between tasks, activities and transactions;
 triggering and orchestrating concurrent activities using messages; the identification of information resources need to
-realize an activity; and the orchestration of activities across organizational boundaries.  Conversely, YAWL is based on
+realise an activity; and the orchestration of activities across organisational boundaries.  Conversely, YAWL is based on
 the \picalc \citep{aalst2004workflow}.  The notation also provides for a richer range of workflow requirements than
 activity diagrams, including sophisticated forking and merging rules, separation between workflow specifications and
 executions and resourcing and data requirements.
@@ -179,18 +179,18 @@ executions and resourcing and data requirements.
 Describing socio-technical behaviour using workflow notations can be difficult, because of the basic assumption that all
 contingencies in a workflow can be completely described at a given level of granularity, and that more complex details
 can be encapsulated within coarser grained modules.  As argued in \Cref{sec:introduction}, socio-technical
-behaviors are inherently highly coupled with cross cutting concerns, making such refinement based techniques difficult
+behaviours are inherently highly coupled with cross cutting concerns, making such refinement based techniques difficult
 to apply.  As \citet{israilidis13ignorance} have argued, the `unknowns' in a socio-technical system may be far more
-significant than the `knowns'. Several authors have therefore discussed alternative techniques for modeling
-socio-technical systems with support for contingent behavior.
+significant than the `knowns'. Several authors have therefore discussed alternative techniques for modelling
+socio-technical systems with support for contingent behaviour.
 
-Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modeling socio-technical
+Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modelling socio-technical
 systems \cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
 system actors are seeking to achieve.  Goals can be de-composed into a sub-goal hierarchy using logical operators to
 express the form of decomposition. Goals can also be annotated with strategies and/or resource requirements to support
 automated analysis.  \citet{yu1995social} argued that socio-technical systems should be viewed as collections of
-collaborating actors, each with their own (potentially conflicting) objectives.  Eliciting and analyzing the actors'
-intents allows the inter-dependencies between actors and the overall behavior of the system to be understood, without
+collaborating actors, each with their own (potentially conflicting) objectives.  Eliciting and analysing the actors'
+intents allows the inter-dependencies between actors and the overall behaviour of the system to be understood, without
 the need for explicit models of individual workflows. \citet{herrmann1999vagueness} introduced techniques for annotating
 goal oriented system models with vagueness.  The annotation allows for the distinction between consistent vagueness (due
 to abstraction) and inconsistent vagueness due to omission.  In principle, this approach allows for the identification
@@ -198,14 +198,14 @@ of aspects of a model that are subject to deviation.  However, the notation is n
 or other means of supporting automated analysis.
 
 Other authors have extended goal oriented approaches to provide greater flexibility. \citet{sommerville09deriving}
-argued that stakeholders often struggle to express their behavior within a socio-technical system in terms of goals.
+argued that stakeholders often struggle to express their behaviour within a socio-technical system in terms of goals.
 Instead, they argue that the concept of responsibilities, the duties held by an actor in a system, are a more intuitive
-means of describing system behaviors that also capture a variety of contingent behaviors.  Various notational features
+means of describing system behaviours that also capture a variety of contingent behaviours.  Various notational features
 have been provided for extending responsibility modelling, including for linking between responsibilities and required
 resources and for associating indicative workflows \citep{dewsbury07responsibility}.  However, these are not accompanied
 with a means of evaluating the effects.
 
-The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstate the recognition of
+The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstrate the recognition of
 the need for methods which capture the complexity of user interactions with information systems.  However, to the best
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
 behaviour on the overall system.  Our approach, in recognising that the causes of deviation in a workflow as a cross
@@ -226,7 +226,7 @@ simulation model at runtime.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we demonstrate our approach to modelling a problem domain and associated idealized workflows in
+In this section we demonstrate our approach to modelling a problem domain and associated idealised workflows in
 socio-technical systems through a case study.  We have chosen a case study of team based software development, in which
 we will explore the efficacy of two software development lifecycles (SDLC) workflows: Waterfall and Test Driven
 Development (TDD).  The case study was chosen as representative of a socio-technical system, combining different user
@@ -242,7 +242,7 @@ but the full source code is also available for inspection in the case study's re
 \cite{storer2016softdev-workflow-scm}.
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
-study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artifacts in the domain
+study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artefacts in the domain
 implemented as collection of Python classes.  \Cref{fig:domain} shows the class diagram for the problem domain in
 the case study.  A software development effort is hosted on a version control system (VCS) server.  Software developers
 interact with the server via VCS client.  Both the server and clients maintain copies of the software system, which must
@@ -253,13 +253,13 @@ system.  Each time a new chunk is added to a feature other chunks may also need 
 further dependencies between chunks or introducing bugs.  Bugs may manifest themselves when the feature they are
 associated with is operated or exercised through the execution of tests.  Features can be debugged, resulting in the
 removal of detected bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting
-a given bug, easing the process of debugging a feature or overall system. All of the information system behaviors
+a given bug, easing the process of debugging a feature or overall system. All of the information system behaviours
 described above and shown in the diagram are implemented as methods in Python classes.
 
 \begin{figure}[t]
   \centering
   \includegraphics[scale=0.8]{floats/full-class-diagram-1}
-  \caption{The software development case study domain model, showing information system artifacts and functions that can
+  \caption{The software development case study domain model, showing information system artefacts and functions that can
     be accessed by user workflows.}
   \label{fig:domain}
 
@@ -343,7 +343,7 @@ invoked.
 
 Further workflows were implemented for common software development activities: the specification and implementation of
 features in the system; testing; debugging and refactoring (reducing dependencies).  Since workflows are modular they
-can also be organized hierarchically.  \Cref{fig:workflows} also shows this modularity is exploited for the
+can also be organised hierarchically.  \Cref{fig:workflows} also shows this modularity is exploited for the
 implementation workflow. In this example, the workflows for modifying the structure of a software system (for adding
 chunks or tests and so on) depend on the change management workflow in order to coordinate the distribution of changes
 within a team.
@@ -370,7 +370,7 @@ following TDD.
 All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
 problem domain time for controlling task execution and concurrent execution of these tasks by actors.  Task costs are
 denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \cref{fig:workflows}.  The agent
-pauses execution of a task until sufficient ticks from the centralized clock have been received and then resumes execution.
+pauses execution of a task until sufficient ticks from the centralised clock have been received and then resumes execution.
 This mechanism is implemented transparently with respect to workflow classes, easing the modelling burden for the user.
 The execution of tasks and their duration is logged in a tree like structure by each agent, supporting later inspection
 and analysis of behaviour.
@@ -382,7 +382,7 @@ and analysis of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we describe our approach to modeling deviations in user behaviour such as distraction using aspect
+In this section we describe our approach to modelling deviations in user behaviour such as distraction using aspect
 oriented dynamic fuzzing of task descriptions.  To achieve this, deviations are modelled as a \emph{dynamic fuzzing
   aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu monitors the
 invocation of workflow task methods in the background during the execution of a simulation.  When a workflow task method
@@ -394,7 +394,7 @@ invoking the altered method.  Further implementation details are omitted for bre
 PyDySoFu library is available in the project repository for inspection \cite{storer2016pydysofu-scm}.
 
 In order to evaluate the feasibility of our approach, a fuzzing aspect that mimics \emph{distraction} was implemented
-using PyDySoFu.  The distraction aspect represents deviations in expected behavior when an actor engaged in one task
+using PyDySoFu.  The distraction aspect represents deviations in expected behaviour when an actor engaged in one task
 becomes distracted by another, irrelevant activity and so do not complete later steps in the workflow.  The probability
 of distraction increases as the simulation proceeds, i.e. the probability of moving to an irrelevant task increases the
 longer a simulation has been executing.  For example, a software development team may be distracted from the
@@ -440,13 +440,13 @@ def incomplete_procedure(random, pmf=default_pmf()):
     system.}
   \label{fig:distraction-fuzzer}
 \end{figure}
-The fuzzing aspect is parameterized, so the actual aspect is defined as the inner
+The fuzzing aspect is parameterised, so the actual aspect is defined as the inner
 function \lstinline!_incomplete_procedure!.  The first four lines of the inner function configures a probability mass
 function (PMF) for choosing how many steps should be removed by the aspect, \lstinline!n!, based on the remaining time
 in the simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured
-by the modeler.
+by the modeller.
 
-PyDySoFu is accompanied by a library of aspects from which more complex aspects can be constructed and parameterized.
+PyDySoFu is accompanied by a library of aspects from which more complex aspects can be constructed and parameterised.
 This includes functions for recursing into control structures and selecting and replacing steps based on their position
 in the AST.  These features are exploited in the second part of the fuzzer, which recurses into any nested control
 structures (while, for and try) found in the method and applies a filter to the bodies of these statements, tail first .
@@ -460,7 +460,7 @@ recursion.
 Notice that the fuzzing aspect models the effects of distraction \emph{independently} of its application to a particular
 workflow.  This allows the effects of this deviation in behaviour to be applied transparently to any of the different
 user workflows in the simulation. In the current work, it is not claimed that the implementation of the aspect is
-empirically accurate, rather that it is representative of a qualitatively recognizable phenomena and that the approach
+empirically accurate, rather that it is representative of a qualitatively recognisable phenomena and that the approach
 allows for the effect of the phenomena on a workflow at different severities to be assessed.  Also, it is not claimed
 that distraction is the \emph{only} cause of deviations in behaviour in software development workflows.  Rather, we
 present distraction as an example of a cause of deviation that may affect many different workflows in the same way, and
@@ -480,7 +480,7 @@ use in validation \citet{naylor67verification}.  However, in the context of the 
 evidence does exist, suggesting that Test Driven Development outperforms Waterfall in terms of features delivered and
 software quality
 \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The
-evaluation will therefore adopt a hybrid strategy through the comparision of simulations of ideal and realistic user
+evaluation will therefore adopt a hybrid strategy through the comparison of simulations of ideal and realistic user
 behaviour. Following \citet{naylor67verification}, the model of the problem domain will be tested for
 \emph{plausibility}.  The evaluation will then proceed to test whether two SDLC workflow models perform equivalently
 when executed in ideal circumstances, i.e. that simulations of ideal behaviour do not conform with results presented in
@@ -488,7 +488,7 @@ the literature. Further, the evaluation should demonstrate that the Test Driven 
 Waterfall when user behaviour deviates from the ideal workflow due to the effects of distraction, in conformance with
 the results of empirical studies available in the literature.
 
-Simulations of the problem domain were configured as follows.  A single source of randomness was initialized for each
+Simulations of the problem domain were configured as follows.  A single source of randomness was initialised for each
 configuration with a seed of 1.0 to provide for repeatability of the experiment and to provide for comparison between
 configurations. All configurations were executed for a software development team of 3 actors, with simulations executing
 for a maximum of 500 ticks.  Each configuration was run for 25 different projects.  In order to measure the quality of
@@ -548,7 +548,7 @@ that the simulations of idealised workflows, whilst behaving plausibly, do not c
 literature that TDD should out perform waterfall.
 
 We now proceed to compare the performance of the two software development strategies when subject to deviations in
-behavior caused by distraction. \Cref{fig:fuzzing-features} shows scatter plots for the effect of distraction for
+behaviour caused by distraction. \Cref{fig:fuzzing-features} shows scatter plots for the effect of distraction for
 subsets of workflows on productivity.%
 \begin{figure}[t]
   \centering
@@ -619,7 +619,7 @@ of user behaviour in software development workflows, as found in the available l
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This paper has presented and evaluated a novel approach to modelling and simulating realistic user behaviours when
-interacting with information systems, through the use of model fuzzing aspects.  The novelty of this appraoch is the
+interacting with information systems, through the use of model fuzzing aspects.  The novelty of this approach is the
 ability to model the causes of realistic user behaviour (such as distraction) separately as aspects that can
 subsequently applied flexibly to many different workflows in a simulation. The efficacy of the approach is demonstrated
 in a by showing that the introduction of realistic user behaviour into simulations of software development workflows
@@ -630,10 +630,10 @@ interaction with information systems, in order to better predict emergent socio-
 research is necessary to test the viability of the approach when applied to larger, more complex scale socio-technical
 systems, such as the election e-counting system described by \citet{lock07observations}, comprising whole information
 infrastructures and hundreds or thousands of diverse users.  This will provide opportunities to experiment with a
-variety of other causes of variability in socio-technical system behavior, such as subjective misjudgments, exhaustion,
-misordering of steps and shortcut taking.  Further interdisciplinary research is required to develop and validate the
-realism of socio-technical fuzzing aspects that implement these behaviors. There is a need to link empirical evidence of
-the causes and occurrence of these behaviors to their impact on the operation of workflows.  The overall aim of this
+variety of other causes of variability in socio-technical system behaviour, such as subjective misjudgements, exhaustion,
+reordering of steps and shortcut taking.  Further interdisciplinary research is required to develop and validate the
+realism of socio-technical fuzzing aspects that implement these behaviours. There is a need to link empirical evidence of
+the causes and occurrence of these behaviours to their impact on the operation of workflows.  The overall aim of this
 research agenda is towards simulation techniques that can have predictive capabilities suitable for informing systems
 engineering decisions before resources are committed to construction.  The availability of such tools would do much to
 progress the current craft of large scale socio-technical systems engineering.
