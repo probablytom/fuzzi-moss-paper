@@ -3,39 +3,35 @@
 \documentclass{llncs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{calc}
-\usepackage{showframe}
-
-\usepackage[lighttt]{lmodern}
 
 \usepackage[british]{babel}%
-
-\usepackage{subcaption}
-\captionsetup{compatibility=false}%
-
+\usepackage{calc}%
 \usepackage{cleveref}%
-\usepackage[numbers]{natbib}
 
 \usepackage{listings}
 
-\newlength\listinglinewidth
-\setlength\listinglinewidth\linewidth
-\addtolength\listinglinewidth{-0.5cm}
+\newlength\listinglinewidth%
+\setlength\listinglinewidth\linewidth%
+\addtolength\listinglinewidth{-0.5cm}%
 
-\lstset{language=python}
-\lstset{lineskip=-4pt}
-\lstset{linewidth=\listinglinewidth}
-\lstset{xleftmargin=0.25cm}
-\lstset{basewidth=0.5em}
-\lstset{basicstyle=\ttfamily\footnotesize}
-\lstset{keywordstyle=\ttfamily\bfseries}
-\lstset{frame=single}
+\lstset{language=python}%
+\lstset{lineskip=-4pt}%
+\lstset{linewidth=\listinglinewidth}%
+\lstset{xleftmargin=0.25cm}%
+\lstset{basewidth=0.5em}%
+\lstset{basicstyle=\ttfamily\footnotesize}%
+\lstset{keywordstyle=\ttfamily\bfseries}%
+\lstset{frame=single}%
 
-\usepackage{pgf}
+\usepackage[lighttt]{lmodern}%
+\usepackage[numbers]{natbib}%
+\usepackage{pgf}%
 
-% disable with the [disable] option, which will get rid of all of the todos in
-% the document! Alternatively, pass 'final' as an option to the document class.
+\usepackage{subcaption}
+\captionsetup{compatibility=false}%
 \usepackage[textsize=scriptsize,disable,obeyFinal]{todonotes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\picalc}{\(\pi\)-calculus }
 
