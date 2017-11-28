@@ -202,10 +202,12 @@ with a means of evaluating the effects.
 The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstrate the recognition of
 the need for methods which capture the complexity of user interactions with information systems.  However, to the best
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
-behaviour on the overall system.  Our approach, in recognising that the causes of irregularities in a workflow as cross
-cutting concerns leverages methods established in Software Engineering. The representation of cross cutting concerns
-as aspects has been extensively studied in the Software Engineering literature \citep{Ali2012Aspect}.  However, we are
-unaware of any research that utilises aspect oriented programming techniques in simulation models, either for
+behaviour on the overall system.  Our approach, in recognising that the causes of irregularities in a workflow can be represented as cross
+cutting concerns that alter the execution of the simulation leverages two existing techniques established in software 
+engineering: aspect oriented programming (AOP) and software fuzzing. The representation of cross cutting concerns, such 
+as access control, logging and concurrency
+as program aspects has been extensively studied in the literature \citep{Ali2012Aspect}.  However, we are
+unaware of any research that utilises AOP techniques in simulation models, either for
 socio-technical user behaviours or elsewhere.  Similarly, the use of code fuzzing techniques have been employed
 extensively in quality assurance practices, to assess the impact of deviations in user behaviour on software systems,
 including fuzzing of software configurations at runtime \citep{config_fuzzing}, mutation testing of test suites \cite{demillo78hints}
