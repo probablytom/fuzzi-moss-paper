@@ -14,7 +14,6 @@
     </delete>
    
     <delete dir="working-entries"/>
-    <delete dir="final-entries"/>
     <delete dir="slides-entries"/>
    
   </target>

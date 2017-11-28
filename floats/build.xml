@@ -2,15 +2,9 @@
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
 
-  <target
-      name="clean"
-      description="Remove all non-versioned files.">
+  <target name="clean">
 
     <delete>
-
-      <fileset dir=".">
-	<filename regex=".*\.[0-9]"/>
-      </fileset>
 
       <fileset dir="."
 	       includes="**/*.*~"
@@ -34,46 +28,6 @@
 
     </delete>
 
-  </target>
-
-  <target name="build.gnuplot">
-
-    <apply executable="gnuplot" dir="../">
-      <fileset file="${gnuplot.script}" />      
-      <globmapper 
-	  from="*.gp"
-	  to="${gpdir}/*.tex"
-	/>
-    </apply>
-
-    <pathconvert property="gnuplot.eps.out">
-      <path path="${gnuplot.script}"/>
-      <globmapper
-	  from="*.gp"
-	  to="*.eps" 
-	  />
-    </pathconvert>
-    
-    <apply executable="epstopdf">
-      <fileset file="${gnuplot.eps.out}"/>
-      <globmapper 
-	  from="*.eps"
-	  to="${gpdir}/*.pdf"
-	  />
-    </apply>
-    
-  </target>
-
-  <target name="build.gnuplots.indir">
-    <foreach  target="build.gnuplot" param="gnuplot.script">
-      <fileset dir="${gpdir}" includes="*.gp"/>
-    </foreach>
-  </target>
-  
-  <target name="build.gnuplots">
-     <foreach target="build.gnuplots.indir" param="gpdir">
-       <path><dirset dir="../"/></path>
-    </foreach>
   </target>
 
   <!-- metapost targets -->
@@ -106,6 +60,6 @@
     
   </target>
 
-  <target name="build" depends="build.gnuplots,build.metaposts"/>
+  <target name="build" depends="build.metaposts"/>
 
 </project>
