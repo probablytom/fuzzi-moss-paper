@@ -164,22 +164,19 @@ This section presents a literature review of approaches to modelling the interac
 systems.  Graphical notations have received considerable attention, perhaps due to their perceived efficacy in
 communicating specifications between users, customers and system architects.  Workflow description languages, such as as
 UML activity diagrams \citep{omg07omguml}, BPMN \citep{omg2011omgbpmn} and YAWL \citep{hofstede2010yawl} can be used to
-denote workflows as directed graphs composed of activities.  Various formalisms are used to underpin these notations and
-support analysis.  For example, UML activity diagrams are based on Petri Nets, as is BPMN, but with a richer notation
-for expressing more complex aspects of activities, such as differentiating between tasks, activities and transactions;
+denote workflows as directed graphs composed of activities, as well as forking and merging workflows.  BPMN has a richer notation than activity diagrams, allowing for discrimination between tasks, activities and transactions;
 triggering and orchestrating concurrent activities using messages; the identification of information resources need to
-realise an activity; and the orchestration of activities across organisational boundaries.  Conversely, YAWL is based on
-the \picalc \citep{aalst2004workflow}.  The notation also provides for a richer range of workflow requirements than
+realise an activity; and the orchestration of activities across organisational boundaries. YAWL  also provides for a richer range of workflow requirements than
 activity diagrams, including sophisticated forking and merging rules, separation between workflow specifications and
 executions and resourcing and data requirements.
 
 Describing socio-technical behaviour using workflow notations can be difficult, because of the basic assumption that all
-contingencies in a workflow can be completely described at a given level of granularity, and that more complex details
+paths in a workflow can be completely described at a given level of granularity, and that more complex details
 can be encapsulated within coarser grained modules.  As argued in \Cref{sec:introduction}, socio-technical
 behaviours are inherently highly coupled with cross cutting concerns, making such refinement based techniques difficult
 to apply.  As \citet{israilidis13ignorance} have argued, the `unknowns' in a socio-technical system may be far more
 significant than the `knowns'. Several authors have therefore discussed alternative techniques for modelling
-socio-technical systems with support for contingent behaviour.
+socio-technical systems with support for complexity in behaviour.
 
 Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modelling socio-technical
 systems \cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
@@ -191,13 +188,13 @@ intents allows the inter-dependencies between actors and the overall behaviour o
 the need for explicit models of individual workflows. \citet{herrmann1999vagueness} introduced techniques for annotating
 goal oriented system models with vagueness.  The annotation allows for the distinction between consistent vagueness (due
 to abstraction) and inconsistent vagueness due to omission.  In principle, this approach allows for the identification
-of aspects of a model that are subject to deviation.  However, the notation is not accompanied by a formal semantics,
+of aspects of a model that may be subject to irregularity.  However, the notation is not accompanied by a formal semantics,
 or other means of supporting automated analysis.
 
 Other authors have extended goal oriented approaches to provide greater flexibility. \citet{sommerville09deriving}
 argued that stakeholders often struggle to express their behaviour within a socio-technical system in terms of goals.
 Instead, they argue that the concept of responsibilities, the duties held by an actor in a system, are a more intuitive
-means of describing system behaviours that also capture a variety of contingent behaviours.  Various notational features
+means of describing system behaviours that also capture a variety of contingencies.  Various notational features
 have been provided for extending responsibility modelling, including for linking between responsibilities and required
 resources and for associating indicative workflows \citep{dewsbury07responsibility}.  However, these are not accompanied
 with a means of evaluating the effects.
@@ -205,8 +202,8 @@ with a means of evaluating the effects.
 The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstrate the recognition of
 the need for methods which capture the complexity of user interactions with information systems.  However, to the best
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
-behaviour on the overall system.  Our approach, in recognising that the causes of deviation in a workflow as a cross
-cutting concern leverages off methods established in Software Engineering. The representation of cross cutting concerns
+behaviour on the overall system.  Our approach, in recognising that the causes of irregularities in a workflow as cross
+cutting concerns leverages methods established in Software Engineering. The representation of cross cutting concerns
 as aspects has been extensively studied in the Software Engineering literature \citep{Ali2012Aspect}.  However, we are
 unaware of any research that utilises aspect oriented programming techniques in simulation models, either for
 socio-technical user behaviours or elsewhere.  Similarly, the use of code fuzzing techniques have been employed
