@@ -102,8 +102,8 @@ an experienced developer may omit steps that they consider unnecessary, such as 
 performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
-system, the behaviour of other users or the environment \citep{sommerville09deriving}.  In our example scenario, a
-software development team may begin reducing quality assurance efforts as a deadline for a release approaches, in an
+system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example, a
+software development team may be tempted to begin reducing quality assurance efforts as a deadline for a release approaches, in an
 effort to ensure all required features are completed \citep{beck02test}. Behaviour is also continually evolving, as the
 autonomous actors in a system adapt to new circumstances, discover optimizations to their workflows, adapt the workflow
 to suit local organisational priorities or take shortcuts \citep{bonen79evolutionary}.  In the example scenario, it is
@@ -115,16 +115,16 @@ A system architect must model their workflows as they are intended to be execute
 organisational context any socio-technical system exhibits contingent behaviour which is fundamental to their accurate
 simulation. Conventional systems engineering notations for describing user behaviour, such as BPMN \citep{omg2011omgbpmn},
 activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for efficiently modelling these
-characteristics.  Attempting to model the heterogeneity, contingency and evolution of user behaviour using these
+characteristics.  Attempting to model all the potential sequences of actions that result from realistic user behaviour using these
 approaches inevitably results in models that are either too abstract or narrow to be informative, or too complex to be
-tractable.  Alternative approaches that abstract the complexity of user behaviour, such as i* \citep{yu1995social},
+tractable.  Approaches that abstract the complexity of user behaviour, such as i* \citep{yu1995social},
 Kaos \citep{werneck2009goreistarkaos} and Responsibility Modelling \citep{sommerville09deriving} lack sufficient detail to
-generate executable simulations.
+generate executable simulations.  
 
-The key insight of this paper is that the same deviation in behaviour often affects a number of possible actions.
-Conversely, a given user's behaviour is the combination of their expected ideal behaviour and the set of deviations that
+The key insight of this paper is that the same deviation from idealised behaviour can affect many different workflows.
+Conversely, a given user's behaviour can be modelled as  the combination of expected ideal behaviour and the irregularities that
 affect how that user exhibits their behaviour.  Therefore, \emph{we propose and demonstrate the separate
-modelling of behavioural irregularities from workflows themselves, showing that they are cross-cutting concerns which can
+modelling of behavioural irregularities from workflows themselves, showing that they can be represented as cross-cutting concerns which can
 be applied to an idealised workflow model}.
 
 The two contributions of this paper are as follows:
@@ -132,8 +132,8 @@ The two contributions of this paper are as follows:
 \begin{itemize}
 
 \item A method for simulating user interactions with information systems that allows for the separate modelling of
-  idealised descriptions of workflow and the effects of deviations from those workflows.  We implement our approach in
-  an fuzzing aspects software framework, using a combination of aspect oriented programming \cite{filman01aspect} and
+  idealised descriptions of workflow and the effects of irregularities on those workflows.  We implement our approach in
+  a fuzzing aspects software framework, using a combination of aspect oriented programming \cite{filman01aspect} and
   dynamic code fuzzing \citep{takanen08fuzzing}, allowing us to alter the flow of execution in a workflow description
   without sacrificing readability or simplicity.
 
@@ -148,11 +148,10 @@ The two contributions of this paper are as follows:
 The rest of this paper is structured as follows.  \Cref{sec:related} discusses related work, covering existing
 techniques for modelling socio-technical workflows and the limitations encountered in the literature.  Section
 \ref{sec:case-study} introduces the case study problem domain selected to evaluate our approach, and presents the method
-for constructing models of socio-technical systems and associated workflows. \Cref{sec:fuzzing} describes the
-development of aspect oriented fuzzing of user behaviour described as workflow models, and the software tool developed
+for constructing models of information systems and associated workflows. \Cref{sec:fuzzing} describes the
+development of aspect oriented fuzzing of user behaviour and the software tool developed
 for this purpose.  \Cref{sec:evaluation} presents our evaluation of the case study and Section
-\ref{sec:conclusions} discusses conclusions and future work, as well as noting the potential for applying fuzzing to
-other forms of socio-technical models.
+\ref{sec:conclusions} discusses conclusions and future work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
