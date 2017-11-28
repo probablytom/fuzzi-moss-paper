@@ -93,16 +93,16 @@ Our contention is that these failures arise because systems engineers lack the t
 and accurately simulate the interaction between the information systems and their organisational context, which comprise
 a socio-technical system. Without such facilities, systems engineers cannot predict potential socio-technical system
 behaviour during information system design. Simulating this interaction between the information system and users is
-hard because user behaviour is heterogeneous, contingent and evolutionary, leading to deviations from idealised
+hard because user behaviour is heterogeneous, contingent and evolutionary, leading to irregularities in idealised
 workflows.  Different users have different abilities, training and experiences and can experience phenomena such as
 distraction, misjudgements, exhaustion and confusion that can have significant influence on how and when a user completes
-a task.  For example, a novice developer working within a large team may be unaware of software development best
+a task.  For example, a novice developer working within a large software team may be unaware of software development best
 practices described in a workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely,
 an experienced developer may omit steps that they consider unnecessary, such as peer reviews of their code, to optimise their
 performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
-system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example, a
+system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example scenario, a
 software development team may be tempted to begin reducing quality assurance efforts as a deadline for a release approaches, in an
 effort to ensure all required features are completed \citep{beck02test}. Behaviour is also continually evolving, as the
 autonomous actors in a system adapt to new circumstances, discover optimizations to their workflows, adapt the workflow
@@ -121,7 +121,7 @@ tractable.  Approaches that abstract the complexity of user behaviour, such as i
 Kaos \citep{werneck2009goreistarkaos} and Responsibility Modelling \citep{sommerville09deriving} lack sufficient detail to
 generate executable simulations.  
 
-The key insight of this paper is that the same deviation from idealised behaviour can affect many different workflows.
+The key insight of this paper is that the same behaviourial irregularities can affect many different idealised workflows.
 Conversely, a given user's behaviour can be modelled as  the combination of expected ideal behaviour and the irregularities that
 affect how that user exhibits their behaviour.  Therefore, \emph{we propose and demonstrate the separate
 modelling of behavioural irregularities from workflows themselves, showing that they can be represented as cross-cutting concerns which can
