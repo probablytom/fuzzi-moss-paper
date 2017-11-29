@@ -222,13 +222,13 @@ simulation model at runtime in order to mimic complex user behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we demonstrate our approach to modelling a problem domain and associated idealised workflows in
+In this section we demonstrate our approach to modelling information systems and associated idealised workflows in
 socio-technical systems through a case study.  We have chosen a case study of team based software development, in which
 we will explore the efficacy of two software development lifecycles (SDLC) workflows: Waterfall and Test Driven
 Development (TDD).  The case study was chosen as representative of a socio-technical system, combining different user
 roles (developer, project manager), information systems (version control server and client, and the software development
-effort itself) and a variety of well defined idealised workflows (implementation, testing, debugging etc.).  Further,
-there is a growing consensus amongst software development professionals and academics that TDD is a more resilient SDLC
+effort itself) and a variety of well documented idealised workflows (implementation, testing, debugging etc.).  Further,
+there is a growing consensus amongst software development professionals and in the academic literature that TDD is a more resilient SDLC
 than Waterfall to variable human behaviour
 \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The case
 study therefore provides an opportunity to test whether the modelling approach can be used to distinguish between the
@@ -239,9 +239,9 @@ but the full source code is also available for inspection in the case study's re
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
 study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artefacts in the domain
-implemented as collection of Python classes.  \Cref{fig:domain} shows the class diagram for the problem domain in
+implemented as a collection of Python classes.  \Cref{fig:domain} shows the class diagram for the problem domain in
 the case study.  A software development effort is hosted on a version control system (VCS) server.  Software developers
-interact with the server via VCS client.  Both the server and clients maintain copies of the software system, which must
+interact with the server via a VCS client.  Both the server and clients maintain copies of the software system, which must
 be coordinated through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features,
 representing user-facing specifications of the system's functionality.  Features may be of varying size, requiring more
 or fewer code chunks to be implemented in order to be operational.  Chunks may have dependencies on other chunks in the
@@ -261,13 +261,13 @@ described above and shown in the diagram are implemented as methods in Python cl
 
 \end{figure}
 
-
 The second modelling step is to define user behaviour workflows. These are also implemented as Python classes, collating
-related tasks to operate on a common state. For the purposes of the software development case study, a change management
-workflow was created for interacting with a version control server in an update-resolve-commit cycle, as shown as the
-first class in \Cref{fig:workflows}.  The state for the workflow is the target version control server and a client
-that manages the working copy.  Separate task methods are provided for checking out the client, committing working copy
-changes to the server and resolving conflicts that arise during a commit task.
+related tasks to operate on a common state (the information systems). \Cref{fig:workflows} shows classes for two of the
+workflows created for the case study: change management and implementation.
+The state for the change management workflow is the
+VCS server and a client that manages the working copy.  Separate task methods are provided for
+checking out the client, committing working copy changes to the server and resolving conflicts that arise during a
+commit task.
 
 \begin{figure}
   \centering
@@ -327,21 +327,21 @@ class Implementation(object):
             self.implement_feature(feature, rand)
 
 \end{lstlisting}
-  \caption{Python code for workflows describing software implementation and change management.}
+  \caption{Python code for workflows describing change management and software implementation.}
   \label{fig:workflows}
 
 \end{figure}
 
-Note that many of the functions of the information system may have side effects that are modelled stochastically, such
-as the possibility that a update from the version control server will result in conflicts with another client's commit.
+Note that many of the functions of the information system have side effects that are modelled stochastically, such
+as the possibility that an update from the version control server will result in conflicts with another client's commit.
 The workflows therefore explicitly pass a source of randomness to the information system model when these actions are
 invoked.
 
 Further workflows were implemented for common software development activities: the specification and implementation of
 features in the system; testing; debugging and refactoring (reducing dependencies).  Since workflows are modular they
-can also be organised hierarchically.  \Cref{fig:workflows} also shows this modularity is exploited for the
-implementation workflow. In this example, the workflows for modifying the structure of a software system (for adding
-chunks or tests and so on) depend on the change management workflow in order to coordinate the distribution of changes
+can also be organised hierarchically.  \Cref{fig:workflows} shows how this modularity is exploited for the
+implementation workflow. The other workflows for modifying the structure of a software system (for adding
+chunks or tests and so on) also depend on the change management workflow in order to coordinate the distribution of changes
 within a team.
 
 Two further workflows, Waterfall and Test Driven Development (TDD) were implemented to investigate the performance of
@@ -364,7 +364,7 @@ the software development were configured to draw features to be implemented from
 following TDD.
 
 All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
-problem domain time for controlling task execution and concurrent execution of these tasks by actors.  Task costs are
+problem domain time for controlling task execution and concurrent execution of these tasks by agents.  Task costs are
 denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \cref{fig:workflows}.  The agent
 pauses execution of a task until sufficient ticks from the centralised clock have been received and then resumes execution.
 This mechanism is implemented transparently with respect to workflow classes, easing the modelling burden for the user.
