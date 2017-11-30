@@ -224,7 +224,7 @@ simulation model at runtime in order to mimic complex user behaviour.
 
 In this section we demonstrate our approach to modelling information systems and associated idealised workflows in
 socio-technical systems through a case study.  We have chosen a case study of team based software development, in which
-we will explore the efficacy of two software development lifecycles (SDLC) workflows: Waterfall and Test Driven
+we will explore the efficacy of the workflows of two software development lifecycles (SDLC): Waterfall and Test Driven
 Development (TDD).  The case study was chosen as representative of a socio-technical system, combining different user
 roles (developer, project manager), information systems (version control server and client, and the software development
 effort itself) and a variety of well documented idealised workflows (implementation, testing, debugging etc.).  Further,
@@ -261,7 +261,7 @@ described above and shown in the diagram are implemented as methods in Python cl
 
 \end{figure}
 
-The second modelling step is to define user behaviour workflows. These are also implemented as Python classes, collating
+The second modelling step is to define user behaviour workflows that will be followed by users, represented by agents in the simulation environment. These are also implemented as Python classes, collating
 related tasks to operate on a common state (the information systems). \Cref{fig:workflows} shows classes for two of the
 workflows created for the case study: change management and implementation.
 The state for the change management workflow is the
@@ -378,25 +378,25 @@ and analysis of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we describe our approach to modelling deviations in user behaviour such as distraction using aspect
-oriented dynamic fuzzing of task descriptions.  To achieve this, deviations are modelled as a \emph{dynamic fuzzing
-  aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu monitors the
+In this section we demonstrate our approach to modelling irregularities in user behaviour such as distraction using aspect
+oriented dynamic fuzzing of task descriptions.  To achieve this, an irregularity is modelled as a \emph{dynamic fuzzing
+  aspect} using the library we developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu monitors the
 invocation of workflow task methods in the background during the execution of a simulation.  When a workflow task method
-that is subject to deviations is invoked, PyDySoFu pauses the simulation thread of execution and passes the method
+that can be subject to irregularity is invoked, PyDySoFu pauses the simulation thread of execution and passes the method
 context and structure (represented as the abstract syntax trees of the statements in the method body) to a user defined
 fuzzing function.  The fuzzing function then manipulates the structure of the method AST and context as desired and
 returns the AST to PyDySoFu.  In a final stage, PyDySoFu compiles the altered AST and resumes simulation execution by
 invoking the altered method.  Further implementation details are omitted for brevity, but the full source code of the
-PyDySoFu library is available in the project repository for inspection \cite{storer2016pydysofu-scm}.
+PyDySoFu library and documentation is available in the project repository for inspection \cite{storer2016pydysofu-scm}.
 
 In order to evaluate the feasibility of our approach, a fuzzing aspect that mimics \emph{distraction} was implemented
-using PyDySoFu.  The distraction aspect represents deviations in expected behaviour when an actor engaged in one task
-becomes distracted by another, irrelevant activity and so do not complete later steps in the workflow.  The probability
+using PyDySoFu.  The distraction aspect represents deviations in expected behaviour when a user engaged in one task
+becomes distracted by another, irrelevant activity and so does not complete later steps in the workflow.  The probability
 of distraction increases as the simulation proceeds, i.e. the probability of moving to an irrelevant task increases the
 longer a simulation has been executing.  For example, a software development team may be distracted from the
 implementation of tests and debugging as the pressure to complete a set of features increases, due to an impending
 release deadline.  Conversely, the aspect also allows the probability of distraction to be reduced by increasing the
-concentration of an actor (i.e. actors with better concentration do not get distracted as easily).
+concentration of a simulated user (i.e. users with better concentration do not get distracted as easily).
 
 The implementation of the \lstinline!incomplete_procedure! fuzzing aspect is shown in Figure
 \ref{fig:distraction-fuzzer}.%
@@ -417,7 +417,7 @@ def default_pmf(concentration=1.0):
 def incomplete_procedure(random, pmf=default_pmf()):
 
     def _incomplete_procedure(steps, context):
-        clock = context.actor.clock
+        clock = context.agent.clock
         remaining_time = clock.max_ticks - clock.current_tick
 
         n = pmf(remaining_time, random.uniform(0.0, 0.9999))
@@ -428,7 +428,7 @@ def incomplete_procedure(random, pmf=default_pmf()):
             fuzzer=filter_steps(
               choose_last_steps(n, reapply=False),
               replace_steps_with(
-                replacement='self.actor.idling.idle()'
+                replacement='self.agent.idling.idle()'
               )))
         return fuzzer(steps, context)
 \end{lstlisting}
@@ -439,15 +439,15 @@ def incomplete_procedure(random, pmf=default_pmf()):
 The fuzzing aspect is parameterised, so the actual aspect is defined as the inner
 function \lstinline!_incomplete_procedure!.  The first four lines of the inner function configures a probability mass
 function (PMF) for choosing how many steps should be removed by the aspect, \lstinline!n!, based on the remaining time
-in the simulation and the actor's concentration. The default PMF is shown in the figure, although this can be configured
+in the simulation and the agent's concentration. The default PMF is shown in the figure, although this can be configured
 by the modeller.
 
 PyDySoFu is accompanied by a library of aspects from which more complex aspects can be constructed and parameterised.
 This includes functions for recursing into control structures and selecting and replacing steps based on their position
 in the AST.  These features are exploited in the second part of the fuzzer, which recurses into any nested control
-structures (while, for and try) found in the method and applies a filter to the bodies of these statements, tail first .
+structures (while, for and try) found in the method and applies a filter to the bodies of these statements, tail first.
 The \lstinline!filter_steps! aspect selects up to \lstinline!n! steps to remove from the body and replaces each of them
-with an invocation of \lstinline!idle()!, causing the actor executing the workflow to wait one tick for each replaced
+with an invocation of \lstinline!idle()!, causing the agent executing the workflow to wait one tick for each replaced
 step.  The \lstinline!filter_steps! aspect is then applied successively up through the target AST.  The
 \lstinline!choose_last_steps! filter is configured to track how many steps it has already removed, so that the value of
 \lstinline!n! is calculated across the entire body of the fuzzed task method, rather than at each level in the
@@ -456,10 +456,10 @@ recursion.
 Notice that the fuzzing aspect models the effects of distraction \emph{independently} of its application to a particular
 workflow.  This allows the effects of this deviation in behaviour to be applied transparently to any of the different
 user workflows in the simulation. In the current work, it is not claimed that the implementation of the aspect is
-empirically accurate, rather that it is representative of a qualitatively recognisable phenomena and that the approach
+empirically accurate, rather that it is representative of a qualitatively recognisable phenomena that is better modelled separately from the workflow; and that the approach
 allows for the effect of the phenomena on a workflow at different severities to be assessed.  Also, it is not claimed
-that distraction is the \emph{only} cause of deviations in behaviour in software development workflows.  Rather, we
-present distraction as an example of a cause of deviation that may affect many different workflows in the same way, and
+that distraction is the \emph{only} cause of irregularities in behaviour in software development workflows.  Rather, we
+present distraction as an example of a cause of irregulairty that may affect many different workflows in the same way, and
 demonstrate the approach to modelling it separately as a cross-cutting concern.
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -486,7 +486,7 @@ the results of empirical studies available in the literature.
 
 Simulations of the problem domain were configured as follows.  A single source of randomness was initialised for each
 configuration with a seed of 1.0 to provide for repeatability of the experiment and to provide for comparison between
-configurations. All configurations were executed for a software development team of 3 actors, with simulations executing
+configurations. All configurations were executed for a software development team of 3 agents, with simulations executing
 for a maximum of 500 ticks.  Each configuration was run for 25 different projects.  In order to measure the quality of
 the development built by the simulation, the system was operated 10 times.  The operation of the simulated development
 entails random selection and operation of features for up to 750 features.  If a bug is manifested during operation then
