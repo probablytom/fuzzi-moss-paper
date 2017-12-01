@@ -90,17 +90,17 @@ voting \citep{lock07observations} and stock market trading systems \citep{cftc-s
 failure cannot be attributed to either purely user behaviour or the information system(s), but instead to an interplay
 between both factors within the overall socio-technical system.
 
-Our contention is that these failures arise because systems engineers lack the tools and methods to efficiently model
-and accurately simulate the interaction between the information systems and their organisational context, which comprise
-a socio-technical system. Without such facilities, systems engineers cannot predict potential socio-technical system
-behaviour during information system design. Simulating this interaction between the information system and users is hard
-because user behaviour is heterogeneous, contingent and evolutionary, leading to irregularities in workflows envisaged by systems engineers.
-Different users have different abilities, training and experiences and can experience phenomena such as distraction,
-misjudgements, exhaustion and confusion that can have significant influence on how and when a user completes a task.
-For example, a novice developer working within a large software team may be unaware of software development best
-practices described in a workflow, perhaps forgetting to make frequent commits to a version control server.  Conversely,
-an experienced developer may omit steps that they consider unnecessary, such as peer reviews of their code, to optimise
-their performance.
+The contention in this paper is that these failures arise because systems engineers lack the tools and methods to
+efficiently model and accurately simulate the interaction between the information systems and their organisational
+context, which comprise a socio-technical system. Without such facilities, systems engineers cannot predict potential
+socio-technical system behaviour during information system design. Simulating this interaction between the information
+system and users is hard because user behaviour is heterogeneous, contingent and evolutionary, leading to irregularities
+in workflows envisaged by systems engineers.  Different users have different abilities, training and experiences and can
+experience phenomena such as distraction, misjudgements, exhaustion and confusion that can have significant influence on
+how and when a user completes a task.  For example, a novice developer working within a large software team may be
+unaware of software development best practices described in a workflow, perhaps forgetting to make frequent commits to a
+version control server.  Conversely, an experienced developer may omit steps that they consider unnecessary, such as
+peer reviews of their code, to optimise their performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
 system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example
@@ -133,10 +133,10 @@ The two contributions of this paper are as follows:
 \begin{itemize}
 
 \item A method for simulating user interactions with information systems that allows for the separate modelling of
-  idealised descriptions of workflow and the effects of irregularities on those workflows.  We implement our approach in
+  idealised descriptions of workflows and the effects of irregularities on those workflows.  The approach is implemented in
   a fuzzing aspects software framework, using a combination of aspect oriented programming \cite{filman01aspect} and
-  dynamic code fuzzing \citep{takanen08fuzzing}, allowing us to alter the flow of execution in a workflow description
-  without sacrificing readability or simplicity.
+  dynamic code fuzzing \citep{takanen08fuzzing}, allowing the flow of execution in a workflow description
+  to be altered without sacrificing readability or simplicity.
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
   Waterfall software development workflows.  The case study demonstrates that models of idealised behaviour in software
@@ -171,10 +171,10 @@ activity; and the orchestration of activities across organisational boundaries. 
 workflow requirements than activity diagrams, including sophisticated forking and merging rules, separation between
 workflow specifications and executions and resourcing and data requirements.
 
-Describing socio-technical behaviour using workflow notations can be difficult, because of the basic assumption that all
+Describing realistic user behaviour in workflow notations can be difficult, because of the basic assumption that all
 paths in a workflow can be completely described at a given level of granularity, and that more complex details can be
-encapsulated within coarser grained modules.  As argued in \Cref{sec:introduction}, socio-technical behaviours are
-inherently highly coupled with cross-cutting concerns, making such refinement based techniques difficult to apply.  As
+encapsulated within coarser grained modules.  As argued in \Cref{sec:introduction}, user behaviours are
+inherently complex, making such refinement based techniques difficult to apply.  As
 \citet{israilidis13ignorance} have argued, the `unknowns' in a socio-technical system may be far more significant than
 the `knowns'. Several authors have therefore discussed alternative techniques for modelling socio-technical systems with
 support for complexity in behaviour.
@@ -203,18 +203,20 @@ with a means of evaluating the effects.
 The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstrate the recognition of
 the need for methods which capture the complexity of user interactions with information systems.  However, to the best
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
-behaviour on the overall system. Our observation that the causes of irregularities in workflow execution are separate
-concerns from the model of the workflow itself invites a novel approach to the problem of simulating realistic user
-behaviour. This approach combines dynamic software fuzzing to provide variation in the model and aspect oriented
-programming (AOP) to decouple the behavioural variation from the idealised model. The representation of cross-cutting
-concerns, such as access control, logging and concurrency as program aspects has been extensively studied in the
-literature \citep{Ali2012Aspect}; and the use of code fuzzing techniques have been employed extensively in quality
-assurance practices, to assess the impact of unexpected events on software systems, including fuzzing of software
-configurations at runtime \citep{config_fuzzing}, mutation testing of test suites \cite{demillo78hints} and fuzzing of
-inputs test data to search for software security vulnerabilities \citep{takanen08fuzzing}.  However, we have not
-discovered any similar work on the application of fuzzing techniques to dynamically inject variation into a simulation
-model at runtime in order to mimic complex user behaviour. Similarly, We are unaware of any research that utilises AOP
-techniques in simulation models, either for socio-technical user behaviours or elsewhere.
+behaviour on the overall system. The observation made in \Cref{sec:introduction} that the causes of irregularities in
+workflow execution are separate concerns from the model of the workflow itself invites a novel approach to the problem
+of simulating realistic user behaviour. This approach combines dynamic software fuzzing to provide variation in the
+workflow model; and aspect oriented programming (AOP) to decouple the behavioural variation from the idealised model.
+
+The representation of cross-cutting concerns, such as access control, logging and concurrency as program aspects has
+been extensively studied in the literature \citep{Ali2012Aspect}; and the use of code fuzzing techniques have been
+employed extensively in quality assurance practices, to assess the impact of unexpected events on software systems,
+including fuzzing of software configurations at runtime \citep{config_fuzzing}, mutation testing of test suites
+\cite{demillo78hints} and fuzzing of inputs test data to search for software security vulnerabilities
+\citep{takanen08fuzzing}.  However, we have not discovered any similar work on the application of fuzzing techniques to
+dynamically inject variation into a simulation model at runtime in order to mimic complex user behaviour. Similarly, we
+are unaware of any research that utilises AOP techniques in simulation models, either for socio-technical user
+behaviours or elsewhere.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -230,12 +232,12 @@ Development (TDD).  The case study was chosen as representative of a socio-techn
 roles (developer, project manager), information systems (version control server and client, and the software development
 effort itself) and a variety of well documented idealised workflows (implementation, testing, debugging etc.).  Further,
 there is a growing consensus amongst software development professionals and in the academic literature that TDD is a
-more resilient SDLC than Waterfall to variable human behaviour
+more resilient SDLC than Waterfall to realistic human behaviour
 \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The case
 study therefore provides an opportunity to test whether the modelling approach can be used to distinguish between the
 effects of idealised and realistic user behaviours in a socio-technical system.  The model is implemented in an agent
 oriented framework, Theatre\_Ag, written in Python.  Fragments of the case study are provided as examples, but the full
-source code is also available for inspection in the case study's repository \cite{storer2016softdev-workflow-scm}.
+source code is also available for inspection \cite{storer2016softdev-workflow-scm}.
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
 study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artefacts in the domain implemented
@@ -246,11 +248,11 @@ through a VCS update, conflict-resolve, commit cycle.  Software systems are comp
 user-facing specifications of the system's functionality.  Features may be of varying size, requiring more or fewer code
 chunks to be implemented in order to be operational.  Chunks may have dependencies on other chunks in the system.  Each
 time a new chunk is added to a feature other chunks may also need to be modified, potentially creating further
-dependencies between chunks or introducing bugs.  Bugs may manifest themselves when the feature they are associated with
-is operated or exercised through the execution of tests.  Features can be debugged, resulting in the removal of detected
-bugs.  Consequently, the more tests created for a feature, the greater the probability of detecting a given bug, easing
-the process of debugging a feature or overall system. All of the information system behaviours described above and shown
-in the diagram are implemented as methods in Python classes.
+dependencies between chunks or introducing bugs.  Features can be operated, causing some of the underlying chunks and
+any dependencies to also be operated.  Bugs may become manifest during chunk operation, or through the execution of
+tests.  Features can be debugged, resulting in the removal of detected bugs.  Consequently, the more tests created for a
+feature, the greater the probability of detecting a given bug, easing the process of debugging. All of the information
+system behaviours described above and shown in the diagram are implemented as methods in Python classes.
 
 \begin{figure}[t]
   \centering
@@ -364,11 +366,11 @@ following TDD.
 
 All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
 problem domain time for controlling task execution and concurrent execution of these tasks by agents.  Task costs are
-denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \cref{fig:workflows}.  The agent pauses
-execution of a task until sufficient ticks from the centralised clock have been received and then resumes execution.
-This mechanism is implemented transparently with respect to workflow classes, easing the modelling burden for the user.
-The execution of tasks and their duration is logged in a tree-like structure by each agent, supporting later inspection
-and analysis of behaviour.
+denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \Cref{fig:workflows}.  The agent pauses
+execution of a task until sufficient ticks from the clock have been received and then resumes execution.  This mechanism
+is implemented transparently with respect to workflow classes, easing the modelling burden.  The execution
+of tasks and their duration is logged in a tree-like structure by each agent, supporting later inspection and analysis
+of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
