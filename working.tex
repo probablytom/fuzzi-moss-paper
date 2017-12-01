@@ -242,11 +242,9 @@ oriented framework, Theatre\_Ag, written in Python.  Fragments of the case study
 source code is also available for inspection \cite{storer2016softdev-workflow-scm}.
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
-study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artefacts in the domain implemented
-as a collection of Python classes.  \Cref{fig:domain} shows the class diagram
-for the problem domain in the case study.
-
-A software development effort is hosted on a version control system (VCS) server.  Software developers interact with the
+study. The domain is modelled as a collection of Python classes, as shown in \Cref{fig:domain}, following an object oriented approach
+\cite{omg07omguml}.  
+ The core information system is a version control server (VCS) which hosts the software development effort.  Software developers interact with the
 server via a VCS client.  Both the server and clients maintain copies of the software system, which must be coordinated
 through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features, representing
 user-facing specifications of the system's functionality.  Features may be of varying size, requiring more or fewer code
