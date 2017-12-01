@@ -82,7 +82,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Information systems are operated within a wider organisational context, characterised by the needs, demands and
-behaviours of individual users, interpersonal relationships, organisational structures, business processes, legal or
+behaviours of individual users, interpersonal relationships, organisational structures, business processes, legal and
 regulatory standards, and cultural norms \citep{bade07structures,pentland05organisational}.  The influence of this
 \emph{socio-technical} interplay on system behaviour (and often failure) has been described in multiple and diverse case
 studies of information systems, including automated emergency vehicle dispatch \citep{robinson96limited}, electronic
@@ -102,7 +102,7 @@ unaware of software development best practices described in a workflow, perhaps 
 version control server.  Conversely, an experienced developer may omit steps that they consider unnecessary, such as
 peer reviews of their code, to optimise their performance.
 
-Information system users may also adapt their behaviour due to contingencies that arise due to faults in the information
+Information system users may also adapt their behaviour due to contingencies that arise from faults in the information
 system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example
 scenario, a software development team may be tempted to begin reducing quality assurance efforts as a deadline for a
 release approaches, in an effort to ensure all required features are completed \citep{beck02test}. Behaviour is also
@@ -112,9 +112,10 @@ the example scenario, it is reasonable to anticipate that a novice developer's b
 of an expert as they gain more experience.  As a consequence, the de facto behaviour exhibited within a system may
 differ from that envisaged by system architects in idealised workflows.
 
-A system architect must model their workflows as they are intended to be executed in practice, yet due to their
-organisational context any socio-technical system exhibits contingent behaviour which is fundamental to their accurate
-simulation. Conventional systems engineering notations for describing user behaviour, such as BPMN
+A system architect must model their workflows as they are intended to be
+executed in practice, but their organisational context introduces contingent behaviour which is
+fundamental to the workflow's accurate simulation and proves cumbersome to model with
+existing techniques.  Conventional systems engineering notations for describing user behaviour, such as BPMN
 \citep{omg2011omgbpmn}, activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for
 efficiently modelling these characteristics.  Attempting to model all the potential sequences of actions that result
 from realistic user behaviour using these approaches inevitably results in models that are either too abstract or narrow
@@ -133,10 +134,12 @@ The two contributions of this paper are as follows:
 \begin{itemize}
 
 \item A method for simulating user interactions with information systems that allows for the separate modelling of
-  idealised descriptions of workflows and the effects of irregularities on those workflows.  The approach is implemented in
-  a fuzzing aspects software framework, using a combination of aspect oriented programming \cite{filman01aspect} and
-  dynamic code fuzzing \citep{takanen08fuzzing}, allowing the flow of execution in a workflow description
-  to be altered without sacrificing readability or simplicity.
+  idealised descriptions of workflows and the effects of irregularities on those
+  workflows.  The approach is implemented in a framework comprising of aspect oriented
+  programming \cite{filman01aspect} and dynamic code fuzzing
+  \citep{takanen08fuzzing}. It is demonstrated that this combination allows for
+  the flow of workflow execution to be altered without sacrificing readability
+  or simplicity.
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
   Waterfall software development workflows.  The case study demonstrates that models of idealised behaviour in software
@@ -164,8 +167,9 @@ This section presents a literature review of approaches to modelling the interac
 systems.  Graphical notations have received considerable attention, perhaps due to their perceived efficacy in
 communicating specifications between users, customers and system architects.  Workflow description languages, such as as
 UML activity diagrams \citep{omg07omguml}, BPMN \citep{omg2011omgbpmn} and YAWL \citep{hofstede2010yawl} can be used to
-denote workflows as directed graphs composed of activities, as well as forking and merging workflows.  BPMN has a richer
-notation than activity diagrams, allowing for discrimination between tasks, activities and transactions; triggering and
+denote workflows visually as directed graphs composed of activities, as well as
+forking and merging workflows.  Although activity diagrams are more widely
+adopted than BPMN, the latter provides a richer modelling notation, allowing for discrimination between tasks, activities and transactions; triggering and
 orchestrating concurrent activities using messages; the identification of information resources need to realise an
 activity; and the orchestration of activities across organisational boundaries. YAWL also provides for a richer range of
 workflow requirements than activity diagrams, including sophisticated forking and merging rules, separation between
@@ -176,10 +180,10 @@ paths in a workflow can be completely described at a given level of granularity,
 encapsulated within coarser grained modules.  As argued in \Cref{sec:introduction}, user behaviours are
 inherently complex, making such refinement based techniques difficult to apply.  As
 \citet{israilidis13ignorance} have argued, the `unknowns' in a socio-technical system may be far more significant than
-the `knowns'. Several authors have therefore discussed alternative techniques for modelling socio-technical systems with
-support for complexity in behaviour.
+the `knowns'. 
 
-Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modelling socio-technical
+Several authors have therefore discussed alternative techniques for modelling socio-technical systems with
+support for complexity in behaviour.  Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modelling socio-technical
 systems \cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
 system actors are seeking to achieve.  Goals can be de-composed into a sub-goal hierarchy using logical operators to
 express the form of decomposition. Goals can also be annotated with strategies and/or resource requirements to support
@@ -205,8 +209,8 @@ the need for methods which capture the complexity of user interactions with info
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
 behaviour on the overall system. The observation made in \Cref{sec:introduction} that the causes of irregularities in
 workflow execution are separate concerns from the model of the workflow itself invites a novel approach to the problem
-of simulating realistic user behaviour. This approach combines dynamic software fuzzing to provide variation in the
-workflow model; and aspect oriented programming (AOP) to decouple the behavioural variation from the idealised model.
+of simulating realistic user behaviour. This approach combines dynamic software fuzzing, which provides variation in the
+workflow model, with aspect oriented programming (AOP), to decouple this behavioural variation from the idealised model.
 
 The representation of cross-cutting concerns, such as access control, logging and concurrency as program aspects has
 been extensively studied in the literature \citep{Ali2012Aspect}; and the use of code fuzzing techniques have been
@@ -241,7 +245,9 @@ source code is also available for inspection \cite{storer2016softdev-workflow-sc
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
 study. An object oriented approach to modelling is adopted \cite{omg07omguml}, with artefacts in the domain implemented
-as a collection of Python classes.  \Cref{fig:domain} shows the class diagram for the problem domain in the case study.
+as a collection of Python classes.  \Cref{fig:domain} shows the class diagram
+for the problem domain in the case study.
+
 A software development effort is hosted on a version control system (VCS) server.  Software developers interact with the
 server via a VCS client.  Both the server and clients maintain copies of the software system, which must be coordinated
 through a VCS update, conflict-resolve, commit cycle.  Software systems are composed of features, representing
