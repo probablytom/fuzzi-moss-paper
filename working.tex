@@ -112,12 +112,10 @@ the example scenario, it is reasonable to anticipate that a novice developer's b
 of an expert as they gain more experience.  As a consequence, the de facto behaviour exhibited within a system may
 differ from that envisaged by system architects in idealised workflows.
 
-A system architect must model their workflows as they are intended to be
-executed in practice, but their organisational context introduces contingent behaviour which is
-fundamental to the workflow's accurate simulation and proves cumbersome to model with
-existing techniques.  Conventional systems engineering notations for describing user behaviour, such as BPMN
-\citep{omg2011omgbpmn}, activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl} lack features for
-efficiently modelling these characteristics.  Attempting to model all the potential sequences of actions that result
+Despite the potential impact on system performance, the complexity of user behaviour is cumbersome to model and
+therefore predict using conventional systems engineering notations for describing workflows, such as  as BPMN
+\citep{omg2011omgbpmn}, activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl}.
+Attempting to model all the potential sequences of actions that result
 from realistic user behaviour using these approaches inevitably results in models that are either too abstract or narrow
 to be informative, or too complex to be tractable.  Approaches that abstract the complexity of user behaviour, such as
 i* \citep{yu1995social}, Kaos \citep{werneck2009goreistarkaos} and Responsibility Modelling
@@ -137,8 +135,8 @@ The two contributions of this paper are as follows:
   idealised descriptions of workflows and the effects of irregularities on those
   workflows.  The approach is implemented in a framework comprising of aspect oriented
   programming \cite{filman01aspect} and dynamic code fuzzing
-  \citep{takanen08fuzzing}. It is demonstrated that this combination allows for
-  the flow of workflow execution to be altered without sacrificing readability
+  \citep{takanen08fuzzing}.  This combination allows for irregularities to be introduced into workflow models
+  without sacrificing readability
   or simplicity.
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
