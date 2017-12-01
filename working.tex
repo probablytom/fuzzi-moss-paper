@@ -370,7 +370,11 @@ following TDD.
 
 All task execution is coordinated relative to a single simulation clock, enabling both the explicit representation of
 problem domain time for controlling task execution and concurrent execution of these tasks by agents.  Task costs are
-denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \Cref{fig:workflows}.
+denoted using the \lstinline!@default_cost! decorator in a workflow as shown in \Cref{fig:workflows}.  The agent pauses
+execution of a task until sufficient ticks from the clock have been received and then resumes execution.  This mechanism
+is implemented transparently with respect to workflow classes, easing the modelling burden.  The execution of tasks and
+their duration is logged in a tree-like structure by each agent, supporting later inspection and analysis of behaviour.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
