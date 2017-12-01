@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<project basedir="." default="build" name="wallis2016simulating-socio-technical-variance-using-executable-workflow-fuzzing">
+<project basedir="." default="build" name="Wallis_2016_Modelling_Realistic_User_Behaviour_in_Information_Systems_Simulation_Models_as_Fuzzing_Aspects">
   
   <target name="clean">
     <ant dir="floats" target="clean"/>
