@@ -374,26 +374,25 @@ of behaviour.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Modelling Deviation in Behaviour as Fuzzing Aspects}
+\section{Modelling Irregularity in Behaviour as Fuzzing Aspects}
 \label{sec:fuzzing}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-In this section we demonstrate our approach to modelling irregularities in user behaviour such as distraction using
-aspect oriented dynamic fuzzing of task descriptions.  To achieve this, an irregularity is modelled as a \emph{dynamic
-  fuzzing aspect} using the library we developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu
+In this section the approach to modelling irregularities in user behaviour is demonstrated.  To achieve this, an irregularity is modelled as a \emph{dynamic
+  fuzzing aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu
 interrupts the invocation of workflow task methods in the background during the execution of a simulation.  When a
 workflow task method that can be subject to irregularity is invoked, PyDySoFu pauses the simulation thread of execution
 and passes the method context and structure (represented as the abstract syntax trees of the statements in the method
-body) to a user defined fuzzing function.  The fuzzing function then manipulates the structure of the method AST and
+body) to a modeller defined fuzzing function.  The fuzzing function then manipulates the structure of the method AST and
 context as desired and returns the AST to PyDySoFu.  In a final stage, PyDySoFu compiles the altered AST and resumes
 simulation execution by invoking the altered method.  Further implementation details are omitted for brevity, but the
-full source code of the PyDySoFu library and documentation is available in the project repository for inspection
+full source code of the PyDySoFu library and documentation is available for inspection
 \cite{storer2016pydysofu-scm}.
 
-In order to evaluate the feasibility of our approach, a fuzzing aspect that mimics \emph{distraction} was implemented
-using PyDySoFu.  The distraction aspect represents deviations in expected behaviour when a user engaged in one task
-becomes distracted by another, irrelevant activity and so does not complete later steps in the workflow.  The
+In order to evaluate the feasibility of the approach, a fuzzing aspect that mimics \emph{distraction} was implemented
+using PyDySoFu.  The distraction aspect represents irregularities in expected behaviour when a user engaged in one task
+becomes distracted by another, irrelevant activity and so does not complete later steps in the intended workflow.  The
 probability of distraction increases as the simulation proceeds, i.e. the probability of moving to an irrelevant task
 increases the longer a simulation has been executing.  For example, a software development team may be distracted from
 the implementation of tests and debugging as the pressure to complete a set of features increases, due to an impending
@@ -458,7 +457,7 @@ step.  The \lstinline!filter_steps! aspect is then applied successively up throu
 recursion.
 
 Notice that the fuzzing aspect models the effects of distraction \emph{independently} of its application to a particular
-workflow.  This allows the effects of this deviation in behaviour to be applied transparently to any of the different
+workflow.  This allows the effects of this irregular behaviour to be applied transparently to any of the different
 user workflows in the simulation. In the current work, it is not claimed that the implementation of the aspect is
 empirically accurate, rather that it is representative of a qualitatively recognisable phenomena that is better modelled
 separately from the workflow; and that the approach allows for the effect of the phenomena on a workflow at different
@@ -500,7 +499,7 @@ length of the average trace of the operations of the system was recorded as the 
 feature) and large (4 chunks per feature). Both the Waterfall and TDD SDLC workflows were simulated.  In either case,
 the incomplete procedure distraction aspect was applied to either the high level software development workflow, or to
 the set of lower level development activity workflows (implementation, change management etc.).  The aspect was applied
-using concentration values between 0.001 and 5.0.  Simulations results are stored in the study repository
+using concentration values between 0.001 and 5.0.  Raw simulations results are available for inspection
 \citep{storer2016softdev-workflow-scm}.
 
 In the first part of the evaluation, simulations of the software development workflow were considered for ideal
@@ -617,8 +616,9 @@ This paper has presented and evaluated a novel approach to modelling and simulat
 interacting with information systems, through the use of model fuzzing aspects.  The novelty of this approach is the
 ability to model the causes of realistic user behaviour (such as distraction) separately as aspects that can
 subsequently be applied flexibly to many different workflows in a simulation. The efficacy of the approach is
-demonstrated by showing that the introduction of realistic user behaviour into simulations of software development
-workflows gives results that better conform with empirical evidence available in the literature.
+demonstrated by showing that the introduction of realistic user behaviour into simulations of software development gives
+results that better conform with results in the literature, without requiring alterations to the
+existing models of ideal workflows.
 
 This proof of concept presents the opportunity for a substantial research agenda in the modelling and simulation of user
 interaction with information systems, in order to better predict emergent socio-technical system properties. Further
@@ -632,7 +632,7 @@ conceivable. There is a need to link empirical evidence of the causes and occurr
 impact on a workflow's simulation and real-world execution.
 
 The overall aim of this research agenda is towards simulation techniques that can have predictive capabilities suitable
-for informing systems engineering decisions before resources are committed to construction.  The availability of such
+for informing systems engineering decisions, before resources are committed to construction.  The availability of such
 tools would do much to progress the current craft of large scale information systems engineering.
 
 
