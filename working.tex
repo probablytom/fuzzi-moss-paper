@@ -24,7 +24,7 @@
 \lstset{frame=single}%
 
 \usepackage[lighttt]{lmodern}%
-\usepackage[numbers]{natbib}%
+\usepackage[numbers,sectionbib]{natbib}%
 \usepackage{pgf}%
 
 \usepackage{subcaption}
@@ -43,9 +43,9 @@
 
 \title{Modelling Realistic User Behaviour in Information Systems Simulation Models as Fuzzing Aspects}
 
-\titlerunning{Modelling Realistic User Behaviour in Information Systems}
+\titlerunning{}
 
-\author{Tom Wallis\orcidID{} \and Tim Storer\orcidID{}}
+\author{Tom Wallis \and Tim Storer}  % Does Tim need his orcidID in here?
 
 \authorrunning{Wallis and Storer}
 
@@ -72,9 +72,6 @@
   in that behaviour as aspects which fuzz the model. We demonstrate the success of this approach through a case study of
   software development workflows, showing that the introduction of realistic user behaviour to idealised workflows
   better simulates outcomes reported in the empirical software engineering literature.
-
-  \keywords{Behaviour modelling, Simulation, Socio-technical systems, Dynamic software fuzzing, Aspect oriented modelling}
-
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,7 +141,7 @@ The two contributions of this paper are as follows:
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
   Waterfall software development workflows.  The case study demonstrates that models of idealised behaviour in software
-  development do not conform with the empirical evidence which suggests that TDD out performs Waterfall
+  development do not conform with the empirical evidence which suggests that TDD outperforms Waterfall
   \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}, but that
   models which incorporate realistic user behaviour when interacting with information systems do.
 
@@ -478,12 +475,12 @@ cross-cutting concern.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This section presents the results of applying the user behaviour fuzzing method to the case study.  Evaluating the
+This section presents the results of applying the user behaviour fuzzing method to the case study. Evaluating the
 correctness of simulation techniques intended for large scale systems is notoriously difficult, since the usual
 rationale for developing the simulation is the lack of available empirical observations of the real world phenomena
-\cite{naylor67verification}.  However, in the context of the case study, limited empirical evidence does exist that
-suggests TDD outperforms Waterfall in terms of features delivered and software quality
-\citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}.  The
+\cite{naylor67verification}. However, in the context of the case study, limited empirical evidence exists that suggests
+TDD outperforms Waterfall in terms of features delivered and software quality
+\citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}. The
 evaluation will therefore adopt a hybrid strategy.
 
 Following \citet{naylor67verification}, the model of the problem domain will first be tested for \emph{plausibility}.  A
@@ -532,20 +529,19 @@ simulations to establish problem domain plausibility.  \Cref{fig:no-fuzzing:feat
   \label{fig:no-fuzzing}
 \end{figure}
 shows that there is an exponential increase in the number of commits to the version control server as project size
-increases.  This result is to be expected due to the exponential increase in the number of additional modifications,
-tests, debugging and refactoring activities that would be required as a project grows in scale.  Similarly, Figure
-\ref{fig:no-fuzzing:mtf} shows a decline in project quality (a reduction in the MTF from 300 to just above 0 and then
-stabilising for projects with more than 12 chunks) as project size increases.  Again, the additional complexity of
-larger projects increases the probability of a bug causing a system failure.
-These results strengthen the claim that the model of the problem domain is plausible.
+increases. This result is to be expected due to the exponential increase in the number of additional modifications,
+tests, debugging and refactoring activities that would be required as a project grows in scale. Similarly, Figure
+\ref{fig:no-fuzzing:mtf} shows a decline in project quality (a reduction in the MTF from 300 to just above 0) as project
+size increases. Again, the additional complexity of larger projects increases the probability of a bug causing a system
+failure. These results strengthen the claim that the model of the problem domain is plausible.
 
 A further observation from the figures is that TDD and Waterfall workflows perform equivalently when workflows are not
 subject to user distraction.  When ideal workflows are executed for both Waterfall (blue) and TDD (red), the results
-show that a similar number of project commits are recorded and a similar MTF achieved.  This confirms the expectation
+show similar metrics for each.  This confirms the expectation
 that the simulations of idealised workflows, while behaving plausibly, do not conform with expectations from the
-literature that TDD should out perform Waterfall.
+literature that TDD should outperform Waterfall.
 
-We now proceed to compare the performance of the two software development
+We now proceed to compare the performance of the two 
 strategies when subject to behavioural irregularity
 caused by distraction. \Cref{fig:fuzzing-features} shows scatter plots for the effect of distraction for
 subsets of workflows on productivity.%
@@ -574,12 +570,11 @@ In both plots, the number of features implemented is plotted against the total n
 fuzzing (Waterfall in blue, TDD in red). \Cref{fig:fuzzing-features:WF} shows the effect when only the high level
 software development workflow (Waterfall or TDD) is fuzzed, whereas \Cref{fig:fuzzing-features:CTIDR} shows the effect
 of fuzzing lower level activities (change management, implementation, testing, debugging and refactoring). Both figures
-clearly demonstrate that increasing distraction causes a decline in the number of completed features. However, in both
+clearly demonstrate that increasing distraction reduces the number of completed features. However, in both
 configurations, TDD is more resilient to distraction fuzzing than Waterfall, with a larger proportion of features
-implemented. The decline in feature implementation when either workflow is fuzzed appears to be highly linear, with a
-far steeper decline for Waterfall than for TDD. In \Cref{fig:fuzzing-features}, both SDLC workflows appear to be largely
-immune to distraction up to the removal of approximately 100 statements, after which feature completion declines, with
-steeper declines for Waterfall.
+implemented as steps are removed. In \Cref{fig:fuzzing-features}, both SDLC workflows appear to be largely immune to
+distraction until around 100 steps are removed, after which feature completion declines, with steeper declines for
+Waterfall.
 
 \Cref{fig:fuzzing-mtf} shows the effect of distraction on MTF, again distinguishing between Waterfall (blue) and TDD
 (red) SDLCs.  In these plots, both workflow fuzzing configurations described above are plotted together, as their
@@ -594,6 +589,8 @@ realistic simulations of user behaviour in software development workflows, as fo
   \hfill
   \begin{subfigure}{2.3in}
     \fbox{\includegraphics{floats/mtf_against_total_fuzz_projects_small}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     \caption{Small projects.}
   \end{subfigure}
   \hfill
@@ -618,28 +615,31 @@ realistic simulations of user behaviour in software development workflows, as fo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This paper has presented and evaluated a novel approach to modelling and simulating realistic user behaviours when
-interacting with information systems, through the use of model fuzzing aspects.  The novelty of this approach is the
+interacting with information systems, through the use of model fuzzing aspects. The novelty of this approach is the
 ability to model the causes of realistic user behaviour (such as distraction) separately as aspects that can
-subsequently be applied flexibly to many different workflows in a simulation. The efficacy of the approach is
-demonstrated by showing that the introduction of realistic user behaviour into simulations of software development gives
-results that better conform with results in the literature, without requiring alterations to the
-existing models of ideal workflows.
+be applied flexibly to many different workflows in a simulation. The efficacy of the approach is
+demonstrated in the introduction of realistic user behaviour to an example system simulation, which better conforms with
+results in the literature without altering the original workflows.
 
 This proof of concept presents the opportunity for a substantial research agenda in the modelling and simulation of user
-interaction with information systems, in order to better predict emergent socio-technical system properties. Further
-research is necessary to test the viability of the approach when applied to larger, more complex socio-technical
-systems, such as the election e-counting system described by \citet{lock07observations}, comprising whole information
-infrastructures and hundreds or thousands of diverse users.  This will provide opportunities to experiment with a
-variety of other causes of irregularity in user behaviour, such as subjective misjudgements, exhaustion, reordering of
-steps and shortcut taking.  Interdisciplinary research is required to develop and validate the realism of the fuzzing
-aspects that implement these user behaviours, and a library of pre-validated aspects made available to ease modelling is
-conceivable. There is a need to link empirical evidence of the causes and occurrences of these behaviours to their
-impact on a workflow's simulation and real-world execution.
+interaction with information systems, in order to better predict emergent system properties. Further research is
+necessary to test the viability of the approach in more complex, large scale simulations, such as
+the election e-counting system described by \citet{lock07observations}, comprising whole information infrastructures and
+many diverse users. This will provide opportunities to experiment with a variety of other causes of
+irregularity in user behaviour, such as subjective misjudgements, exhaustion, reordering of steps and shortcut taking.
+Interdisciplinary research is required to develop and validate the realism of the fuzzing aspects that implement these
+user behaviours, and a library of pre-validated aspects could be made available to ease modelling. There is a need to
+link empirical evidence of the causes and occurrences of these behaviours to their impact on a workflow's simulation and
+real-world execution.
 
 The overall aim of this research agenda is towards simulation techniques that can have predictive capabilities suitable
-for informing systems engineering decisions, before resources are committed to construction.  The availability of such
-tools would do much to progress the current craft of large scale information systems engineering.
+for informing systems engineering decisions, before resources are allocated toward them. Such tools would do much to
+progress the current craft of large scale information systems engineering.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section*{Acknowledgements}
+The authors would especially like to thank Gordon Baxter, Phil Trinder and
+Russell Lock for their help when revising this paper.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -648,9 +648,6 @@ tools would do much to progress the current craft of large scale information sys
 \bibliography{references,repositories}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 
 
 \end{document}
