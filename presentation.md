@@ -3,7 +3,7 @@
 % Aberystwyth, April 2018
 
 ---
-header-includes:     "<style type='text/css'>.reveal h1, .reveal h2, .reveal h3 {text-transform: none;} .reveal h1 {font-size: 1.5em; } .floatleft {float: left} </style>"
+header-includes:     "<style type='text/css'>.reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none; text-align:left} .reveal h1 {font-size: 1.5em; } .floatleft {float: left} </style>"
 
 ---
 
@@ -11,10 +11,10 @@ header-includes:     "<style type='text/css'>.reveal h1, .reveal h2, .reveal h3 
 ## About me
 
 :::::::::::::: {.columns}
-::: {.column width="50%"}
+::: {.column width="60%"}
 contents...
 :::
-::: {.column width="50%"}
+::: {.column width="40%"}
 ![](tim.jpg)
 :::
 ::::::::::::::
@@ -24,7 +24,7 @@ contents...
 ## Designing for user in <br/> Socio-Technical Systems
 
 :::::::::::::: {.columns}
-::: {.column style="width: 60%; text-align: left"}
+::: {.column style="width: 60%; text-align: left; float: left"}
 
 Users really *are* the problem. Behaviour is:
 
@@ -43,11 +43,11 @@ Users really *are* the problem. Behaviour is:
 ## Trying to predict the impact of user behaviour is *really hard*
 
 :::::::::::::: {.columns}
-::: {.column width="60%"}
+:::{.column style="width: 60%; text-align: left; float: left"}
 
- * Idealised models are not representative
- * Stochastic models lack detail.
- * Detailed workflow models are intractable.
+ * Idealised models miss vital nuance in real world behaviour.
+ * Stochastic models depend on behaviour being homogeneous.
+ * Detailed workflow models quickly become intractable.
 :::
 ::: {.column width="30%"}
 ![](ambulance.jpg)
@@ -59,20 +59,20 @@ Users really *are* the problem. Behaviour is:
 ## Coping Strategies in Information Systems Engineering
 
 :::::::::::::: {.columns}
-::: {.column width="50%"}
+::: {.column style="width:40%; text-align: left; float: left"}
 
  * Build, fail, rebuild
  * Trial, error and revision
  * Workarounds
 :::
-::: {.column width="30%"}
+::: {.column tyle="width:55%; text-align: left; float: left"}
 ![](heathrow.jpg)
 :::
 ::::::::::::::
 
 ---
 
-## Intuition: Variability, contingency and adaption in user behaviour is a cross cutting concern.
+## Intuition: *Variability, contingency and adaption in user behaviour is a cross cutting concern.*
 
 The same causes of variability affect many different workflows, so apply their effects as fuzzing aspects to functional descriptions of workflow behaviours.
 
@@ -86,25 +86,70 @@ Develop a modelling technique that enables a separation of concerns between mode
 
 ---
 
-## Case Study Selection
+## Case Study Selection - Team Based Software Development
+
+:::::::::::::: {.columns}
+:::{.column style="width: 50%; text-align: left; float: left; font-size:24pt"}
+
+ * Actors have different roles
+ * Development work coordinated around a centralised VCS.
+ * Well defined ideal workflows, but with potential for variability
+ * Different coordination workflows possible
+ * Limited empirical evidence as to efficacy of different workflows [George & Williams,Israilidis et al., Bhat, T. & Nagappan].
+
+:::
+:::{.column style="width: 45%; text-align: center; float: right"}
+![](agile.png)
+:::
+::::::::::::::
+
+
+:::{.notes}
+
+ * developer, project manager
+ * change management, specification, implementation, testing, debugging, refactoring
+ * Waterfall, TDD
+
+:::
 
 ----
 
 ## Domain Model
 
----
-
-## Modelling Predictable Domain Properties
+<img src="floats/full-class-diagram-1.jpg" alt="" style="width: 80%;"/>
 
 ---
 
-## Workflow Model
+### Modelling Predictable Domain Properties - Debugging a Code Chunk
+
+```
+    def debug(self, random, bug=None):
+
+        if len(self.bugs) == 0:
+            return False
+
+        if bug is None or bug not in self.bugs:
+            if random.unknown_bug_should_be_removed(self):
+                bug = random.choose_bug(self)
+                self.bugs.remove(bug)
+        elif random.known_bug_should_be_removed(self):
+            self.bugs.remove(bug)
+
+```
+
+---
+
+## Workflow Class Model
+
+![](floats/workflow-classes-1.jpg)
 
 ---
 
 ## Workflow Modelling Example - Change Management
 
 ---
+
+### ... and the code
 
 ## Workflow Modelling Example - Debugging
 
