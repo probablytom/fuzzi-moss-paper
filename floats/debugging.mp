@@ -17,29 +17,27 @@ iAssoc.iFont.name := "t1-zi4r-7";
 
 beginfig(1);
 
-  Begin.beginChangeManagement;
+  Begin.beginDebug;
 
   Branch.WhileTrue;
 
-  End.endChangeManagement;
+  End.endDebug;
 
 %%%
 
   Begin.beginTry;
   
-  Activity.UpdateA("update");
-
-  Activity.Commit("commit");
+  Activity.testExercise("exercise","test");
 
   Activity.Break("break");
 
   End.endTry;
 
-  leftToRight(30)(beginTry, Commit);
-  topToBottom(30)(Commit, UpdateA, Break);
+  leftToRight(30)(beginTry, testExercise);
+  topToBottom(30)(testExercise, Break);
   leftToRight(30)(endTry,Break);
   
-  Group.TryBlock(beginTry, Commit, UpdateA, Break, endTry);
+  Group.TryBlock(beginTry, testExercise, Break, endTry);
 
   SuperActivity.Try("try")(TryBlock);
 
@@ -47,20 +45,18 @@ beginfig(1);
 
   Begin.beginExcept;
 
-  Activity.UpdateB("update");
-
-  Branch.ForConflict;
+  Activity.Debug("debug");
   
-  Activity.Resolve("resolve");
+  Activity.Commit("commit");
 
   End.endExcept;
 
-  topToBottom(30)(UpdateB, ForConflict, Resolve);
+  topToBottom(30)(Debug, Commit);
 
-  leftToRight(30)(beginExcept, UpdateB);
-  leftToRight(30)(endExcept, ForConflict);
+  leftToRight(30)(beginExcept, Debug);
+  leftToRight(30)(endExcept, Commit);
 
-  Group.ExceptBlock(beginExcept, UpdateB, ForConflict, Resolve, endExcept);
+  Group.ExceptBlock(beginExcept, Debug, Commit, endExcept);
 
   ExceptBlock.info.right := 20;
   ExceptBlock.info.left := 30;
@@ -69,56 +65,50 @@ beginfig(1);
 
 %%%
 
-  leftToRight(30)(beginChangeManagement, WhileTrue);
+  leftToRight(30)(beginDebug, WhileTrue);
 
-  topToBottom(30)(WhileTrue, Try, endChangeManagement);
+  topToBottom(30)(WhileTrue, Try, endDebug);
 
   leftToRight(60)(Try,Except);
 
-  drawObjects(beginChangeManagement, WhileTrue, Try, Except, endChangeManagement);
+  drawObjects(beginDebug, WhileTrue, Try, Except, endDebug);
 
 %%%
 
-  clink(transition)(beginChangeManagement, WhileTrue);
+  clink(transition)(beginDebug, WhileTrue);
 
   clink(transition)(WhileTrue, Try);
 
   clink(transition)(Try, Except);
 
-  clink(transition)(Try, endChangeManagement);
+  clink(transition)(Try, endDebug);
       
-
+  link(transition)(pathManhattanY(Except.n, WhileTrue.e));
 %%%
   
-  clink(transition)(beginTry, Commit);
+  clink(transition)(beginTry, testExercise);
 
-  clink(transition)(Commit, UpdateA);
-
-  clink(transition)(UpdateA, Break);
+  clink(transition)(testExercise, Break);
 
   clink(transition)(Break, endTry);
 
 
 %%%
 
-  clink(transition)(beginExcept, UpdateB);
+  clink(transition)(beginExcept, Debug);
 
-  clink(transition)(UpdateB, ForConflict);
+  clink(transition)(Debug, Commit);
 
-  clink(transition)(ForConflict)(Resolve);
+  clink(transition)(Commit, endExcept);
 
-  clink(transition)(ForConflict, endExcept);
+%%%
 
-  link(transition)(pathStepX(Resolve.e, ForConflict.e, 15));
 
-  link(transition)(pathManhattanY(Except.n, WhileTrue.e));
 
 
   item(iGuard)("[True]")(obj.w = 0.5[WhileTrue.s, Try.n]);
 
-  item(iGuard)("[for each conflict]")(obj.e = 0.5[ForConflict.s, Resolve.n]);
-
-  item(iGuard)("[VCSException]")(obj.s = 0.5[Try.e, Except.w]);
+  item(iGuard)("[BugEncounteredException]")(obj.s = 0.5[Try.e, Except.w]);
 
 endfig;
 

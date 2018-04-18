@@ -17,98 +17,77 @@ iAssoc.iFont.name := "t1-zi4r-7";
 
 beginfig(1);
 
-  Begin.beginDebug;
-
-  Branch.WhileTrue;
-
-  End.endDebug;
-
 %%%
 
   Begin.beginTry;
-  
-  Activity.testExercise("exercise","test");
-
-  Activity.Break("break");
-
+  Activity.GetUserStory("user_story = ", "product_backlog.get()");
+  Activity.Implement("implement_feature_tdd");
   End.endTry;
 
-  leftToRight(30)(beginTry, testExercise);
-  topToBottom(30)(testExercise, Break);
-  leftToRight(30)(endTry,Break);
+  leftToRight(30)(beginTry, GetUserStory);
+  topToBottom(30)(GetUserStory, Implement);
+  leftToRight(30)(endTry, Implement);
+
+  Group.TryBlock(beginTry, GetUserStory, Implement, endTry);
   
-  Group.TryBlock(beginTry, testExercise, Break, endTry);
 
   SuperActivity.Try("try")(TryBlock);
-
+  
 %%%
 
   Begin.beginExcept;
-
-  Activity.Debug("debug");
-  
-  Activity.Commit("commit");
-
+  Activity.break("break");
   End.endExcept;
 
-  topToBottom(30)(Debug, Commit);
+%%%
 
-  leftToRight(30)(beginExcept, Debug);
-  leftToRight(30)(endExcept, Commit);
+  topToBottom(30)(beginExcept, break, endExcept);
+  Group.exceptBlock(beginExcept, break, endExcept);
 
-  Group.ExceptBlock(beginExcept, Debug, Commit, endExcept);
+  SuperActivity.Except("except")(exceptBlock);
 
-  ExceptBlock.info.right := 20;
-  ExceptBlock.info.left := 30;
+%%%
+
+  Begin.beginWorkFromBackLog;
   
-  SuperActivity.Except("except")(ExceptBlock);
+  Branch.WhileTrue;
+
+  End.endWorkFromBackLog;
+
+  topToBottom(30)(beginWorkFromBackLog, WhileTrue, Try);
+
+  leftToRight(30)(Try, Except, endWorkFromBackLog);
+
+%%%
+  
+  drawObjects(beginWorkFromBackLog, WhileTrue, Try, Except, endWorkFromBackLog);
 
 %%%
 
-  leftToRight(30)(beginDebug, WhileTrue);
-
-  topToBottom(30)(WhileTrue, Try, endDebug);
-
-  leftToRight(60)(Try,Except);
-
-  drawObjects(beginDebug, WhileTrue, Try, Except, endDebug);
+  clink(transition)(beginTry, GetUserStory);
+  clink(transition)(GetUserStory, Implement);
+  clink(transition)(Implement, endTry);
 
 %%%
 
-  clink(transition)(beginDebug, WhileTrue);
+  clink(transition)(beginExcept, break);
+  clink(transition)(break, endExcept);
 
+%%%
+  
+  clink(transition)(beginWorkFromBackLog, WhileTrue);
   clink(transition)(WhileTrue, Try);
-
+  clink(transition)(WhileTrue, Try);
   clink(transition)(Try, Except);
 
-  clink(transition)(Try, endDebug);
-      
-  link(transition)(pathManhattanY(Except.n, WhileTrue.e));
-%%%
-  
-  clink(transition)(beginTry, testExercise);
+  clink(transition)(Except, endWorkFromBackLog);
 
-  clink(transition)(testExercise, Break);
-
-  clink(transition)(Break, endTry);
-
+  link(transition)(pathStepX(Try.w, WhileTrue.w, -10));
 
 %%%
 
-  clink(transition)(beginExcept, Debug);
-
-  clink(transition)(Debug, Commit);
-
-  clink(transition)(Commit, endExcept);
-
-%%%
-
-
-
-
-  item(iGuard)("[True]")(obj.w = 0.5[WhileTrue.s, Try.n]);
-
-  item(iGuard)("[BugEncounteredException]")(obj.s = 0.5[Try.e, Except.w]);
+  item(iGuard)("[Empty]")(obj.s = 0.5[Try.e, Except.w]);
+  item(iGuard)("[True]")(obj.w = 0.5[Try.n, WhileTrue.s]);
 
 endfig;
 
