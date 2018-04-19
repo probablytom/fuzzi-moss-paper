@@ -3,7 +3,7 @@
 % Aberystwyth, April 2018
 
 ---
-header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none; text-align:left} .reveal h1 {font-size: 1.5em; } .floatleft {float: left} .reveal code {font-size: 14pt} </style>"
+header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none; text-align:left} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} div.sourceCode{margin-top: 0px; margin-bottom:0pt} </style>"
 
 ---
 
@@ -159,7 +159,9 @@ class Chunk(object):
 ```{.python}
 class ChangeManagement(object):
 
-    # ...
+    @default_cost(1)
+    def resolve(self, conflict, random):
+        self.centralised_vcs_client.resolve(conflict, random)
 
     def commit_changes(self, random):
         while True:
@@ -188,8 +190,10 @@ class ChangeManagement(object):
 
 ```{.python}
 class Debugging(object):
-
-	#...
+	
+    @default_cost(1)
+    def debug(self, feature, bug, random):
+        feature.debug(random, bug)
 	
     def debug_test(self, test, random):
         while True:
@@ -199,7 +203,6 @@ class Debugging(object):
             except BugEncounteredException as e:
                 self.debug(test.feature, e.bug, random)
                 self.change_management.commit_changes(random)
-
 ```
 </section>
 
@@ -238,6 +241,59 @@ class TestDrivenDevelopment(object):
 </section>
 
 ----
+
+<section>
+<h1>Theatre_Ag Agent Simulation Environment </h1>
+::::::::::::: {.columns}
+:::{.column style="width: 60%; text-align: left; float: left; font-size:24pt"}
+
+ * Theatre metaphor: actors, casts, scenes, episodes, directions
+ * Actors are threads that:
+     * synchronize on simulation clock ticks
+     * execute a workflow until a task *cost* is encountered
+     * waits for sufficient clock ticks to pass before proceeding
+ * Tasks are passed as workflow instance method references and arguments
+ * Actors can allocate each other tasks
+
+
+:::
+:::{.column style="width: 35%; text-align: center; float: right"}
+![](floats/theatre_ag.svg)
+:::
+::::::::::::::
+</section>
+
+<section>
+<h3>...and the code</h3>
+```{.python}
+reference_get_attr = workflow_class.__getattribute__
+
+def __tracked_getattribute(self, item):
+
+    attribute = reference_get_attr(self, item)
+
+    def sync_wrap(*args, **kwargs):
+
+        actor = self.actor
+        actor.busy.acquire()
+        actor.log_task_initiation(attribute, self, args)
+        actor.incur_delay(attribute, self, args)
+        actor.wait_for_turn()
+
+        try:
+            return attribute.im_func(self, *args, **kwargs)
+        finally:
+            actor.log_task_completion()
+            actor.busy.release()
+
+    sync_wrap.func_name = attribute.im_func.func_name
+    return sync_wrap
+
+workflow_class.__getattribute__ = __tracked_getattribute
+```
+</section>
+
+---
 
 # Aspect Weaving in Python
 
@@ -346,7 +402,72 @@ An *aspect prelude* that alters a reference representation of a function's abstr
 
 ---
 
-# A simple example -<br/> [washing your hands](https://github.com/twsswt/pydysofu/blob/master/tutorial.ipynb)
+# Minimal Example
+
+:::::::::::::: {.columns}
+::: {.column width="40%"}
+
+ * Define a target environment and workflow
+
+:::
+::: {.column width="60%"} 
+```{.python}
+class AWorkflow(object):
+    def __init__(self, environment):
+        self.environment = environment
+    
+    def a_method(self):
+        self.environment.append(1)
+        self.environment.append(2)
+        self.environment.append(3)
+environment = list()
+target = AWorkflow(environment)
+```
+
+:::
+::::::::::::::
+
+. . .
+
+:::::::::::::: {.columns}
+::: {.column width="40%"}
+
+ * Define a fuzzer and bind it to the workflow
+
+:::
+::: {.column width="60%"} 
+```{.python}
+def shuffle_steps(steps, context):
+    return pydysofu_random.shuffle(steps)
+
+advice = {AWorkflow.a_method: shuffle_steps}
+Pydysofu.fuzz_clazz(AWorkflow, advice)
+```
+
+:::
+::::::::::::::
+
+. . .
+
+:::::::::::::: {.columns}
+::: {.column width="40%"}
+
+ * Test
+
+:::
+::: {.column width="60%"} 
+
+```{.python}
+target.a_method()
+print environment
+```
+
+:::
+::::::::::::::
+
+---
+
+# A more complex example -<br/> [washing your hands](https://github.com/twsswt/pydysofu/blob/master/tutorial.ipynb)
 
 <section>
 ```{.python}
@@ -440,22 +561,21 @@ False
 <section>
  1. In the prelude, retrieve the appropriate fuzzing function from a dictionary and invoke `fuzz function`:
 
- ```{.python}
- 
+ ~~~{.python}
  class FuzzingAspect(IdentityAspect):
      def prelude(self, attribute, context):
         reference_function = attribute.im_func
         advice_key = getattr(attribute.im_class, attribute.func_name)
-
+        
         fuzzer = self.fuzzing_advice.get(advice_key, identity)
         fuzz_function(reference_function, fuzzer, context)
- ```
+ ~~~
 
 </section>
 
 <section>
 
-2. In `fuzz_function` Recover the source code for a target method, build a copy of it's AST and pass to a visitor:
+2. In `fuzz_function`, recover the source code for a target method, build a copy of it's AST and pass to a visitor:
 
  ```{.python style="font-size: 24pt"}
  def fuzz_function(reference_function, fuzzer, context):
@@ -503,17 +623,149 @@ def fuzz_function(reference_function, fuzzer=identity, context=None):
 
 ---
 
-# Modelling Distraction
+<section>
+<h1> Modelling Distraction as a Fuzzing Function</h1>
 
-Projects)
+Define a fuzzer that:
+
+ * Draws a random number of steps to remove from the end of a function from a probability mass function on the remaining simulation time.
+ * Recurses into nested control structures (While, For, Try)
+ * Chooses the lowest, last n steps and replaces them with '`idle`'.
+
+</section>
+
+<section>
+<h3> and the code.</h3>
+
+```{.python}
+def incomplete_procedure(random, pmf):
+    
+    def _incomplete_procedure(steps, context):
+        clock = context.actor.clock
+        remaining_time = clock.max_ticks - clock.current_tick
+
+        probability = random.uniform(0.0, 0.9999)
+
+        n = pmf(remaining_time, probability)
+
+        choose_last_steps_fuzzer = choose_last_steps(n, False)
+
+        fuzzer = in_sequence(
+            [
+                recurse_into_nested_steps(
+                    target_structures={ast.While, ast.For, ast.TryExcept},
+                    fuzzer=filter_steps(
+                        choose_last_steps_fuzzer,
+                        replace_steps_with(replacement='self.actor.idling.idle()')
+                    )
+                )
+            ]
+        )
+
+        return fuzzer(steps, context)
+
+    return _incomplete_procedure
+
+```
+
+</section>
+
+---
+
+# Evaluation Strategy
+
+* Simulations of large scale systems are difficult to validate
+  * Example: climate science
+  * That's why we simulate
+* Approach advocated by Naylor and Finger (1967) and others
+  * Staged approach
+  * Evaluate plausibility first
+  * Gain confidence in predictive capability
+  * Ask is the simulation *useful*?
 
 ---
 
 # Case Study Experimental Setup
 
+* Compare waterfall performance against TDD
+* Project of up to 6 user stories, length 2 or 4
+* 3 actor development team, 500 clock ticks maximum
+* Apply fuzzing to top level or low level workflows
+* Vary the extent of fuzzing by configuring distraction PMF
+
+
+---
+
 # Results
 
-#
+---
+
+# No fuzzing - Commits Versus Project Size
+
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+ ![](floats/commits_against_project_size_for_0_fuzz_simulations.jpg)
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+ * Waterfall (Blue)
+ * TDD (Red)
+
+:::
+::::::::::::::
+
+---
+
+# No fuzzing -<br/> Mean Time to Failure Versus Project Size
+
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+![](floats/commits_against_project_size_for_0_fuzz_simulations.jpg)
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+ * Waterfall (Blue)
+ * TDD (Red)
+
+:::
+::::::::::::::
+
+---
+
+# Effect of Fuzzing on Feature Completion
+
+<section>
+<img src="floats/features_against_total_fuzz_CTIDR.jpg" style="width: 50%"/>
+
+Fuzzing Change Management, Implementation, Testing, Debugging, Refactoring.
+</section>
+
+<section>
+<img src="floats/features_against_total_fuzz_WT.jpg" style="width: 50%"/>
+
+Fuzzing Waterfall, TDD.
+</section>
+
+---
+
+# Effect of Fuzzing on Mean Time to Failure
+
+<section>
+<img src="floats/mtf_against_total_fuzz_projects_large.jpg" style="width: 50%"/>
+
+Large Projects
+</section>
+
+<section>
+<img src="floats/mtf_against_total_fuzz_projects_small.jpg" style="width: 50%"/>
+
+Small Projects
+</section>
+
 
 # Take away: model irregular user behaviour separately as cross cutting concerns.
 
