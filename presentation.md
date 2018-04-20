@@ -822,7 +822,7 @@ Fuzzing Change Management, Implementation, Testing, Debugging, Refactoring.
 :::::::::::::: {.columns}
 ::: {.column style="width:50%; text-align: left; float: left"}
 
-<img src="floats/features_against_total_fuzz_TW.jpg"/>
+<img src="floats/features_against_total_fuzz_WT.jpg"/>
 
 :::
 ::: {.column tyle="width:35%; text-align: left; float: left"}
