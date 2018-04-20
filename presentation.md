@@ -3,7 +3,7 @@
 % Aberystwyth, April 2018
 
 ---
-header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none; text-align:left} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} div.sourceCode{margin-top: 0px; margin-bottom:0pt} </style>"
+header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} pre.sourceCode {margin-top:2px; margin-left:2px; margin-top: 2px; margin-bottom:2px; margin-right:0pt}  div.sourceCode{margin-left:0px; margin-top: 0px; margin-bottom:0px} </style>"
 
 ---
 
@@ -14,7 +14,7 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 contents...
 :::
 ::: {.column width="40%"}
-![](tim.jpg)
+![](floats/tim.jpg)
 :::
 ::::::::::::::
 
@@ -33,55 +33,64 @@ Users really *are* the problem. Behaviour is:
 
 :::
 ::: {.column width="30%"}
-![](ecounting.jpg)
+![](floats/ecounting.jpg)
 :::
 ::::::::::::::
 
 ----
 
-# Trying to predict the impact of user behaviour is *really hard*
-
-:::::::::::::: {.columns}
-:::{.column style="width: 60%; text-align: left; float: left"}
-
- * Idealised models miss vital nuance in real world behaviour.
- * Stochastic models depend on behaviour being homogeneous.
- * Detailed workflow models quickly become intractable.
-:::
-::: {.column width="30%"}
-![](ambulance.jpg)
-:::
-::::::::::::::
-
-----
-
-# Coping Strategies in Information Systems Engineering
+# Current Approaches to IS Engineering are Expensive
 
 :::::::::::::: {.columns}
 ::: {.column style="width:40%; text-align: left; float: left"}
 
- * Build, fail, rebuild
- * Trial, error and revision
- * Workarounds
+- Build, fail, rebuild
+- Trial, error and revision
+- Workarounds
 :::
-::: {.column tyle="width:55%; text-align: left; float: left"}
-![](heathrow.jpg)
+::: {.column style="width:55%; text-align: left; float: left"}
+![](C:/Users/Tim/Documents/Research%20Papers/Wallis_2015_Fuzzi/floats/heathrow.jpg)
 :::
 ::::::::::::::
 
----
+------
 
-# Intuition: *Variability, contingency and adaption in user behaviour is a cross cutting concern.*
+# But, trying to model and predict the impact of user behaviour is really hard
 
-The same causes of variability affect many different workflows, so apply their effects as fuzzing aspects to functional descriptions of workflow behaviours.
+:::::::::::::: {.columns}
+:::{.column style="width: 60%; text-align: left; float: left"}
+
+ * Idealised models miss vital nuances.
+ * Detailed models quickly become unwieldy.
+ * Stochastic models depend on homogeneity.
+ * Socio-technical approaches, lack predictive capability.
+:::
+::: {.column width="30%"}
+![](floats/ambulance.jpg)
+:::
+::::::::::::::
+
+----
+
+# Intuition
+
+ * Looking for a means of conveniently modelling complex behaviour in predictive, stoichastic models.
+
+:::{style="font-size: 50px"}
+> *Variability, contingency and adaption in user behaviour are cross cutting concerns.*
+:::
+* The same causes of variability affect many different workflows.
+* So apply the *effects* as fuzzing aspects to functional descriptions of workflow behaviours.
 
 :::{.notes}
-Develop a modelling technique that enables a separation of concerns between models of information systems, idealised workflows and the effect of realistic behaviour applied to those workflows..
+Develop a modelling technique that enables a separation of concerns between models of information systems, idealised workflows and the effect of realistic behaviour applied to those workflows.
 :::
 
 ----
 
 # Our Approach - Fuzzi Moss and Friends
+
+![](floats/approach.svg)
 
 ---
 
@@ -114,7 +123,9 @@ Develop a modelling technique that enables a separation of concerns between mode
 
 <section>
 <h1>The Domain Model of a Software Project</h1>
+:::{style="text-align:center"}
 <img src="floats/full-class-diagram-1.jpg" alt="" style="width: 70%;"/>
+:::
 </section>
 
 <section>
@@ -144,13 +155,19 @@ class Chunk(object):
 
 # Workflow Class Model
 
+:::{style="text-align:center"}
 <img src="floats/workflow-classes-1.jpg" alt="" style="width: 100%;"/>
+:::
 
 ---
 
 <section>
 <h1>Workflow Modelling Example - Change Management</h1>
+
+:::{style="text-align:center"}
 <img src="floats/change-management-1.jpg" alt="" style="width: 60%;"/>
+:::
+
 </section>
 
 <section>
@@ -182,7 +199,11 @@ class ChangeManagement(object):
 
 <section>
 <h1>Workflow Modelling Example - Debugging</h1>
+
+:::{style="text-align:center"}
 <img src="floats/debugging-1.jpg" alt="" style="width: 80%;"/>
+:::
+
 </section>
 
 <section>
@@ -211,7 +232,11 @@ class Debugging(object):
 
 <section>
 <h1>Workflow Modelling Example - <br/>Test Driven Development</h1>
+
+:::{style="text-align:center"}
 <img src="floats/test-driven-development-1.jpg" alt="" style="width: 70%;"/>
+:::
+
 </section>
 
 <section>
@@ -554,14 +579,14 @@ False
 ```
 </section>
 
-
+---
 
 # Implementation in PyDySoFu
 
 <section>
- 1. In the prelude, retrieve the appropriate fuzzing function from a dictionary and invoke `fuzz function`:
+1. In the prelude, retrieve the appropriate fuzzing function from a dictionary and invoke `fuzz function`:
 
- ~~~{.python}
+~~~python
  class FuzzingAspect(IdentityAspect):
      def prelude(self, attribute, context):
         reference_function = attribute.im_func
@@ -569,7 +594,7 @@ False
         
         fuzzer = self.fuzzing_advice.get(advice_key, identity)
         fuzz_function(reference_function, fuzzer, context)
- ~~~
+~~~
 
 </section>
 
@@ -577,7 +602,7 @@ False
 
 2. In `fuzz_function`, recover the source code for a target method, build a copy of it's AST and pass to a visitor:
 
- ```{.python style="font-size: 24pt"}
+```python
  def fuzz_function(reference_function, fuzzer, context):
     func_source = inspect.getsourcelines(reference_function)[0]
     reference_syntax_tree = ast.parse(''.join(func_source))
@@ -585,14 +610,14 @@ False
     fuzzed_syntax_tree = copy.deepcopy(reference_syntax_tree)
     workflow_transformer = WorkflowTransformer(fuzzer=fuzzer, context=context)
     workflow_transformer.visit(fuzzed_syntax_tree)
- ```
+```
 
 </section>
 
 <section>
 3. In the visitor, extract the body of a function and apply the fuzzer:
 
-```{.python}
+```
     def visit_FunctionDef(self, node):
         result = self.generic_visit(node)
         node.body = self.fuzzer(node.body, self.context)
@@ -615,8 +640,6 @@ def fuzz_function(reference_function, fuzzer=identity, context=None):
 
     compiled_module = compile(fuzzed_syntax_tree, '<potentially custom>', 'exec')
     reference_function.func_code = compiled_module.co_consts[0]
-
-
 ```
 
 </section>
@@ -700,7 +723,7 @@ def incomplete_procedure(random, pmf):
 
 ---
 
-# No fuzzing - Commits Versus Project Size
+# No fuzzing -<br/> Commits Versus Project Size
 
 :::::::::::::: {.columns}
 ::: {.column style="width:50%; text-align: left; float: left"}
@@ -710,8 +733,10 @@ def incomplete_procedure(random, pmf):
 :::
 ::: {.column tyle="width:35%; text-align: left; float: left"}
 
- * Waterfall (Blue)
- * TDD (Red)
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
 
 :::
 ::::::::::::::
@@ -728,8 +753,10 @@ def incomplete_procedure(random, pmf):
 :::
 ::: {.column tyle="width:35%; text-align: left; float: left"}
 
- * Waterfall (Blue)
- * TDD (Red)
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
 
 :::
 ::::::::::::::
@@ -739,15 +766,51 @@ def incomplete_procedure(random, pmf):
 # Effect of Fuzzing on Feature Completion
 
 <section>
-<img src="floats/features_against_total_fuzz_CTIDR.jpg" style="width: 50%"/>
 
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+<img src="floats/features_against_total_fuzz_CTIDR.jpg"/>
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
+
+:::
+::::::::::::::
+
+::: {style="clear:both"}
+:::
 Fuzzing Change Management, Implementation, Testing, Debugging, Refactoring.
+
 </section>
 
 <section>
-<img src="floats/features_against_total_fuzz_WT.jpg" style="width: 50%"/>
 
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+<img src="floats/features_against_total_fuzz_TW.jpg"/>
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
+
+:::
+::::::::::::::
+
+::: {style="clear:both"}
+:::
 Fuzzing Waterfall, TDD.
+
 </section>
 
 ---
@@ -755,15 +818,51 @@ Fuzzing Waterfall, TDD.
 # Effect of Fuzzing on Mean Time to Failure
 
 <section>
-<img src="floats/mtf_against_total_fuzz_projects_large.jpg" style="width: 50%"/>
 
-Large Projects
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+<img src="floats/mtf_against_total_fuzz_projects_large.jpg"/>
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
+
+:::
+::::::::::::::
+
+::: {style="clear:both"}
+:::
+Large projects.
+
 </section>
 
 <section>
-<img src="floats/mtf_against_total_fuzz_projects_small.jpg" style="width: 50%"/>
 
-Small Projects
+:::::::::::::: {.columns}
+::: {.column style="width:50%; text-align: left; float: left"}
+
+<img src="floats/mtf_against_total_fuzz_projects_small.jpg"/>
+
+:::
+::: {.column tyle="width:35%; text-align: left; float: left"}
+
+<br/>
+
+ * Waterfall (<span style="color:blue">Blue</span>)
+ * TDD (<span style="color:red">Red</span>)
+
+:::
+::::::::::::::
+
+::: {style="clear:both"}
+:::
+Small projects.
+
 </section>
 
 
