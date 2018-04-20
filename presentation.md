@@ -3,7 +3,7 @@
 % Aberystwyth, April 2018
 
 ---
-header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} pre.sourceCode {margin-top:2px; margin-left:2px; margin-top: 2px; margin-bottom:2px; margin-right:0pt}  div.sourceCode{margin-left:0px; margin-top: 0px; margin-bottom:0px} </style>"
+header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} pre.sourceCode {margin-top:2px; margin-left:2px; margin-top: 2px; margin-bottom:2px; margin-right:0pt}  div.sourceCode{margin-left:0px; margin-top: 0px; margin-bottom:0px} .reveal section img {border: 0px} </style>"
 
 ---
 
@@ -74,13 +74,15 @@ Users really *are* the problem. Behaviour is:
 
 # Intuition
 
- * Looking for a means of conveniently modelling complex behaviour in predictive, stoichastic models.
+:::{style="font-size: 36px"}
+ * Need a convenient mechanism for introducing complex behaviour in stochastic simulations.
 
 :::{style="font-size: 50px"}
 > *Variability, contingency and adaption in user behaviour are cross cutting concerns.*
 :::
-* The same causes of variability affect many different workflows.
-* So apply the *effects* as fuzzing aspects to functional descriptions of workflow behaviours.
+* The same causes of variability affect different workflows.
+* So, apply the *effects* as fuzzing aspects to functional descriptions of workflow behaviours.
+:::
 
 :::{.notes}
 Develop a modelling technique that enables a separation of concerns between models of information systems, idealised workflows and the effect of realistic behaviour applied to those workflows.
@@ -90,7 +92,9 @@ Develop a modelling technique that enables a separation of concerns between mode
 
 # Our Approach - Fuzzi Moss and Friends
 
+:::{style="text-align:center"}
 ![](floats/approach.svg)
+:::
 
 ---
 
@@ -492,15 +496,29 @@ print environment
 
 ---
 
-# A more complex example -<br/> [washing your hands](https://github.com/twsswt/pydysofu/blob/master/tutorial.ipynb)
+# A more complex example -<br/> [why do your children make you sick?](http://localhost:8888/notebooks/tutorial.ipynb)
+
 
 <section>
+
+1. Define the problem domain
+
 ```{.python}
 class Hands(object):
     def __init__(self):
         self.clean = False
         self.soaped = False
-        
+```
+</section>
+
+
+
+<section>
+2. Define the workflows 
+
+:::::: {.columns}
+:::{.column width="45%"}
+```{.python}
 class GetDirtyWorkflow(object):
     
     is_workflow = True
@@ -521,8 +539,11 @@ class RinseWorkflow(object):
 
     def rinse(self):
         self.washable.soaped = False
+```
+:::
 
-
+:::{.column width="50%"}
+```{.python}
 class WashWorkflow(object):
 
     is_workflow = True
@@ -543,6 +564,15 @@ class WashWorkflow(object):
        self.scrub()
        self.rinse.rinse()
        
+```
+:::
+::::::
+</section>
+
+<section>
+3. Define the fuzzer
+
+```{.python}
 from pydysofu import fuzz_clazz
 from pydysofu.core_fuzzers import shuffle_steps
 
@@ -550,7 +580,13 @@ advice = {
     WashWorkflow.wash: shuffle_steps
 }
 fuzz_clazz(WashWorkflow, advice)
+```
+</section>
 
+<section>
+4. Try it out
+
+```{.python}
 hands = Hands()
 get_dirty_workflow = GetDirtyWorkflow(hands)
 wash_workflow = WashWorkflow(hands)
@@ -560,22 +596,14 @@ for _ in range(0, 10):
     wash_workflow.wash()
     print hands.clean
 ```
-</section>
 
-<section>
 The output is something like:
 
 ```
 True
 False
 True
-True
-False
-False
-True
-False
-False
-False
+...
 ```
 </section>
 
