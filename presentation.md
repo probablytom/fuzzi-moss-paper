@@ -32,10 +32,11 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 # Roadmap
 
 * Motivational argument
-* Case study of our approach
-  * Modelling the ideal of a socio-technical system
-  * Aspect Weaving in Python
-  * Altering W
+* Case study (software development) domain and workflow model
+* Dynamic Fuzzing Aspects and their implementation
+* Case study evaluation
+
+---
 
 # Designing for user in <br/> Socio-Technical Systems
 
@@ -56,7 +57,7 @@ Users really *are* the problem. Behaviour is:
 
 ----
 
-# Current Approaches to IS Engineering are Expensive
+# Current Practical Approaches to Socio-Technical Engineering are Expensive
 
 :::::::::::::: {.columns}
 ::: {.column style="width:40%; text-align: left; float: left"}
