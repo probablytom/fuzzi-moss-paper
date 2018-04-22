@@ -3,7 +3,7 @@
 % Aberystwyth, April 2018
 
 ---
-header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none} .reveal h1 {font-size: 1.2em; } .floatleft {float: left} .reveal code {font-size: 12pt} pre.sourceCode {margin-top:2px; margin-left:2px; margin-top: 2px; margin-bottom:2px; margin-right:0pt}  div.sourceCode{margin-left:0px; margin-top: 0px; margin-bottom:0px} .reveal section img {border: 0px} </style>"
+header-includes:     "<style type='text/css'>.reveal section {text-align: left} .reveal h1, .reveal h2, .reveal h3, .reveal p {text-transform: none} .reveal h1 {font-size: 1.2em; } .reveal h2 {font-size: 1.0em;}  .floatleft {float: left} .reveal code {font-size: 12pt} pre.sourceCode {margin-top:2px; margin-left:2px; margin-top: 2px; margin-bottom:2px; margin-right:0pt}  div.sourceCode{margin-left:0px; margin-top: 0px; margin-bottom:0px} .reveal section img {border: 0px} </style>"
 
 ---
 
@@ -11,7 +11,16 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 
 :::::::::::::: {.columns}
 ::: {.column width="60%"}
-contents...
+
+::: incremental
+
+*  Interests in system, security and software engineering.
+
+* Tools and methods for building better, more reliable systems.
+
+* (I'm also a climbing bore, so thanks for the invite).
+:::
+
 :::
 ::: {.column width="40%"}
 ![](floats/tim.jpg)
@@ -19,6 +28,14 @@ contents...
 ::::::::::::::
 
 ----
+
+# Roadmap
+
+* Motivational argument
+* Case study of our approach
+  * Modelling the ideal of a socio-technical system
+  * Aspect Weaving in Python
+  * Altering W
 
 # Designing for user in <br/> Socio-Technical Systems
 
@@ -324,110 +341,11 @@ workflow_class.__getattribute__ = __tracked_getattribute
 
 ---
 
-# Aspect Weaving in Python
+# Modifying Workflows with Fuzzing Aspects 
 
  * Desirable to separate idealised workflows and effects of realistic behaviour as a cross cutting concern.
- * Aspects allow for *quantification* and *obliviousness*.
- * Our implementation in Python: Asp
-
-
-# Aspect Weaving Implementation
-
-<section>
-1. Replace the `object.__get_attribute__()` method to intercept all method invocations, to define an anonymous `wrap` function as substitute for the target method:
-
-```{.python}
-def weave_clazz(clazz, advice):
-
-    def __weaved_getattribute__(self, item):
-        attribute = object.__getattribute__(self, item)
-
-            def wrap(*args, **kwargs):
-            
-            #...
-
-            return wrap
-
-    clazz.__getattribute__ = __weaved_getattribute__
-```
-
-</section>
-
-<section style="text-align:left">
-
-2. In `wrap`, retrieve *advice* for a target method from a user supplied dictionary:
-
-```{.python}
-            def wrap(*args, **kwargs):
-
-                reference_function = attribute.im_func
-                # Ensure that advice key is unbound method for instance methods.
-                advice_key = getattr(attribute.im_class, attribute.func_name)
-
-                aspect = advice.get(advice_key, identity)
-```
-</section>
-
-<section>
-3. In `wrap`, apply an aspect *prelude* to the target method and context:
-
-```{.python}
-            def wrap(*args, **kwargs):
-
-                reference_function = attribute.im_func
-                # Ensure that advice key is unbound method for instance methods.
-                advice_key = getattr(attribute.im_class, attribute.func_name)
-
-                aspect = advice.get(advice_key, identity)
-                
-                aspect.prelude(attribute, self, *args, **kwargs)
-```
-
-</section>
-
-<section>
-4. In `wrap`, execute the target method:
-
-```{.python}
-            def wrap(*args, **kwargs):
-
-                reference_function = attribute.im_func
-                # Ensure that advice key is unbound method for instance methods.
-                advice_key = getattr(attribute.im_class, attribute.func_name)
-
-                aspect = advice.get(advice_key, identity)
-                
-                aspect.prelude(attribute, self, *args, **kwargs)
-                result = reference_function(*args, **kwargs)
-
-```
-
-</section>
-
-<section>
-5. In `wrap`, apply an aspect *encore* to the method, context and any return value, then return the result.
-
-```{.python}
-            def wrap(*args, **kwargs):
-
-                reference_function = attribute.im_func
-                # Ensure that advice key is unbound method for instance methods.
-                advice_key = getattr(attribute.im_class, attribute.func_name)
-
-                aspect = advice.get(advice_key, identity)
-                
-                aspect.prelude(attribute, self, *args, **kwargs)
-                result = reference_function(*args, **kwargs)
-                return aspect.encore(attribute, self, result)
-                
-```
-
-</section>
-
-
-# Altering Workfows with Dynamic Code Fuzzing using PyDySoFu
-
-An *aspect prelude* that alters a reference representation of a function's abstract syntax tree each time the function is invoked. 
+ * Aspects allow for *quantification* and *obliviousness* [Filman & Friedman, 2000].
+ * A fuzzing aspect alters a reference representation of a function's abstract syntax tree each time the function is invoked. 
 
 ---
 
@@ -467,7 +385,7 @@ target = AWorkflow(environment)
 ::: {.column width="60%"} 
 ```{.python}
 def shuffle_steps(steps, context):
-    return pydysofu_random.shuffle(steps)
+    return random.shuffle(steps)
 
 advice = {AWorkflow.a_method: shuffle_steps}
 Pydysofu.fuzz_clazz(AWorkflow, advice)
@@ -609,7 +527,103 @@ True
 
 ---
 
-# Implementation in PyDySoFu
+# Aspect Weaving Implementation (Asp)
+
+<section>
+1. Replace the `object.__get_attribute__()` method to intercept all method invocations, to define an anonymous `wrap` function as substitute for the target method:
+
+```{.python}
+def weave_clazz(clazz, advice):
+
+    def __weaved_getattribute__(self, item):
+        attribute = object.__getattribute__(self, item)
+
+            def wrap(*args, **kwargs):
+            
+            #...
+
+            return wrap
+
+    clazz.__getattribute__ = __weaved_getattribute__
+```
+
+</section>
+
+<section style="text-align:left">
+
+2. In `wrap`, retrieve *advice* for a target method from a user supplied dictionary:
+
+```{.python}
+            def wrap(*args, **kwargs):
+
+                reference_function = attribute.im_func
+                # Ensure that advice key is unbound method for instance methods.
+                advice_key = getattr(attribute.im_class, attribute.func_name)
+
+                aspect = advice.get(advice_key, identity)
+```
+</section>
+
+<section>
+3. In `wrap`, apply an aspect *prelude* to the target method and context:
+
+```{.python}
+            def wrap(*args, **kwargs):
+
+                reference_function = attribute.im_func
+                # Ensure that advice key is unbound method for instance methods.
+                advice_key = getattr(attribute.im_class, attribute.func_name)
+
+                aspect = advice.get(advice_key, identity)
+                
+                aspect.prelude(attribute, self, *args, **kwargs)
+```
+
+</section>
+
+<section>
+4. In `wrap`, execute the target method:
+
+```{.python}
+            def wrap(*args, **kwargs):
+
+                reference_function = attribute.im_func
+                # Ensure that advice key is unbound method for instance methods.
+                advice_key = getattr(attribute.im_class, attribute.func_name)
+
+                aspect = advice.get(advice_key, identity)
+                
+                aspect.prelude(attribute, self, *args, **kwargs)
+                result = reference_function(*args, **kwargs)
+
+```
+
+</section>
+
+<section>
+5. In `wrap`, apply an aspect *encore* to the method, context and any return value, then return the result.
+
+```{.python}
+            def wrap(*args, **kwargs):
+
+                reference_function = attribute.im_func
+                # Ensure that advice key is unbound method for instance methods.
+                advice_key = getattr(attribute.im_class, attribute.func_name)
+
+                aspect = advice.get(advice_key, identity)
+                
+                aspect.prelude(attribute, self, *args, **kwargs)
+                result = reference_function(*args, **kwargs)
+                return aspect.encore(attribute, self, result)
+                
+```
+
+</section>
+
+---
+
+
+# Dynamic Fuzzing Implementation (PyDySoFu)
 
 <section>
 1. In the prelude, retrieve the appropriate fuzzing function from a dictionary and invoke `fuzz function`:
@@ -645,7 +659,7 @@ True
 <section>
 3. In the visitor, extract the body of a function and apply the fuzzer:
 
-```
+```python
     def visit_FunctionDef(self, node):
         result = self.generic_visit(node)
         node.body = self.fuzzer(node.body, self.context)
@@ -894,12 +908,18 @@ Small projects.
 </section>
 
 
-# Take away: model irregular user behaviour separately as cross cutting concerns.
+# The Take Away
 
-Future:
+:::{style="font-size: 42px"}
 
- * Bigger, better case studies
- * Application of fuzzing to other representations
+> Model irregular user behaviour separately as cross cutting concerns.
+
+:::
+
+## Future:
+
+ * Bigger, better case studies.
+ * Application of fuzzing to representations other than workflows?
  * Validate models of irregular behaviour using process log data sets.
 
 ---
