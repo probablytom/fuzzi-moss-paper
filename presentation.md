@@ -11,14 +11,10 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 
 :::::::::::::: {.columns}
 ::: {.column width="60%"}
-
-::: incremental
-
-*  Interests in system, security and software engineering.
-
-*  Tools and methods for building better, more reliable systems.
-
-*  (I'm also a climbing bore, so thanks for the invite).
+:::incremental
+ * Interests in system, security and software engineering.
+ * Tools and methods for building better, more reliable systems.
+ * (I'm also a climbing bore, so thanks for the invite).
 :::
 
 :::
@@ -27,18 +23,18 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 :::
 ::::::::::::::
 
-----
+---
 
 # Roadmap
 
-* Motivational argument
-* Case study (software development) domain and workflow model
-* Dynamic Fuzzing Aspects and their implementation
-* Case study evaluation
+* Motivational argument on engineering methods for socio-technical systems.
+* Case study (software development) domain and workflow model.
+* Dynamic Fuzzing Aspects and their implementation.
+* Case study evaluation - realistic system properties through workflow fuzzing.
 
 ---
 
-# Designing for user in <br/> Socio-Technical Systems
+# Designing for users in <br/> Socio-Technical Systems
 
 :::::::::::::: {.columns}
 ::: {.column style="width: 60%; text-align: left; float: left"}
@@ -55,9 +51,10 @@ Users really *are* the problem. Behaviour is:
 :::
 ::::::::::::::
 
-----
+---
 
-# Current Practical Approaches to Socio-Technical Engineering are Expensive
+<section>
+<h1>Current Practical Approaches to Socio-Technical Engineering are Expensive...</h1>
 
 :::::::::::::: {.columns}
 ::: {.column style="width:40%; text-align: left; float: left"}
@@ -70,10 +67,11 @@ Users really *are* the problem. Behaviour is:
 ![](C:/Users/Tim/Documents/Research%20Papers/Wallis_2015_Fuzzi/floats/heathrow.jpg)
 :::
 ::::::::::::::
+</section>
 
-------
 
-# But, trying to model and predict the impact of user behaviour is really hard
+<section>
+<h1>...but, trying to model and predict the impact of user behaviour is really hard.</h1>
 
 :::::::::::::: {.columns}
 :::{.column style="width: 60%; text-align: left; float: left"}
@@ -81,14 +79,16 @@ Users really *are* the problem. Behaviour is:
  * Idealised models miss vital nuances.
  * Detailed models quickly become unwieldy.
  * Stochastic models depend on homogeneity.
- * Socio-technical approaches, lack predictive capability.
+ * Socio-technical approaches lack predictive capability.
 :::
 ::: {.column width="30%"}
 ![](floats/ambulance.jpg)
 :::
 ::::::::::::::
 
-----
+</section>
+
+---
 
 # Intuition
 
@@ -99,7 +99,7 @@ Users really *are* the problem. Behaviour is:
 > *Variability, contingency and adaption in user behaviour are cross cutting concerns.*
 :::
 * The same causes of variability affect different workflows.
-* So, apply the *effects* as fuzzing aspects to functional descriptions of workflow behaviours.
+* So, apply the *effects* as fuzzing aspects to functional descriptions of ideal workflow behaviours.
 :::
 
 :::{.notes}
@@ -121,11 +121,11 @@ Develop a modelling technique that enables a separation of concerns between mode
 :::::::::::::: {.columns}
 :::{.column style="width: 50%; text-align: left; float: left; font-size:24pt"}
 
- * Actors have different roles
+ * Actors have different roles.
  * Development work coordinated around a centralised VCS.
- * Well defined ideal workflows, but with potential for variability
- * Different coordination workflows possible
- * Limited empirical evidence as to efficacy of different workflows [George & Williams,Israilidis et al., Bhat, T. & Nagappan].
+ * Well defined *ideal* workflows, but with potential for variance.
+ * Different coordination workflows possible (Waterfall, TDD...).
+ * Limited empirical evidence as to efficacy of different workflows [George & Williams, Israilidis et al., Bhat, T. & Nagappan].
 
 :::
 :::{.column style="width: 45%; text-align: center; float: right"}
@@ -294,13 +294,13 @@ class TestDrivenDevelopment(object):
 ::::::::::::: {.columns}
 :::{.column style="width: 60%; text-align: left; float: left; font-size:24pt"}
 
- * Theatre metaphor: actors, casts, scenes, episodes, directions
+ * Theatre metaphor: actors, casts, scenes, episodes, directions.
  * Actors are threads that:
-     * synchronize on simulation clock ticks
-     * execute a workflow until a task *cost* is encountered
-     * waits for sufficient clock ticks to pass before proceeding
- * Tasks are passed as workflow instance method references and arguments
- * Actors can allocate each other tasks
+     * Synchronize on simulation clock ticks.
+     * Execute a workflow until a task *cost* is encountered.
+     * Wait for sufficient clock ticks to pass before proceeding.
+ * Tasks are passed as workflow instance method references and arguments.
+ * Actors can allocate tasks to each other.
 
 
 :::
@@ -345,7 +345,7 @@ workflow_class.__getattribute__ = __tracked_getattribute
 # Modifying Workflows with Fuzzing Aspects 
 
  * Desirable to separate idealised workflows and effects of realistic behaviour as a cross cutting concern.
- * Aspects allow for *quantification* and *obliviousness* [Filman & Friedman, 2000].
+ * Aspects enable transparent interception and modification of program flow - *quantification* and *obliviousness* [Filman & Friedman, 2000].
  * A fuzzing aspect alters a reference representation of a function's abstract syntax tree each time the function is invoked. 
 
 ---
@@ -368,6 +368,7 @@ class AWorkflow(object):
         self.environment.append(1)
         self.environment.append(2)
         self.environment.append(3)
+
 environment = list()
 target = AWorkflow(environment)
 ```
@@ -386,10 +387,12 @@ target = AWorkflow(environment)
 ::: {.column width="60%"} 
 ```{.python}
 def shuffle_steps(steps, context):
-    return random.shuffle(steps)
+    result = list(steps)
+    random.shuffle(result)
+    return result
 
 advice = {AWorkflow.a_method: shuffle_steps}
-Pydysofu.fuzz_clazz(AWorkflow, advice)
+pydysofu.fuzz_clazz(AWorkflow, advice)
 ```
 
 :::
@@ -694,9 +697,9 @@ def fuzz_function(reference_function, fuzzer=identity, context=None):
 
 Define a fuzzer that:
 
- * Draws a random number of steps to remove from the end of a function from a probability mass function on the remaining simulation time.
  * Recurses into nested control structures (While, For, Try)
- * Chooses the lowest, last n steps and replaces them with '`idle`'.
+ * Chooses the lowest, last *n* steps and replaces them with '`idle`'.
+ * Where *n* is calculated using a PMF of remaining simulation time.
 
 </section>
 
@@ -753,20 +756,16 @@ def incomplete_procedure(random, pmf):
 
 # Case Study Experimental Setup
 
-* Compare waterfall performance against TDD
-* Project of up to 6 user stories, length 2 or 4
-* 3 actor development team, 500 clock ticks maximum
-* Apply fuzzing to top level or low level workflows
-* Vary the extent of fuzzing by configuring distraction PMF
+* Compare waterfall performance against TDD.
+* Project of up to 6 user stories, length 2 or 4.
+* 3 actor development team, 500 clock ticks maximum.
+* Apply fuzzing to top level or low level workflows.
+* Vary the extent of fuzzing by configuring distraction PMF.
 
 
 ---
 
-# Results
-
----
-
-# No fuzzing -<br/> Commits Versus Project Size
+# Results - No fuzzing<br/> Commits Versus Project Size
 
 :::::::::::::: {.columns}
 ::: {.column style="width:50%; text-align: left; float: left"}
@@ -786,7 +785,7 @@ def incomplete_procedure(random, pmf):
 
 ---
 
-# No fuzzing -<br/> Mean Time to Failure Versus Project Size
+# Results - No fuzzing<br/> Mean Time to Failure Versus Project Size
 
 :::::::::::::: {.columns}
 ::: {.column style="width:50%; text-align: left; float: left"}
@@ -806,7 +805,7 @@ def incomplete_procedure(random, pmf):
 
 ---
 
-# Effect of Fuzzing on Feature Completion
+# Results<br/> Effect of Fuzzing on Feature Completion
 
 <section>
 
@@ -858,7 +857,7 @@ Fuzzing Waterfall, TDD.
 
 ---
 
-# Effect of Fuzzing on Mean Time to Failure
+# Results - <br/>Effect of Fuzzing on Mean Time to Failure
 
 <section>
 
