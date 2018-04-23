@@ -16,9 +16,9 @@ header-includes:     "<style type='text/css'>.reveal section {text-align: left} 
 
 *  Interests in system, security and software engineering.
 
-* Tools and methods for building better, more reliable systems.
+*  Tools and methods for building better, more reliable systems.
 
-* (I'm also a climbing bore, so thanks for the invite).
+*  (I'm also a climbing bore, so thanks for the invite).
 :::
 
 :::
