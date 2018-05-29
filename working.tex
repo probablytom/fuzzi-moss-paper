@@ -41,7 +41,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Modelling Realistic User Behaviour in Information Systems Simulation Models as Fuzzing Aspects}
+\title{Modelling Realistic User Behaviour in Information Systems Simulations as Fuzzing Aspects}
 
 \titlerunning{}
 
@@ -83,10 +83,10 @@
 
 Information systems are operated within a wider organisational context, characterised by the needs, demands and
 behaviours of individual users, interpersonal relationships, organisational structures, business processes, legal and
-regulatory standards, and cultural norms \citep{bade07structures,pentland05organisational}.  The influence of this
+regulatory standards, and cultural norms~\citep{bade07structures,pentland05organisational}.  The influence of this
 \emph{socio-technical} interplay on system behaviour (and often failure) has been described in multiple and diverse case
-studies of information systems, including automated emergency vehicle dispatch \citep{robinson96limited}, electronic
-voting \citep{lock07observations} and stock market trading systems \citep{cftc-sec10findings}. In each case, system
+studies of information systems, including automated emergency vehicle dispatch~\citep{robinson96limited}, electronic
+voting~\citep{lock07observations} and stock market trading systems~\citep{cftc-sec10findings}. In each case, system
 failure cannot be attributed to either purely user behaviour or the information system(s), but instead to an interplay
 between both factors within the overall socio-technical system.
 
@@ -103,22 +103,22 @@ version control server.  Conversely, an experienced developer may omit steps tha
 peer reviews of their code, to optimise their performance.
 
 Information system users may also adapt their behaviour due to contingencies that arise from faults in the information
-system or the behaviour of other users in the environment \citep{sommerville09deriving}.  Continuing the example
+system or the behaviour of other users in the environment~\citep{sommerville09deriving}.  Continuing the example
 scenario, a software development team may be tempted to begin reducing quality assurance efforts as a deadline for a
-release approaches, in an effort to ensure all required features are completed \citep{beck02test}. Behaviour is also
+release approaches, in an effort to ensure all required features are completed~\citep{beck02test}. Behaviour is also
 continually evolving, as the users of a system adapt to new circumstances, discover optimizations to their
-workflows, adapt the workflow to suit local organisational priorities or take shortcuts \citep{bonen79evolutionary}.  In
+workflows, adapt the workflow to suit local organisational priorities or take shortcuts~\citep{bonen79evolutionary}.  In
 the example scenario, it is reasonable to anticipate that a novice developer's behaviour will gradually evolve into that
 of an expert as they gain more experience.  As a consequence, the de facto behaviour exhibited within a system may
 differ from that envisaged by system architects in idealised workflows.
 
 Despite the potential impact on system performance, the complexity of user behaviour is cumbersome to model and
-therefore predict using conventional systems engineering notations for describing workflows, such as  BPMN
-\citep{omg2011omgbpmn}, activity diagrams \citep{omg07omguml} and YAWL \citep{hofstede2010yawl}.
+therefore predict using conventional systems engineering notations for describing workflows, such as BPMN
+\citep{omg2011omgbpmn}, activity diagrams~\citep{omg07omguml} and YAWL~\citep{hofstede2010yawl}.
 Attempting to model all the potential sequences of actions that result
 from realistic user behaviour using these approaches inevitably results in models that are either too abstract or narrow
 to be informative, or too complex to be tractable.  Approaches that abstract the complexity of user behaviour, such as
-i* \citep{yu1995social}, Kaos \citep{werneck2009goreistarkaos} and Responsibility Modelling
+i*~\citep{yu1995social}, Kaos~\citep{werneck2009goreistarkaos} and Responsibility Modelling
 \citep{sommerville09deriving} lack sufficient detail to generate executable simulations.
 
 The key insight of this paper is that the same behavioural irregularities can affect many different idealised
@@ -134,15 +134,15 @@ The two contributions of this paper are as follows:
 \item A method for simulating user interactions with information systems that allows for the separate modelling of
   idealised descriptions of workflows and the effects of irregularities on those
   workflows.  The approach is implemented in a framework comprising of aspect oriented
-  programming \cite{filman01aspect} and dynamic code fuzzing
-  \citep{takanen08fuzzing}.  This combination allows for irregularities to be introduced into workflow models
+  programming~\cite{filman01aspect} and dynamic code fuzzing
+ ~\citep{takanen08fuzzing}.  This combination allows for irregularities to be introduced into workflow models
   without sacrificing readability
   or simplicity.
 
 \item A demonstration of the efficacy of the approach in a case study comparison of Test Driven Development (TDD) and
   Waterfall software development workflows.  The case study demonstrates that models of idealised behaviour in software
   development do not conform with the empirical evidence which suggests that TDD outperforms Waterfall
-  \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}, but that
+ ~\citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}, but that
   models which incorporate realistic user behaviour when interacting with information systems do.
 
 \end{itemize}
@@ -164,7 +164,7 @@ presents our evaluation of the case study and Section \ref{sec:conclusions} disc
 This section presents a literature review of approaches to modelling the interaction between users and information
 systems.  Graphical notations have received considerable attention, perhaps due to their perceived efficacy in
 communicating specifications between users, customers and system architects.  Workflow description languages, such as as
-UML activity diagrams \citep{omg07omguml}, BPMN \citep{omg2011omgbpmn} and YAWL \citep{hofstede2010yawl} can be used to
+UML activity diagrams~\citep{omg07omguml}, BPMN~\citep{omg2011omgbpmn} and YAWL~\citep{hofstede2010yawl} can be used to
 denote workflows visually as directed graphs composed of activities, as well as
 forking and merging workflows.  Although activity diagrams are more widely
 adopted than BPMN, the latter provides a richer modelling notation, allowing for discrimination between tasks, activities and transactions; triggering and
@@ -181,8 +181,8 @@ inherently complex, making such refinement based techniques difficult to apply. 
 the `knowns'. 
 
 Several authors have therefore discussed alternative techniques for modelling socio-technical systems with
-support for complexity in behaviour.  Both i* \citep{yu1995social} and KaOS \citep{dardenne93goal} are goal oriented notations for modelling socio-technical
-systems \cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
+support for complexity in behaviour.  Both i*~\citep{yu1995social} and KaOS~\citep{dardenne93goal} are goal oriented notations for modelling socio-technical
+systems~\cite{werneck2009goreistarkaos}.  In contrast to workflows, goal oriented approaches primarily capture what
 system actors are seeking to achieve.  Goals can be de-composed into a sub-goal hierarchy using logical operators to
 express the form of decomposition. Goals can also be annotated with strategies and/or resource requirements to support
 automated analysis.  \citet{yu1995social} argued that socio-technical systems should be viewed as collections of
@@ -199,10 +199,10 @@ argued that stakeholders often struggle to express their behaviour within a soci
 Instead, they argue that the concept of responsibilities, the duties held by an actor in a system, are a more intuitive
 means of describing system behaviours that also capture a variety of contingencies.  Various notational features have
 been provided for extending responsibility modelling, including for linking between responsibilities and required
-resources and for associating indicative workflows \citep{dewsbury07responsibility}.  However, these are not accompanied
+resources and for associating indicative workflows~\citep{dewsbury07responsibility}.  However, these are not accompanied
 with a means of evaluating the effects.
 
-The contributions made by \citet{herrmann1999vagueness} and \citet{sommerville09deriving} demonstrate the recognition of
+The contributions made by~\citet{herrmann1999vagueness} and~\citet{sommerville09deriving} demonstrate the recognition of
 the need for methods which capture the complexity of user interactions with information systems.  However, to the best
 of our knowledge there has been no attempt to go further and develop methods which can simulate the effects of this
 behaviour on the overall system. The observation made in \Cref{sec:introduction} that the causes of irregularities in
@@ -211,9 +211,9 @@ of simulating realistic user behaviour. This approach combines dynamic software 
 workflow model, with aspect oriented programming (AOP), to decouple this behavioural variation from the idealised model.
 
 The representation of cross-cutting concerns, such as access control, logging and concurrency as program aspects has
-been extensively studied in the literature \citep{Ali2012Aspect}; and the use of code fuzzing techniques have been
+been extensively studied in the literature~\citep{Ali2012Aspect}; and the use of code fuzzing techniques have been
 employed extensively in quality assurance practices, to assess the impact of unexpected events on software systems,
-including fuzzing of software configurations at runtime \citep{config_fuzzing}, mutation testing of test suites
+including fuzzing of software configurations at runtime~\citep{config_fuzzing}, mutation testing of test suites
 \cite{demillo78hints} and fuzzing of inputs test data to search for software security vulnerabilities
 \citep{takanen08fuzzing}.  However, we have not discovered any similar work on the application of fuzzing techniques to
 dynamically inject variation into a simulation model at runtime in order to mimic complex user behaviour. Similarly, we
@@ -239,7 +239,7 @@ more resilient SDLC than Waterfall to realistic human behaviour
 study therefore provides an opportunity to test whether the modelling approach can be used to distinguish between the
 effects of idealised and realistic user behaviours in a socio-technical system.  The model is implemented in an agent
 oriented framework, Theatre\_Ag, written in Python.  Fragments of the case study are provided as examples, but the full
-source code is also available for inspection \cite{storer2016softdev-workflow-scm}.
+source code is also available for inspection~\cite{storer2016softdev-workflow-scm}.
 
 The first step in the modelling approach is to represent the state and functions of the information systems in the case
 study. The domain is modelled as a collection of Python classes, as shown in \Cref{fig:domain}, following an object oriented approach
@@ -348,9 +348,9 @@ adding chunks or tests and so on) also depend on the change management workflow 
 of changes within a team.
 
 Two further workflows, Waterfall and Test Driven Development (TDD) were implemented to investigate the performance of
-different team based software development lifecycles (SDLC).  The Waterfall SDLC \citep{benington83production} describes
+different team based software development lifecycles (SDLC).  The Waterfall SDLC~\citep{benington83production} describes
 a linear staged approach to system development, in which specification of all features is followed by system
-implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD \citep{beck02test} prescribes the
+implementation, testing, debugging, refactoring and final deployment.  Conversely, TDD~\citep{beck02test} prescribes the
 definition of tests for each feature, before proceeding to implementation and refactoring.  Advocates of TDD argue that
 such an approach results in software that is delivered quicker and of higher quality because tests are explicitly linked
 to the specification and features are not committed without a passing test suite.
@@ -382,7 +382,7 @@ their duration is logged in a tree-like structure by each agent, supporting late
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 In this section the approach to modelling irregularities in user behaviour is demonstrated.  To achieve this, an irregularity is modelled as a \emph{dynamic
-  fuzzing aspect} using the library developed for this purpose, PyDySoFu \cite{storer2016pydysofu-scm}.  PyDySoFu
+  fuzzing aspect} using the library developed for this purpose, PyDySoFu~\cite{storer2016pydysofu-scm}.  PyDySoFu
 interrupts the invocation of workflow task methods in the background during the execution of a simulation.  When a
 workflow task method that can be subject to irregularity is invoked, PyDySoFu pauses the simulation thread of execution
 and passes the method context and structure (represented as the abstract syntax trees of the statements in the method
@@ -483,7 +483,7 @@ TDD outperforms Waterfall in terms of features delivered and software quality
 \citep{Bhat2006TestDrivenDevelopment,George2004TestDrivenDevelopment,Huang2009EmpiricalTestFirstProgramming}. The
 evaluation will therefore adopt a hybrid strategy.
 
-Following \citet{naylor67verification}, the model of the problem domain will first be tested for \emph{plausibility}.  A
+Following~\citet{naylor67verification}, the model of the problem domain will first be tested for \emph{plausibility}.  A
 comparison of simulations of user behaviour with and without the application of dynamic aspect fuzzing will then be
 made.  The first comparison will test whether two SDLC workflow models perform equivalently when executed in ideal
 circumstances, i.e. that simulations of ideal behaviour do not conform with results presented in the literature. The
@@ -624,7 +624,7 @@ results in the literature without altering the original workflows.
 This proof of concept presents the opportunity for a substantial research agenda in the modelling and simulation of user
 interaction with information systems, in order to better predict emergent system properties. Further research is
 necessary to test the viability of the approach in more complex, large scale simulations, such as
-the election e-counting system described by \citet{lock07observations}, comprising whole information infrastructures and
+the election e-counting system described by~\citet{lock07observations}, comprising whole information infrastructures and
 many diverse users. This will provide opportunities to experiment with a variety of other causes of
 irregularity in user behaviour, such as subjective misjudgements, exhaustion, reordering of steps and shortcut taking.
 Interdisciplinary research is required to develop and validate the realism of the fuzzing aspects that implement these
@@ -638,8 +638,8 @@ progress the current craft of large scale information systems engineering.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 \section*{Acknowledgements}
-The authors would especially like to thank Gordon Baxter, Phil Trinder and
-Russell Lock for their help when revising this paper.
+The authors would especially like to thank Gordon Baxter, Phil Trinder and Russell Lock for their help when revising
+this paper, and OBASHI Technology for helping to fund the work.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
